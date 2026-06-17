@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Clube de Benefícios Auto Vale Prevenções - Marketplace">
+    <meta name="theme-color" content="#2F3EBF">
+    <title>Clube de Benefícios - Auto Vale Prevenções</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <img src="assets/Logomarca.png" alt="Auto Vale Prevenções" class="navbar-logo">
+                <span class="navbar-divider"></span>
+                <span class="navbar-title">Clube de Benefícios</span>
+            </div>
+            <nav class="navbar-menu">
+                <a href="#" class="nav-link active">Marketplace</a>
+                <a href="#" class="nav-link">Meus Pontos</a>
+                <a href="#" class="nav-link">Cupons</a>
+                <a href="#" class="nav-link">Histórico</a>
+            </nav>
+            <div class="navbar-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Alternar tema">
+                    <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <div class="user-menu">
+                    <div class="user-avatar">JC</div>
+                    <div class="user-info">
+                        <span class="user-name">João Carlos</span>
+                        <span class="user-points">1.250 pts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-text">
+                    <h1 class="hero-title">Encontre benefícios <span class="text-gradient">exclusivos</span></h1>
+                    <p class="hero-subtitle">Descubra parceiros com descontos incríveis na sua região</p>
+                </div>
+                <div class="search-bar">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" placeholder="Buscar parceiros, categorias ou benefícios...">
+                    <button class="search-btn">Buscar</button>
+                </div>
+                <!-- Stats -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">127</span>
+                        <span class="stat-label">Parceiros</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">18</span>
+                        <span class="stat-label">Categorias</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">2.4k</span>
+                        <span class="stat-label">Associados</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">R$85k</span>
+                        <span class="stat-label">Economia gerada</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Filter -->
+        <section class="categories-section">
+            <div class="categories-container">
+                <button class="category-chip active" data-category="all">Todos</button>
+                <button class="category-chip" data-category="postos">⛽ Postos</button>
+                <button class="category-chip" data-category="lava-jato">🚿 Lava-Jatos</button>
+                <button class="category-chip" data-category="mecanica">🔧 Mecânicas</button>
+                <button class="category-chip" data-category="estetica">✨ Estética</button>
+                <button class="category-chip" data-category="pneus">🛞 Pneus</button>
+                <button class="category-chip" data-category="eletrica">⚡ Auto Elétricas</button>
+                <button class="category-chip" data-category="borracharia">🔩 Borracharias</button>
+                <button class="category-chip" data-category="guincho">🚗 Guincho</button>
+                <button class="category-chip" data-category="alimentacao">🍔 Alimentação</button>
+                <button class="category-chip" data-category="saude">🏥 Saúde</button>
+                <button class="category-chip" data-category="educacao">📚 Educação</button>
+            </div>
+        </section>
+
+        <!-- Marketplace Grid -->
+        <section class="marketplace-section">
+            <div class="marketplace-container">
+                <div class="marketplace-header">
+                    <h2 class="section-title">Parceiros disponíveis</h2>
+                    <div class="sort-options">
+                        <select class="sort-select">
+                            <option>Mais próximos</option>
+                            <option>Maior desconto</option>
+                            <option>Mais pontos</option>
+                            <option>Melhor avaliação</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="partners-grid" id="partnersGrid">
+                    <!-- Cards serão inseridos via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
