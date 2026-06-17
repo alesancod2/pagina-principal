@@ -104,7 +104,7 @@ img{max-width:100%;display:block}
 .partners-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:20px}
 
 /* ===== Partner Card ===== */
-.partner-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:var(--transition);position:relative}
+.partner-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:var(--transition);position:relative;cursor:pointer}
 .partner-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:var(--primary)}
 .card-header{display:flex;justify-content:space-between;align-items:center;padding:20px 20px 0}
 .card-logo{width:48px;height:48px;border-radius:12px;background:rgba(47,62,191,.08);display:flex;align-items:center;justify-content:center;font-size:1.5rem}
@@ -156,6 +156,73 @@ html.dark-mode .nav-link:hover{color:var(--secondary);background:rgba(0,166,81,.
 html.dark-mode .nav-link.active{color:var(--secondary);background:rgba(0,166,81,.12)}
 html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
 
+/* ===== Partner Detail Modal ===== */
+.partner-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity 300ms ease}
+.partner-modal-overlay.active{opacity:1}
+.partner-modal{position:relative;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;background:var(--bg-card);border-radius:var(--radius);box-shadow:0 24px 80px rgba(0,0,0,.25);transform:translateY(20px) scale(0.96);transition:transform 300ms ease;scrollbar-width:thin}
+.partner-modal-overlay.active .partner-modal{transform:translateY(0) scale(1)}
+.partner-modal::-webkit-scrollbar{width:6px}
+.partner-modal::-webkit-scrollbar-track{background:transparent}
+.partner-modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.modal-close{position:absolute;top:16px;right:16px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--text-secondary);transition:var(--transition);line-height:1}
+.modal-close:hover{background:rgba(220,53,69,.1);color:#dc3545;transform:scale(1.1)}
+.modal-content{padding:0}
+
+/* Modal Header */
+.modal-header-section{display:flex;align-items:center;gap:20px;padding:32px 32px 24px;border-bottom:1px solid var(--border)}
+.modal-logo{width:72px;height:72px;border-radius:16px;background:rgba(47,62,191,.08);display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0}
+.modal-header-info{display:flex;flex-direction:column;gap:6px}
+.modal-partner-name{font-size:1.4rem;font-weight:800;color:var(--text-primary);line-height:1.2}
+.modal-category-badge{display:inline-block;padding:4px 12px;border-radius:20px;background:rgba(47,62,191,.08);color:var(--primary);font-size:0.75rem;font-weight:600;width:fit-content}
+.modal-rating{display:flex;align-items:center;gap:8px}
+.modal-stars{color:#F59E0B;font-size:1rem;letter-spacing:1px}
+.modal-rating-value{font-size:0.85rem;font-weight:700;color:var(--text-primary)}
+
+/* Modal Body */
+.modal-body-section{padding:24px 32px}
+.modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.modal-info-item{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:var(--radius-sm);background:var(--bg-input);border:1px solid var(--border)}
+.modal-info-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px}
+.modal-info-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.modal-info-label{font-size:0.7rem;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.modal-info-value{font-size:0.82rem;color:var(--text-primary);font-weight:500;word-break:break-word}
+.modal-description{margin-bottom:24px}
+.modal-section-title{font-size:0.95rem;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.modal-section-title::before{content:'';width:3px;height:16px;border-radius:2px;background:var(--gradient-brand)}
+.modal-description-text{font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
+
+/* Modal Benefits */
+.modal-benefits{margin-bottom:8px}
+.modal-benefits-list{display:flex;flex-direction:column;gap:12px}
+.modal-benefit-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-sm);background:var(--bg-input);border:1px solid var(--border);transition:var(--transition)}
+.modal-benefit-item:hover{border-color:var(--secondary);background:rgba(0,166,81,.04)}
+.benefit-icon-wrap{width:40px;height:40px;border-radius:10px;background:rgba(0,166,81,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.benefit-details{display:flex;flex-direction:column;gap:2px}
+.benefit-name{font-size:0.85rem;font-weight:600;color:var(--text-primary)}
+.benefit-value{font-size:0.78rem;color:var(--text-muted)}
+
+/* Modal Footer */
+.modal-footer-section{display:flex;gap:12px;padding:20px 32px 32px;border-top:1px solid var(--border)}
+.modal-btn-use{flex:1;padding:14px 24px;border-radius:var(--radius-sm);background:var(--gradient-brand);color:#fff;font-size:0.9rem;font-weight:700;transition:var(--transition);text-align:center}
+.modal-btn-use:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 8px 24px rgba(47,62,191,.3)}
+.modal-btn-whatsapp{padding:14px 20px;border-radius:var(--radius-sm);background:rgba(37,211,102,.1);color:#25D366;font-size:0.9rem;font-weight:600;border:1px solid rgba(37,211,102,.3);transition:var(--transition)}
+.modal-btn-whatsapp:hover{background:rgba(37,211,102,.2);transform:translateY(-2px)}
+
+/* Dark Mode Modal */
+html.dark-mode .partner-modal-overlay{background:rgba(0,0,0,.8)}
+html.dark-mode .partner-modal{background:var(--bg-card);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px)}
+html.dark-mode .modal-close{background:rgba(255,255,255,.08);color:var(--text-secondary)}
+html.dark-mode .modal-close:hover{background:rgba(220,53,69,.15);color:#ff6b7a}
+html.dark-mode .modal-header-section{border-bottom-color:rgba(255,255,255,.06)}
+html.dark-mode .modal-logo{background:rgba(0,166,81,.12)}
+html.dark-mode .modal-category-badge{background:rgba(0,166,81,.12);color:var(--secondary)}
+html.dark-mode .modal-info-item{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+html.dark-mode .modal-benefit-item{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06)}
+html.dark-mode .modal-benefit-item:hover{border-color:var(--secondary);background:rgba(0,166,81,.08)}
+html.dark-mode .benefit-icon-wrap{background:rgba(0,166,81,.15)}
+html.dark-mode .modal-footer-section{border-top-color:rgba(255,255,255,.06)}
+html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2)}
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
     .hero-title{font-size:1.75rem}
@@ -174,6 +241,13 @@ html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
     .hero-stats{gap:16px}
     .stat-value{font-size:1.2rem}
     .user-info{display:none}
+    .partner-modal-overlay{padding:0;align-items:flex-end}
+    .partner-modal{max-width:100%;max-height:95vh;border-radius:var(--radius) var(--radius) 0 0}
+    .modal-header-section{padding:24px 20px 20px}
+    .modal-body-section{padding:20px}
+    .modal-info-grid{grid-template-columns:1fr}
+    .modal-footer-section{padding:16px 20px 24px;flex-direction:column}
+    .modal-btn-whatsapp{text-align:center}
 }
 @media(max-width:480px){
     .search-bar{flex-direction:column;padding:12px}
@@ -290,6 +364,16 @@ html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
         </section>
     </main>
 
+    <!-- Modal Detalhe do Parceiro -->
+    <div class="partner-modal-overlay" id="partnerModal" style="display:none;">
+        <div class="partner-modal">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-content" id="modalContent">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
 /* ===== CLUBE DE BENEFÍCIOS AUTO VALE - Marketplace ===== */
 (function() {
@@ -297,19 +381,34 @@ html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
 
     // Dados mockados dos parceiros
     var partners = [
-        { id:1, name:"Auto Posto São Jorge", category:"postos", city:"Linhares - ES", distance:"1.2 km", discount:5, points:10, rating:4.8, logo:"⛽", description:"Combustível de qualidade" },
-        { id:2, name:"Lava Jato Premium", category:"lava-jato", city:"Linhares - ES", distance:"2.5 km", discount:15, points:20, rating:4.6, logo:"🚿", description:"Lavagem completa" },
-        { id:3, name:"Mecânica Central", category:"mecanica", city:"Linhares - ES", distance:"3.1 km", discount:10, points:30, rating:4.9, logo:"🔧", description:"Mecânica especializada" },
-        { id:4, name:"Estética Car Pro", category:"estetica", city:"Linhares - ES", distance:"1.8 km", discount:20, points:25, rating:4.7, logo:"✨", description:"Polimento e cristalização" },
-        { id:5, name:"Pneus & Cia", category:"pneus", city:"Linhares - ES", distance:"4.2 km", discount:12, points:40, rating:4.5, logo:"🛞", description:"Todas as marcas" },
-        { id:6, name:"Auto Elétrica Rápida", category:"eletrica", city:"Linhares - ES", distance:"2.0 km", discount:8, points:15, rating:4.4, logo:"⚡", description:"Diagnóstico computadorizado" },
-        { id:7, name:"Borracharia 24h", category:"borracharia", city:"Linhares - ES", distance:"0.8 km", discount:10, points:10, rating:4.3, logo:"🔩", description:"Atendimento 24 horas" },
-        { id:8, name:"Guincho Express", category:"guincho", city:"Linhares - ES", distance:"5.0 km", discount:15, points:50, rating:4.8, logo:"🚗", description:"Guincho e reboque" },
-        { id:9, name:"Restaurante Sabor Mineiro", category:"alimentacao", city:"Linhares - ES", distance:"1.5 km", discount:10, points:5, rating:4.6, logo:"🍔", description:"Almoço executivo" },
-        { id:10, name:"Farmácia Saúde+", category:"saude", city:"Linhares - ES", distance:"0.5 km", discount:8, points:5, rating:4.7, logo:"🏥", description:"Medicamentos e bem-estar" },
-        { id:11, name:"Auto Escola Dirigir Bem", category:"educacao", city:"Linhares - ES", distance:"3.5 km", discount:25, points:100, rating:4.9, logo:"📚", description:"Cursos de direção defensiva" },
-        { id:12, name:"Posto Shell Av. Brasil", category:"postos", city:"Linhares - ES", distance:"2.8 km", discount:3, points:8, rating:4.5, logo:"⛽", description:"Promoção combustível aditivado" }
+        { id:1, name:"Auto Posto São Jorge", category:"postos", city:"Linhares - ES", distance:"1.2 km", discount:5, points:10, rating:4.8, logo:"⛽", description:"Combustível de qualidade", fullDescription:"Posto de combustível com bandeira premium, oferecendo gasolina aditivada, etanol e diesel S-10. Programa de fidelidade exclusivo para associados Auto Vale com acúmulo de pontos em cada abastecimento.", phone:"(27) 3264-1234", whatsapp:"(27) 99812-3456", address:"Av. Augusto Pestana, 1250 - Centro, Linhares - ES" },
+        { id:2, name:"Lava Jato Premium", category:"lava-jato", city:"Linhares - ES", distance:"2.5 km", discount:15, points:20, rating:4.6, logo:"🚿", description:"Lavagem completa", fullDescription:"Lava jato especializado com lavagem interna e externa completa, higienização de estofados, polimento express e enceramento. Produtos biodegradáveis e reaproveitamento de água.", phone:"(27) 3264-5678", whatsapp:"(27) 99834-5678", address:"Rua Gov. Santos Neves, 450 - Movelar, Linhares - ES" },
+        { id:3, name:"Mecânica Central", category:"mecanica", city:"Linhares - ES", distance:"3.1 km", discount:10, points:30, rating:4.9, logo:"🔧", description:"Mecânica especializada", fullDescription:"Oficina mecânica com profissionais certificados, atendendo todas as marcas. Diagnóstico computadorizado, revisão completa, suspensão, freios e motor. Garantia de serviço de 90 dias.", phone:"(27) 3264-9012", whatsapp:"(27) 99856-7890", address:"Rua Rufino de Carvalho, 320 - Centro, Linhares - ES" },
+        { id:4, name:"Estética Car Pro", category:"estetica", city:"Linhares - ES", distance:"1.8 km", discount:20, points:25, rating:4.7, logo:"✨", description:"Polimento e cristalização", fullDescription:"Centro de estética automotiva premium. Serviços de polimento técnico, cristalização de pintura, vitrificação, PPF (película protetora), envelopamento e detalhamento interno completo.", phone:"(27) 3264-3456", whatsapp:"(27) 99878-1234", address:"Av. João Felipe Calmon, 890 - Shell, Linhares - ES" },
+        { id:5, name:"Pneus & Cia", category:"pneus", city:"Linhares - ES", distance:"4.2 km", discount:12, points:40, rating:4.5, logo:"🛞", description:"Todas as marcas", fullDescription:"Loja especializada em pneus das melhores marcas: Michelin, Pirelli, Continental, Goodyear e Bridgestone. Alinhamento 3D, balanceamento computadorizado e cambagem.", phone:"(27) 3264-7890", whatsapp:"(27) 99890-2345", address:"Rod. ES-010, Km 3 - Interlagos, Linhares - ES" },
+        { id:6, name:"Auto Elétrica Rápida", category:"eletrica", city:"Linhares - ES", distance:"2.0 km", discount:8, points:15, rating:4.4, logo:"⚡", description:"Diagnóstico computadorizado", fullDescription:"Auto elétrica com equipamentos de última geração para diagnóstico e reparo de sistemas elétricos e eletrônicos. Instalação de acessórios, alarmes, som automotivo e rastreadores.", phone:"(27) 3264-2345", whatsapp:"(27) 99812-6789", address:"Rua Augusto Luciano, 156 - Aviso, Linhares - ES" },
+        { id:7, name:"Borracharia 24h", category:"borracharia", city:"Linhares - ES", distance:"0.8 km", discount:10, points:10, rating:4.3, logo:"🔩", description:"Atendimento 24 horas", fullDescription:"Borracharia com atendimento 24 horas, 7 dias por semana. Socorro na estrada, troca de pneus, conserto de furos, calibragem e rodízio. Atendimento rápido e profissional.", phone:"(27) 3264-6789", whatsapp:"(27) 99834-0123", address:"Rua Principal, 45 - Centro, Linhares - ES" },
+        { id:8, name:"Guincho Express", category:"guincho", city:"Linhares - ES", distance:"5.0 km", discount:15, points:50, rating:4.8, logo:"🚗", description:"Guincho e reboque", fullDescription:"Serviço de guincho e reboque 24h com cobertura em toda região de Linhares e municípios vizinhos. Plataforma hidráulica para veículos leves e pesados. Tempo médio de chegada: 30 minutos.", phone:"(27) 3264-0123", whatsapp:"(27) 99856-4567", address:"Av. Industrial, 2200 - Distrito Industrial, Linhares - ES" },
+        { id:9, name:"Restaurante Sabor Mineiro", category:"alimentacao", city:"Linhares - ES", distance:"1.5 km", discount:10, points:5, rating:4.6, logo:"🍔", description:"Almoço executivo", fullDescription:"Restaurante com comida caseira mineira de qualidade. Self-service no almoço com mais de 40 pratos, incluindo opções vegetarianas. Marmitex para viagem e delivery na região central.", phone:"(27) 3264-4567", whatsapp:"(27) 99878-5678", address:"Rua Dr. Abelardo, 78 - Centro, Linhares - ES" },
+        { id:10, name:"Farmácia Saúde+", category:"saude", city:"Linhares - ES", distance:"0.5 km", discount:8, points:5, rating:4.7, logo:"🏥", description:"Medicamentos e bem-estar", fullDescription:"Farmácia completa com medicamentos, produtos de higiene, beleza e bem-estar. Atendimento farmacêutico personalizado, aferição de pressão, testes rápidos e aplicação de injetáveis.", phone:"(27) 3264-8901", whatsapp:"(27) 99890-6789", address:"Av. Beira Rio, 320 - Centro, Linhares - ES" },
+        { id:11, name:"Auto Escola Dirigir Bem", category:"educacao", city:"Linhares - ES", distance:"3.5 km", discount:25, points:100, rating:4.9, logo:"📚", description:"Cursos de direção defensiva", fullDescription:"Auto escola credenciada pelo DETRAN-ES. Cursos de primeira habilitação, reciclagem, direção defensiva e curso para condutores de veículos de emergência. Simulador de direção moderno.", phone:"(27) 3264-5432", whatsapp:"(27) 99812-8901", address:"Rua Castelo Branco, 560 - Colina, Linhares - ES" },
+        { id:12, name:"Posto Shell Av. Brasil", category:"postos", city:"Linhares - ES", distance:"2.8 km", discount:3, points:8, rating:4.5, logo:"⛽", description:"Promoção combustível aditivado", fullDescription:"Posto bandeira Shell com combustível V-Power de alta performance. Loja de conveniência Select 24h, calibragem gratuita e programa Shell Box com cashback para associados.", phone:"(27) 3264-6543", whatsapp:"(27) 99834-2345", address:"Av. Brasil, 1800 - Araçás, Linhares - ES" }
     ];
+
+    // Mapeamento de categorias para nomes legíveis
+    var categoryNames = {
+        'postos': 'Postos de Combustível',
+        'lava-jato': 'Lava-Jatos',
+        'mecanica': 'Mecânicas',
+        'estetica': 'Estética Automotiva',
+        'pneus': 'Pneus e Rodas',
+        'eletrica': 'Auto Elétricas',
+        'borracharia': 'Borracharias',
+        'guincho': 'Guincho e Reboque',
+        'alimentacao': 'Alimentação',
+        'saude': 'Saúde e Bem-estar',
+        'educacao': 'Educação'
+    };
 
     // Renderizar cards
     function renderPartners(filter) {
@@ -317,7 +416,7 @@ html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
         var filtered = filter === 'all' ? partners : partners.filter(function(p) { return p.category === filter; });
         
         grid.innerHTML = filtered.map(function(p) {
-            return '<div class="partner-card" data-category="' + p.category + '">' +
+            return '<div class="partner-card" data-category="' + p.category + '" data-id="' + p.id + '" onclick="showPartnerDetail(' + p.id + ')">' +
                 '<div class="card-header">' +
                     '<div class="card-logo">' + p.logo + '</div>' +
                     '<div class="card-badge">' + p.discount + '% OFF</div>' +
@@ -333,11 +432,141 @@ html.dark-mode .navbar-logo{filter:brightness(0) invert(1)}
                 '</div>' +
                 '<div class="card-footer">' +
                     '<div class="card-points">+' + p.points + ' pts</div>' +
-                    '<button class="btn-use">Utilizar</button>' +
+                    '<button class="btn-use" onclick="event.stopPropagation(); showPartnerDetail(' + p.id + ')">Utilizar</button>' +
                 '</div>' +
             '</div>';
         }).join('');
     }
+
+    // ===== MODAL DETALHE DO PARCEIRO =====
+    window.showPartnerDetail = function(partnerId) {
+        var partner = partners.find(function(p) { return p.id === partnerId; });
+        if (!partner) return;
+
+        var modal = document.getElementById('partnerModal');
+        var content = document.getElementById('modalContent');
+        var catName = categoryNames[partner.category] || partner.category;
+
+        // Gerar estrelas
+        var fullStars = Math.floor(partner.rating);
+        var hasHalf = (partner.rating - fullStars) >= 0.5;
+        var starsHtml = '';
+        for (var i = 0; i < fullStars; i++) starsHtml += '★';
+        if (hasHalf) starsHtml += '½';
+
+        content.innerHTML = 
+            '<div class="modal-header-section">' +
+                '<div class="modal-logo">' + partner.logo + '</div>' +
+                '<div class="modal-header-info">' +
+                    '<h2 class="modal-partner-name">' + partner.name + '</h2>' +
+                    '<span class="modal-category-badge">' + catName + '</span>' +
+                    '<div class="modal-rating">' +
+                        '<span class="modal-stars">' + starsHtml + '</span>' +
+                        '<span class="modal-rating-value">' + partner.rating + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="modal-body-section">' +
+                '<div class="modal-info-grid">' +
+                    '<div class="modal-info-item">' +
+                        '<span class="modal-info-icon">📍</span>' +
+                        '<div class="modal-info-text">' +
+                            '<span class="modal-info-label">Localização</span>' +
+                            '<span class="modal-info-value">' + partner.city + ' • ' + partner.distance + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<span class="modal-info-icon">📞</span>' +
+                        '<div class="modal-info-text">' +
+                            '<span class="modal-info-label">Telefone</span>' +
+                            '<span class="modal-info-value">' + partner.phone + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<span class="modal-info-icon">💬</span>' +
+                        '<div class="modal-info-text">' +
+                            '<span class="modal-info-label">WhatsApp</span>' +
+                            '<span class="modal-info-value">' + partner.whatsapp + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="modal-info-item">' +
+                        '<span class="modal-info-icon">🏠</span>' +
+                        '<div class="modal-info-text">' +
+                            '<span class="modal-info-label">Endereço</span>' +
+                            '<span class="modal-info-value">' + partner.address + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="modal-description">' +
+                    '<h3 class="modal-section-title">Sobre o parceiro</h3>' +
+                    '<p class="modal-description-text">' + partner.fullDescription + '</p>' +
+                '</div>' +
+                '<div class="modal-benefits">' +
+                    '<h3 class="modal-section-title">Benefícios disponíveis</h3>' +
+                    '<div class="modal-benefits-list">' +
+                        '<div class="modal-benefit-item">' +
+                            '<div class="benefit-icon-wrap">🎫</div>' +
+                            '<div class="benefit-details">' +
+                                '<span class="benefit-name">Desconto exclusivo</span>' +
+                                '<span class="benefit-value">' + partner.discount + '% de desconto para associados</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="modal-benefit-item">' +
+                            '<div class="benefit-icon-wrap">⭐</div>' +
+                            '<div class="benefit-details">' +
+                                '<span class="benefit-name">Acúmulo de pontos</span>' +
+                                '<span class="benefit-value">+' + partner.points + ' pontos por utilização</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="modal-benefit-item">' +
+                            '<div class="benefit-icon-wrap">🎁</div>' +
+                            '<div class="benefit-details">' +
+                                '<span class="benefit-name">Cashback Auto Vale</span>' +
+                                '<span class="benefit-value">2% de cashback em compras acima de R$50</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="modal-footer-section">' +
+                '<button class="modal-btn-use" onclick="alert(\'Benefício ativado! Apresente seu código ao parceiro.\')">Utilizar Benefício</button>' +
+                '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">💬 WhatsApp</button>' +
+            '</div>';
+
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        // Trigger animation
+        setTimeout(function() { modal.classList.add('active'); }, 10);
+    };
+
+    // Fechar modal
+    function closePartnerModal() {
+        var modal = document.getElementById('partnerModal');
+        modal.classList.remove('active');
+        setTimeout(function() {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    // Event listeners do modal
+    document.addEventListener('DOMContentLoaded', function() {
+        var modalClose = document.getElementById('modalClose');
+        var modalOverlay = document.getElementById('partnerModal');
+
+        if (modalClose) {
+            modalClose.addEventListener('click', closePartnerModal);
+        }
+        if (modalOverlay) {
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) closePartnerModal();
+            });
+        }
+        // Fechar com Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closePartnerModal();
+        });
+    });
 
     // Filtro de categorias
     var chips = document.querySelectorAll('.category-chip');
