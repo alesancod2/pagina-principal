@@ -58,4 +58,52 @@ export class UsersService {
       } : null,
     };
   }
+
+  /**
+   * Sincroniza dados do usuário local com a API AEasy
+   * Chamado a cada login via CPF
+   */
+  async syncWithAEasy(userId: string, aeasyData: any): Promise<void> {
+    // Atualizar dados do usuário
+    await this.userRepo.update(userId, {
+      name: aeasyData.nome,
+      phone: aeasyData.telefone || undefined,
+    });
+
+    // Atualizar ou criar associação
+    const association = await this.userRepo.manager.findOne(
+      require('./entities/association.entity').Association,
+      { where: { user: { id: userId } } },
+    );
+
+    const associationData = {
+      planName: aeasyData.plano || 'Proteção Veicular',
+      planType: aeasyData.plano || 'standard',
+      status: this.mapAEasyStatus(aeasyData.status),
+      isCompliant: aeasyData.adimplente !== false,
+      vehiclePlate: aeasyData.veiculo_placa || undefined,
+      vehicleModel: aeasyData.veiculo_modelo || undefined,
+    };
+
+    if (association) {
+      await this.userRepo.manager.update(
+        require('./entities/association.entity').Association,
+        association.id,
+        associationData,
+      );
+    } else {
+      await this.userRepo.manager.save(
+        require('./entities/association.entity').Association,
+        { user: { id: userId }, startDate: new Date(), ...associationData },
+      );
+    }
+  }
+
+  private mapAEasyStatus(status: string): string {
+    const s = (status || '').toUpperCase();
+    if (['ATIVO', 'ATIVA', 'ACTIVE', 'ADIMPLENTE'].includes(s)) return 'active';
+    if (['INADIMPLENTE', 'SUSPENSO'].includes(s)) return 'overdue';
+    if (['CANCELADO', 'ENCERRADO', 'EXCLUIDO'].includes(s)) return 'cancelled';
+    return 'inactive';
+  }
 }

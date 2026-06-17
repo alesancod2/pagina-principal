@@ -1,6 +1,10 @@
 import api from './api';
 
 export interface LoginPayload {
+  cpf: string;
+}
+
+export interface LoginEmailPayload {
   email: string;
   password: string;
 }
@@ -26,7 +30,19 @@ export interface AuthResponse {
 }
 
 export const authService = {
+  /**
+   * Login principal via CPF (integração AEasy)
+   */
   async login(payload: LoginPayload): Promise<AuthResponse> {
+    const { data } = await api.post('/auth/cpf-login', payload);
+    saveTokens(data);
+    return data;
+  },
+
+  /**
+   * Login via email (fallback para admin)
+   */
+  async loginEmail(payload: LoginEmailPayload): Promise<AuthResponse> {
     const { data } = await api.post('/auth/login', payload);
     saveTokens(data);
     return data;
