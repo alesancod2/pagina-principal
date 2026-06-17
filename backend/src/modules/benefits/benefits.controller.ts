@@ -12,6 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { BenefitsService } from './benefits.service';
+import { UseBenefitFlowService } from './use-benefit-flow.service';
 import { CreateBenefitDto, UpdateBenefitDto } from './dto/create-benefit.dto';
 import { UseBenefitDto } from './dto/use-benefit.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -22,7 +23,10 @@ import { AssociationGuard } from '../aeasy/aeasy.guard';
 
 @Controller('benefits')
 export class BenefitsController {
-  constructor(private readonly benefitsService: BenefitsService) {}
+  constructor(
+    private readonly benefitsService: BenefitsService,
+    private readonly useBenefitFlowService: UseBenefitFlowService,
+  ) {}
 
   /**
    * GET /benefits - Listar todos os beneficios ativos
@@ -106,6 +110,7 @@ export class BenefitsController {
 
   /**
    * POST /benefits/:id/use - Utilizar beneficio (requer associacao ativa)
+   * Fluxo completo: valida associacao + beneficio + gera cupom + pontos
    */
   @Post(':id/use')
   @UseGuards(JwtAuthGuard, AssociationGuard)
@@ -115,8 +120,12 @@ export class BenefitsController {
     @CurrentUser('id') userId: string,
     @Body() useBenefitDto: UseBenefitDto,
   ) {
-    // Garantir que o benefitId no body corresponde ao :id da URL
     useBenefitDto.benefitId = id;
-    return this.benefitsService.useBenefit(userId, useBenefitDto);
+    return this.useBenefitFlowService.execute(userId, {
+      benefitId: id,
+      partnerId: useBenefitDto.partnerId,
+      amount: useBenefitDto.amount,
+      notes: useBenefitDto.notes,
+    });
   }
 }
