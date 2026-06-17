@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # PostgreSQL com PostGIS
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: autovale-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: autovale_db
+      POSTGRES_USER: autovale_user
+      POSTGRES_PASSWORD: autovale_pass
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U autovale_user -d autovale_db']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: autovale-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
