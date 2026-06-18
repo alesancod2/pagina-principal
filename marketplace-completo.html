@@ -431,7 +431,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     '<div class="card-location">' + p.city + '</div>' +
                 '</div>' +
                 '<div class="card-footer">' +
-                    '<div class="card-points">Ganhe +' + p.points + ' pontos</div>' +
+                    '<div class="card-points">Ganhe +' + p.points + ' pontos ao utilizar</div>' +
                     '<button class="btn-use" onclick="event.stopPropagation(); showPartnerDetail(' + p.id + ')">Utilizar</button>' +
                 '</div>' +
             '</div>';
@@ -529,7 +529,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                 '</div>' +
             '</div>' +
             '<div class="modal-footer-section">' +
-                '<button class="modal-btn-use" onclick="alert(\'Benefício utilizado com sucesso! Você ganhou +' + partner.points + ' pontos. Apresente seu código ao parceiro.\')">Utilizar Benefício</button>' +
+                '<button class="modal-btn-use" onclick="solicitarUtilizacao(' + partner.id + ', \'' + partner.name.replace(/'/g, "\\'") + '\', ' + partner.points + ')">Utilizar Benefício</button>' +
                 '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">💬 WhatsApp</button>' +
             '</div>';
 
@@ -537,6 +537,31 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         document.body.style.overflow = 'hidden';
         // Trigger animation
         setTimeout(function() { modal.classList.add('active'); }, 10);
+    };
+
+    // ===== SOLICITAÇÃO DE UTILIZAÇÃO (NOVO FLUXO) =====
+    window.solicitarUtilizacao = function(partnerId, partnerName, points) {
+        var usageCode = 'AUTOVALE-' + Math.floor(1000 + Math.random() * 9000);
+        
+        var content = document.getElementById('modalContent');
+        var footerSection = content.querySelector('.modal-footer-section');
+        
+        if (footerSection) {
+            footerSection.innerHTML = 
+                '<div class="usage-request-success" style="text-align:center;padding:20px;background:rgba(0,166,81,0.1);border:1px solid rgba(0,166,81,0.3);border-radius:12px;margin-bottom:16px;">' +
+                    '<div style="font-size:32px;margin-bottom:12px;">✅</div>' +
+                    '<h3 style="color:#00A651;margin-bottom:8px;font-size:16px;">Solicitação Registrada!</h3>' +
+                    '<div style="background:rgba(47,62,191,0.1);border:2px dashed rgba(47,62,191,0.4);border-radius:8px;padding:12px;margin:12px 0;">' +
+                        '<span style="font-size:12px;color:#8A93A5;display:block;margin-bottom:4px;">Seu código de utilização:</span>' +
+                        '<strong style="font-size:22px;color:#2F3EBF;letter-spacing:2px;">' + usageCode + '</strong>' +
+                    '</div>' +
+                    '<p style="font-size:13px;color:#5A6475;line-height:1.5;margin-top:12px;">' +
+                        'Apresente este código ao parceiro <strong>' + partnerName + '</strong> para confirmação.<br>' +
+                        '<strong>+' + points + ' pontos</strong> serão creditados após a confirmação do parceiro.' +
+                    '</p>' +
+                '</div>' +
+                '<button class="modal-btn-use" style="background:#6b7280;cursor:default;" disabled>Aguardando confirmação do parceiro</button>';
+        }
     };
 
     // Fechar modal

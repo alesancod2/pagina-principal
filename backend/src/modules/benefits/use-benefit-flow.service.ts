@@ -2,11 +2,13 @@ import {
   Injectable,
   BadRequestException,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Benefit, BenefitType } from './entities/benefit.entity';
 import { BenefitUsage } from './entities/benefit-usage.entity';
+import { UsageRequest, UsageStatus } from './entities/usage-request.entity';
 import { Association } from '../users/entities/association.entity';
 import { CouponsService } from '../coupons/coupons.service';
 import { PointsService } from '../points/points.service';
@@ -19,30 +21,38 @@ export interface UseBenefitFlowDto {
 }
 
 export interface UseBenefitFlowResult {
-  usage: BenefitUsage;
-  couponCode: string;
-  couponExpiresAt: Date;
-  pointsEarned: number;
-  discountApplied: number;
-  discountType: string;
+  usageRequest: UsageRequest;
+  usageCode: string;
+  pointsToCredit: number;
   benefitTitle: string;
   partnerName?: string;
+  message: string;
+}
+
+export interface ConfirmUsageResult {
+  usageRequest: UsageRequest;
+  pointsCredited: number;
+  message: string;
+}
+
+export interface UsageFilters {
+  status?: UsageStatus;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 /**
- * Servico orquestrador que executa o fluxo completo de uso de beneficio:
- * 1. Valida associacao (ativa + adimplente)
- * 2. Valida beneficio (ativo, datas, max_uses)
- * 3. Verifica regras de dia da semana
- * 4. Gera cupom via CouponsService
- * 5. Registra uso em benefit_usages
- * 6. CREDITA pontos via PointsService (pontos sao GANHOS, nunca exigidos)
- * 7. Retorna resposta completa
+ * Servico orquestrador que executa o fluxo de uso de beneficio SEM voucher unico:
  *
- * IMPORTANTE: Este fluxo NAO verifica saldo de pontos do usuario.
- * A utilizacao de beneficio e LIVRE para qualquer associado ativo e adimplente.
- * Pontos sao apenas ACUMULADOS (creditados) ao associado apos o uso.
- * O campo pointsRequired pertence ao fluxo SEPARADO de resgate (POST /points/redeem).
+ * NOVO FLUXO:
+ * 1. Associado clica "Utilizar" -> gera codigo simples (AUTOVALE-XXXX)
+ * 2. Status: PENDENTE - pontos NAO sao creditados ainda
+ * 3. Parceiro localiza e CONFIRMA a utilizacao no painel
+ * 4. SOMENTE apos confirmacao: pontos creditados ao associado
+ * 5. Historico registrado com codigo, status, data
+ *
+ * IMPORTANTE: Pontos NAO sao creditados imediatamente.
+ * Somente apos confirmacao do parceiro.
  */
 @Injectable()
 export class UseBenefitFlowService {
@@ -51,6 +61,8 @@ export class UseBenefitFlowService {
     private readonly benefitRepository: Repository<Benefit>,
     @InjectRepository(BenefitUsage)
     private readonly usageRepository: Repository<BenefitUsage>,
+    @InjectRepository(UsageRequest)
+    private readonly usageRequestRepository: Repository<UsageRequest>,
     @InjectRepository(Association)
     private readonly associationRepository: Repository<Association>,
     private readonly couponsService: CouponsService,
@@ -58,13 +70,18 @@ export class UseBenefitFlowService {
   ) {}
 
   /**
-   * Executa o fluxo completo de uso de beneficio
-   * NAO exige pontos - apenas CREDITA pontos ao associado
+   * Gera um codigo simples de utilizacao no formato AUTOVALE-XXXX
+   */
+  private generateUsageCode(): string {
+    const number = Math.floor(1000 + Math.random() * 9000);
+    return `AUTOVALE-${number}`;
+  }
+
+  /**
+   * Executa o fluxo de solicitacao de uso de beneficio
+   * NAO credita pontos - apenas cria a solicitacao com status PENDENTE
    */
   async execute(userId: string, dto: UseBenefitFlowDto): Promise<UseBenefitFlowResult> {
-    // IMPORTANTE: NAO verificar saldo de pontos do usuario.
-    // Utilizacao de beneficio e LIVRE - pontos sao apenas GANHOS.
-
     // 1. Validar associacao do usuario (ativa + adimplente)
     await this.validateAssociation(userId);
 
@@ -77,59 +94,157 @@ export class UseBenefitFlowService {
     // 4. Verificar limite de uso por usuario
     await this.validateUserUsageLimit(userId, benefit);
 
-    // 5. Gerar cupom via CouponsService
-    const coupon = await this.couponsService.generateCoupon(
-      userId,
-      benefit.id,
-      dto.partnerId,
-    );
+    // 5. Gerar codigo simples de utilizacao
+    const usageCode = this.generateUsageCode();
 
-    // 6. Calcular desconto
-    const discountApplied = this.calculateDiscount(benefit, dto.amount);
-    const discountType = this.getDiscountTypeLabel(benefit.benefitType);
+    // 6. Calcular pontos que serao creditados APOS confirmacao
+    const pointsToCredit = benefit.pointsGenerated || 0;
 
-    // 7. Calcular pontos gerados
-    const pointsEarned = benefit.pointsGenerated || 0;
-
-    // 8. Registrar uso em benefit_usages
-    const usage = this.usageRepository.create({
+    // 7. Criar solicitacao de uso com status PENDENTE
+    const usageRequest = this.usageRequestRepository.create({
       userId,
       partnerId: dto.partnerId,
       benefitId: benefit.id,
-      couponId: coupon.id,
-      amount: dto.amount || null,
-      discountApplied,
-      pointsEarned,
-      notes: dto.notes || null,
-      usedAt: new Date(),
+      usageCode,
+      status: UsageStatus.PENDING,
+      pointsToCredit,
     });
 
-    const savedUsage = await this.usageRepository.save(usage);
+    const savedRequest = await this.usageRequestRepository.save(usageRequest);
 
-    // 9. Incrementar current_uses no beneficio
+    // 8. Incrementar current_uses no beneficio
     await this.benefitRepository.increment({ id: benefit.id }, 'currentUses', 1);
 
-    // 10. Gerar pontos via PointsService - CREDITAR ao associado (se aplicavel)
-    // Pontos sao ACUMULADOS a cada uso de beneficio (nunca debitados neste fluxo)
-    if (pointsEarned > 0) {
-      await this.pointsService.addPoints(
-        userId,
-        pointsEarned,
-        dto.partnerId,
-        `Pontos ganhos: ${benefit.title}`,
+    // IMPORTANTE: Pontos NAO sao creditados aqui!
+    // Somente apos confirmacao do parceiro via confirmUsage()
+
+    return {
+      usageRequest: savedRequest,
+      usageCode,
+      pointsToCredit,
+      benefitTitle: benefit.title,
+      partnerName: benefit.partner?.companyName || undefined,
+      message: `Solicitacao registrada! Codigo: ${usageCode}. Apresente ao parceiro para confirmacao. Pontos serao creditados apos confirmacao.`,
+    };
+  }
+
+  /**
+   * Parceiro CONFIRMA a utilizacao - somente agora os pontos sao creditados
+   */
+  async confirmUsage(requestId: string, confirmedBy: string): Promise<ConfirmUsageResult> {
+    const usageRequest = await this.usageRequestRepository.findOne({
+      where: { id: requestId },
+      relations: ['benefit', 'user'],
+    });
+
+    if (!usageRequest) {
+      throw new NotFoundException('Solicitacao de utilizacao nao encontrada.');
+    }
+
+    if (usageRequest.status !== UsageStatus.PENDING) {
+      throw new BadRequestException(
+        `Solicitacao ja foi ${usageRequest.status}. Nao e possivel confirmar.`,
       );
     }
 
+    // Atualizar status para CONFIRMADO
+    usageRequest.status = UsageStatus.CONFIRMED;
+    usageRequest.confirmedAt = new Date();
+    usageRequest.confirmedBy = confirmedBy;
+
+    await this.usageRequestRepository.save(usageRequest);
+
+    // AGORA sim creditar pontos ao associado
+    let pointsCredited = 0;
+    if (usageRequest.pointsToCredit > 0) {
+      await this.pointsService.addPoints(
+        usageRequest.userId,
+        usageRequest.pointsToCredit,
+        usageRequest.partnerId,
+        `Pontos ganhos (confirmado): ${usageRequest.benefit?.title || 'Beneficio'} - Codigo: ${usageRequest.usageCode}`,
+      );
+      pointsCredited = usageRequest.pointsToCredit;
+    }
+
     return {
-      usage: savedUsage,
-      couponCode: coupon.code,
-      couponExpiresAt: coupon.expiresAt,
-      pointsEarned,
-      discountApplied,
-      discountType,
-      benefitTitle: benefit.title,
-      partnerName: benefit.partner?.companyName || undefined,
+      usageRequest,
+      pointsCredited,
+      message: `Utilizacao confirmada com sucesso! ${pointsCredited} pontos creditados ao associado.`,
     };
+  }
+
+  /**
+   * Cancelar uma solicitacao de utilizacao
+   */
+  async cancelUsage(requestId: string): Promise<UsageRequest> {
+    const usageRequest = await this.usageRequestRepository.findOne({
+      where: { id: requestId },
+    });
+
+    if (!usageRequest) {
+      throw new NotFoundException('Solicitacao de utilizacao nao encontrada.');
+    }
+
+    if (usageRequest.status !== UsageStatus.PENDING) {
+      throw new BadRequestException(
+        `Solicitacao ja foi ${usageRequest.status}. Nao e possivel cancelar.`,
+      );
+    }
+
+    usageRequest.status = UsageStatus.CANCELLED;
+    await this.usageRequestRepository.save(usageRequest);
+
+    // Decrementar current_uses pois o uso foi cancelado
+    await this.benefitRepository.decrement({ id: usageRequest.benefitId }, 'currentUses', 1);
+
+    return usageRequest;
+  }
+
+  /**
+   * Listar utilizacoes de um parceiro (para painel do parceiro)
+   */
+  async getPartnerUsages(partnerId: string, filters?: UsageFilters): Promise<UsageRequest[]> {
+    const query = this.usageRequestRepository
+      .createQueryBuilder('ur')
+      .leftJoinAndSelect('ur.user', 'user')
+      .leftJoinAndSelect('ur.benefit', 'benefit')
+      .where('ur.partnerId = :partnerId', { partnerId })
+      .orderBy('ur.createdAt', 'DESC');
+
+    if (filters?.status) {
+      query.andWhere('ur.status = :status', { status: filters.status });
+    }
+
+    if (filters?.startDate) {
+      query.andWhere('ur.createdAt >= :startDate', { startDate: filters.startDate });
+    }
+
+    if (filters?.endDate) {
+      query.andWhere('ur.createdAt <= :endDate', { endDate: filters.endDate });
+    }
+
+    return query.getMany();
+  }
+
+  /**
+   * Listar utilizacoes de um usuario (historico do associado)
+   */
+  async getUserUsages(userId: string): Promise<UsageRequest[]> {
+    return this.usageRequestRepository.find({
+      where: { userId },
+      relations: ['partner', 'benefit'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  /**
+   * Buscar uma utilizacao pelo codigo
+   */
+  async findByCode(usageCode: string): Promise<UsageRequest | null> {
+    return this.usageRequestRepository.findOne({
+      where: { usageCode },
+      relations: ['user', 'partner', 'benefit'],
+    });
   }
 
   /**
@@ -216,52 +331,14 @@ export class UseBenefitFlowService {
    */
   private async validateUserUsageLimit(userId: string, benefit: Benefit): Promise<void> {
     if (benefit.maxUsesPerUser) {
-      const userUsageCount = await this.usageRepository.count({
-        where: { userId, benefitId: benefit.id },
+      const userUsageCount = await this.usageRequestRepository.count({
+        where: { userId, benefitId: benefit.id, status: UsageStatus.CONFIRMED },
       });
       if (userUsageCount >= benefit.maxUsesPerUser) {
         throw new BadRequestException(
           'Voce ja atingiu o limite de utilizacoes deste beneficio.',
         );
       }
-    }
-  }
-
-  /**
-   * Calcular desconto com base no tipo de beneficio
-   */
-  private calculateDiscount(benefit: Benefit, amount?: number): number {
-    if (!amount) return 0;
-
-    switch (benefit.benefitType) {
-      case BenefitType.DISCOUNT_PERCENT:
-        return (amount * (benefit.discountPercent || 0)) / 100;
-      case BenefitType.DISCOUNT_FIXED:
-        return benefit.discountFixed || 0;
-      case BenefitType.CASHBACK:
-        return (amount * (benefit.cashbackPercent || 0)) / 100;
-      default:
-        return 0;
-    }
-  }
-
-  /**
-   * Obter label do tipo de desconto
-   */
-  private getDiscountTypeLabel(type: BenefitType): string {
-    switch (type) {
-      case BenefitType.DISCOUNT_PERCENT:
-        return 'Desconto percentual';
-      case BenefitType.DISCOUNT_FIXED:
-        return 'Desconto fixo';
-      case BenefitType.CASHBACK:
-        return 'Cashback';
-      case BenefitType.POINTS:
-        return 'Pontos';
-      case BenefitType.FREEBIE:
-        return 'Brinde';
-      default:
-        return 'Desconto';
     }
   }
 }
