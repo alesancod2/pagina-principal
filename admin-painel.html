@@ -82,9 +82,14 @@
             color: var(--text-primary);
         }
         .menu-item.active {
-            background: linear-gradient(135deg, rgba(0,166,81,0.3), rgba(47,62,191,0.3));
-            color: var(--text-primary);
-            border: 1px solid rgba(0,166,81,0.3);
+            background: linear-gradient(135deg, #2F3EBF 0%, #00A651 100%);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(47,62,191,0.3);
+        }
+        .menu-item.active .icon svg {
+            stroke: #FFFFFF;
         }
         .menu-item .icon {
             display: inline-flex;
