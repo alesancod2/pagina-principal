@@ -1292,6 +1292,71 @@
             </div>
         </div>
 
+            <!-- VOUCHERS POR PARCEIRO -->
+            <div class="table-container" style="margin-top:32px">
+                <div class="table-header">
+                    <h3 style="font-size:16px">🎫 Vouchers por Parceiro</h3>
+                    <div style="display:flex;gap:8px">
+                        <input type="text" class="table-search" placeholder="Buscar voucher..." onkeyup="searchTable(this, 'vouchers-table')">
+                        <button class="btn btn-primary">+ Novo Voucher</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                <table id="vouchers-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Parceiro</th>
+                            <th>Título</th>
+                            <th>Limite</th>
+                            <th>Período</th>
+                            <th>Utilizações</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">DESCONTO10</code></td>
+                            <td>Lava Jato Premium</td>
+                            <td>Desconto 10% Lavagem</td>
+                            <td>3 usos</td>
+                            <td><span class="badge badge-blue">Mensal</span></td>
+                            <td>45 usos totais</td>
+                            <td><span class="badge badge-green">Ativo</span></td>
+                        </tr>
+                        <tr>
+                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">OLEO20</code></td>
+                            <td>Mecânica Central</td>
+                            <td>Desconto Troca de Óleo</td>
+                            <td>2 usos</td>
+                            <td><span class="badge badge-blue">Mensal</span></td>
+                            <td>28 usos totais</td>
+                            <td><span class="badge badge-green">Ativo</span></td>
+                        </tr>
+                        <tr>
+                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">COMBUSTIVEL5</code></td>
+                            <td>Auto Posto São Jorge</td>
+                            <td>Desconto Combustível</td>
+                            <td>10 usos</td>
+                            <td><span class="badge badge-blue">Mensal</span></td>
+                            <td>132 usos totais</td>
+                            <td><span class="badge badge-green">Ativo</span></td>
+                        </tr>
+                        <tr>
+                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">ALINHAMENTO</code></td>
+                            <td>Pneu Forte</td>
+                            <td>Alinhamento + Balanceamento</td>
+                            <td>1 uso</td>
+                            <td><span class="badge badge-purple">Trimestral</span></td>
+                            <td>15 usos totais</td>
+                            <td><span class="badge badge-red">Inativo</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 7. PONTUAÇÃO -->
         <div class="section" id="sec-pontuacao">
             <h1 class="section-title">Pontuação</h1>
