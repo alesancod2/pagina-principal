@@ -1754,29 +1754,44 @@
     </main>
 
     <script>
-        // Menu Navigation
-        const menuItems = document.querySelectorAll('.menu-item');
-        const sections = document.querySelectorAll('.section');
-
-        menuItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const target = item.dataset.section;
-                
-                // Update menu active state
-                menuItems.forEach(m => m.classList.remove('active'));
-                item.classList.add('active');
-                
-                // Show target section
-                sections.forEach(s => s.classList.remove('active'));
-                document.getElementById('sec-' + target).classList.add('active');
-
-                // Close sidebar on mobile
-                if (window.innerWidth <= 768) {
-                    document.getElementById('sidebar').classList.remove('open');
-                    document.getElementById('sidebarOverlay').classList.remove('active');
+        // Menu Navigation - ROBUSTO
+        function navigateTo(sectionName) {
+            // Esconder todas as seções
+            var allSections = document.querySelectorAll('.section');
+            for (var i = 0; i < allSections.length; i++) {
+                allSections[i].style.display = 'none';
+                allSections[i].classList.remove('active');
+            }
+            // Mostrar seção alvo
+            var target = document.getElementById('sec-' + sectionName);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+            // Atualizar menu ativo
+            var allMenuItems = document.querySelectorAll('.menu-item');
+            for (var j = 0; j < allMenuItems.length; j++) {
+                allMenuItems[j].classList.remove('active');
+                if (allMenuItems[j].getAttribute('data-section') === sectionName) {
+                    allMenuItems[j].classList.add('active');
                 }
-            });
-        });
+            }
+            // Fechar sidebar no mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+            }
+        }
+
+        // Adicionar click handlers
+        var menuItems = document.querySelectorAll('.menu-item');
+        for (var k = 0; k < menuItems.length; k++) {
+            (function(item) {
+                item.onclick = function() {
+                    navigateTo(item.getAttribute('data-section'));
+                };
+            })(menuItems[k]);
+        }
 
         // Hamburger menu
         document.getElementById('hamburger').addEventListener('click', () => {
