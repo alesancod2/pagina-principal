@@ -102,11 +102,20 @@ export class BenefitsService {
 
   /**
    * Utilizar um beneficio (associado)
-   * Valida: ativo, dentro das datas, max usos, dia da semana
-   * Gera pontos e registra uso
+   *
+   * REGRA DE NEGOCIO: A utilizacao de beneficio NAO exige pontos.
+   * Pontos sao apenas CREDITADOS (acumulados) ao associado apos o uso.
+   * O campo pointsRequired NAO e verificado aqui - pertence ao fluxo
+   * separado de RESGATE de pontos (POST /points/redeem).
+   *
+   * Validacoes: ativo, dentro das datas, max usos, dia da semana
+   * Resultado: registra uso + CREDITA pontos (pointsGenerated)
    */
   async useBenefit(userId: string, dto: UseBenefitDto): Promise<BenefitUsage> {
     const benefit = await this.findById(dto.benefitId);
+
+    // IMPORTANTE: NAO verificar saldo de pontos do usuario.
+    // A utilizacao de beneficio e LIVRE - pontos sao apenas GANHOS, nunca exigidos.
 
     // 1. Validar se o beneficio esta ativo
     if (!benefit.isActive) {
@@ -182,7 +191,8 @@ export class BenefitsService {
     // 9. Incrementar current_uses no beneficio
     await this.benefitRepository.increment({ id: benefit.id }, 'currentUses', 1);
 
-    // 10. Registrar transacao de pontos (se gerar pontos)
+    // 10. Registrar transacao de pontos - CREDITAR pontos ao associado (se gerar pontos)
+    // Pontos sao ACUMULADOS a cada uso de beneficio (nunca debitados neste fluxo)
     if (pointsEarned > 0) {
       await this.registerPointTransaction(userId, dto.partnerId, pointsEarned, benefit.title);
     }

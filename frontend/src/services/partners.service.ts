@@ -38,7 +38,13 @@ export interface Benefit {
   discountPercent?: number;
   discountFixed?: number;
   cashbackPercent?: number;
+  /** Pontos CREDITADOS ao associado ao utilizar este beneficio */
   pointsGenerated: number;
+  /**
+   * Pontos necessarios para RESGATE (fluxo separado via POST /points/redeem).
+   * NAO bloqueia a utilizacao do beneficio - utilizacao e sempre LIVRE.
+   * Este campo e usado apenas no fluxo de resgate de recompensas especiais.
+   */
   pointsRequired: number;
   startDate?: string;
   endDate?: string;

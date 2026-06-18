@@ -54,7 +54,7 @@
                     '<div class="card-location">' + p.city + '</div>' +
                 '</div>' +
                 '<div class="card-footer">' +
-                    '<div class="card-points">+' + p.points + ' pts</div>' +
+                    '<div class="card-points">Ganhe +' + p.points + ' pontos</div>' +
                     '<button class="btn-use" onclick="event.stopPropagation(); showPartnerDetail(' + p.id + ')">Utilizar</button>' +
                 '</div>' +
             '</div>';
@@ -138,7 +138,7 @@
                             '<div class="benefit-icon-wrap">⭐</div>' +
                             '<div class="benefit-details">' +
                                 '<span class="benefit-name">Acúmulo de pontos</span>' +
-                                '<span class="benefit-value">+' + partner.points + ' pontos por utilização</span>' +
+                                '<span class="benefit-value">Ganhe +' + partner.points + ' pontos por utilização</span>' +
                             '</div>' +
                         '</div>' +
                         '<div class="modal-benefit-item">' +
@@ -152,7 +152,7 @@
                 '</div>' +
             '</div>' +
             '<div class="modal-footer-section">' +
-                '<button class="modal-btn-use" onclick="alert(\'Benefício ativado! Apresente seu código ao parceiro.\')">Utilizar Benefício</button>' +
+                '<button class="modal-btn-use" onclick="alert(\'Benefício utilizado com sucesso! Você ganhou +' + partner.points + ' pontos. Apresente seu código ao parceiro.\')">Utilizar Benefício</button>' +
                 '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">💬 WhatsApp</button>' +
             '</div>';
 

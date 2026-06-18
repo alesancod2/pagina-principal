@@ -36,8 +36,13 @@ export interface UseBenefitFlowResult {
  * 3. Verifica regras de dia da semana
  * 4. Gera cupom via CouponsService
  * 5. Registra uso em benefit_usages
- * 6. Gera pontos via PointsService
+ * 6. CREDITA pontos via PointsService (pontos sao GANHOS, nunca exigidos)
  * 7. Retorna resposta completa
+ *
+ * IMPORTANTE: Este fluxo NAO verifica saldo de pontos do usuario.
+ * A utilizacao de beneficio e LIVRE para qualquer associado ativo e adimplente.
+ * Pontos sao apenas ACUMULADOS (creditados) ao associado apos o uso.
+ * O campo pointsRequired pertence ao fluxo SEPARADO de resgate (POST /points/redeem).
  */
 @Injectable()
 export class UseBenefitFlowService {
@@ -54,8 +59,12 @@ export class UseBenefitFlowService {
 
   /**
    * Executa o fluxo completo de uso de beneficio
+   * NAO exige pontos - apenas CREDITA pontos ao associado
    */
   async execute(userId: string, dto: UseBenefitFlowDto): Promise<UseBenefitFlowResult> {
+    // IMPORTANTE: NAO verificar saldo de pontos do usuario.
+    // Utilizacao de beneficio e LIVRE - pontos sao apenas GANHOS.
+
     // 1. Validar associacao do usuario (ativa + adimplente)
     await this.validateAssociation(userId);
 
@@ -100,7 +109,8 @@ export class UseBenefitFlowService {
     // 9. Incrementar current_uses no beneficio
     await this.benefitRepository.increment({ id: benefit.id }, 'currentUses', 1);
 
-    // 10. Gerar pontos via PointsService (se aplicavel)
+    // 10. Gerar pontos via PointsService - CREDITAR ao associado (se aplicavel)
+    // Pontos sao ACUMULADOS a cada uso de beneficio (nunca debitados neste fluxo)
     if (pointsEarned > 0) {
       await this.pointsService.addPoints(
         userId,
