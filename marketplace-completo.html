@@ -223,6 +223,12 @@ html.dark-mode .benefit-icon-wrap{background:rgba(0,166,81,.15)}
 html.dark-mode .modal-footer-section{border-top-color:rgba(255,255,255,.06)}
 html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2)}
 
+/* ===== SVG Icon Sizing (Lucide standard) ===== */
+.card-logo svg { width: 24px; height: 24px; }
+.modal-logo svg { width: 40px; height: 40px; }
+.modal-info-icon svg { width: 18px; height: 18px; }
+.benefit-icon-wrap svg { width: 20px; height: 20px; }
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
     .hero-title{font-size:1.75rem}
@@ -329,17 +335,17 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         <section class="categories-section">
             <div class="categories-container">
                 <button class="category-chip active" data-category="all">Todos</button>
-                <button class="category-chip" data-category="postos">⛽ Postos</button>
-                <button class="category-chip" data-category="lava-jato">🚿 Lava-Jatos</button>
-                <button class="category-chip" data-category="mecanica">🔧 Mecânicas</button>
-                <button class="category-chip" data-category="estetica">✨ Estética</button>
-                <button class="category-chip" data-category="pneus">🛞 Pneus</button>
-                <button class="category-chip" data-category="eletrica">⚡ Auto Elétricas</button>
-                <button class="category-chip" data-category="borracharia">🔩 Borracharias</button>
-                <button class="category-chip" data-category="guincho">🚗 Guincho</button>
-                <button class="category-chip" data-category="alimentacao">🍔 Alimentação</button>
-                <button class="category-chip" data-category="saude">🏥 Saúde</button>
-                <button class="category-chip" data-category="educacao">📚 Educação</button>
+                <button class="category-chip" data-category="postos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v17"/><path d="M13 10h4a2 2 0 0 1 2 2v10"/><path d="M21 7l-2-2"/><circle cx="20" cy="5" r="1"/><path d="M7 12h4"/><path d="M7 8h4"/></svg> Postos</button>
+                <button class="category-chip" data-category="lava-jato"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Lava-Jatos</button>
+                <button class="category-chip" data-category="mecanica"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Mecânicas</button>
+                <button class="category-chip" data-category="estetica"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Estética</button>
+                <button class="category-chip" data-category="pneus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg> Pneus</button>
+                <button class="category-chip" data-category="eletrica"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg> Auto Elétricas</button>
+                <button class="category-chip" data-category="borracharia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Borracharias</button>
+                <button class="category-chip" data-category="guincho"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg> Guincho</button>
+                <button class="category-chip" data-category="alimentacao"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg> Alimentação</button>
+                <button class="category-chip" data-category="saude"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> Saúde</button>
+                <button class="category-chip" data-category="educacao"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Educação</button>
             </div>
         </section>
 
@@ -378,6 +384,36 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 /* ===== CLUBE DE BENEFÍCIOS AUTO VALE - Marketplace ===== */
 (function() {
     'use strict';
+
+    // SVG icons for categories (Lucide-style: outline, stroke-only, no fill)
+    var categoryIcons = {
+        'postos': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v17"/><path d="M13 10h4a2 2 0 0 1 2 2v10"/><path d="M21 7l-2-2"/><circle cx="20" cy="5" r="1"/><path d="M7 12h4"/><path d="M7 8h4"/></svg>',
+        'lava-jato': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>',
+        'mecanica': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+        'estetica': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>',
+        'pneus': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>',
+        'eletrica': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+        'borracharia': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        'guincho': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+        'alimentacao': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+        'saude': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+        'educacao': '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>'
+    };
+
+    // SVG icons for modal info items
+    var infoIcons = {
+        'mappin': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+        'phone': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+        'message': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+        'home': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+    };
+
+    // SVG icons for benefits
+    var benefitIcons = {
+        'ticket': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>',
+        'star': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+        'gift': '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>'
+    };
 
     // Dados mockados dos parceiros
     var partners = [
@@ -418,7 +454,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         grid.innerHTML = filtered.map(function(p) {
             return '<div class="partner-card" data-category="' + p.category + '" data-id="' + p.id + '" onclick="showPartnerDetail(' + p.id + ')">' +
                 '<div class="card-header">' +
-                    '<div class="card-logo">' + p.logo + '</div>' +
+                    '<div class="card-logo">' + (categoryIcons[p.category] || p.logo) + '</div>' +
                     '<div class="card-badge">' + p.discount + '% OFF</div>' +
                 '</div>' +
                 '<div class="card-body">' +
@@ -456,7 +492,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 
         content.innerHTML = 
             '<div class="modal-header-section">' +
-                '<div class="modal-logo">' + partner.logo + '</div>' +
+                '<div class="modal-logo">' + (categoryIcons[partner.category] || partner.logo) + '</div>' +
                 '<div class="modal-header-info">' +
                     '<h2 class="modal-partner-name">' + partner.name + '</h2>' +
                     '<span class="modal-category-badge">' + catName + '</span>' +
@@ -469,28 +505,28 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
             '<div class="modal-body-section">' +
                 '<div class="modal-info-grid">' +
                     '<div class="modal-info-item">' +
-                        '<span class="modal-info-icon">📍</span>' +
+                        '<span class="modal-info-icon">' + infoIcons.mappin + '</span>' +
                         '<div class="modal-info-text">' +
                             '<span class="modal-info-label">Localização</span>' +
                             '<span class="modal-info-value">' + partner.city + ' • ' + partner.distance + '</span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
-                        '<span class="modal-info-icon">📞</span>' +
+                        '<span class="modal-info-icon">' + infoIcons.phone + '</span>' +
                         '<div class="modal-info-text">' +
                             '<span class="modal-info-label">Telefone</span>' +
                             '<span class="modal-info-value">' + partner.phone + '</span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
-                        '<span class="modal-info-icon">💬</span>' +
+                        '<span class="modal-info-icon">' + infoIcons.message + '</span>' +
                         '<div class="modal-info-text">' +
                             '<span class="modal-info-label">WhatsApp</span>' +
                             '<span class="modal-info-value">' + partner.whatsapp + '</span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="modal-info-item">' +
-                        '<span class="modal-info-icon">🏠</span>' +
+                        '<span class="modal-info-icon">' + infoIcons.home + '</span>' +
                         '<div class="modal-info-text">' +
                             '<span class="modal-info-label">Endereço</span>' +
                             '<span class="modal-info-value">' + partner.address + '</span>' +
@@ -505,21 +541,21 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     '<h3 class="modal-section-title">Benefícios disponíveis</h3>' +
                     '<div class="modal-benefits-list">' +
                         '<div class="modal-benefit-item">' +
-                            '<div class="benefit-icon-wrap">🎫</div>' +
+                            '<div class="benefit-icon-wrap">' + benefitIcons.ticket + '</div>' +
                             '<div class="benefit-details">' +
                                 '<span class="benefit-name">Desconto exclusivo</span>' +
                                 '<span class="benefit-value">' + partner.discount + '% de desconto para associados</span>' +
                             '</div>' +
                         '</div>' +
                         '<div class="modal-benefit-item">' +
-                            '<div class="benefit-icon-wrap">⭐</div>' +
+                            '<div class="benefit-icon-wrap">' + benefitIcons.star + '</div>' +
                             '<div class="benefit-details">' +
                                 '<span class="benefit-name">Acúmulo de pontos</span>' +
                                 '<span class="benefit-value">Ganhe +' + partner.points + ' pontos por utilização</span>' +
                             '</div>' +
                         '</div>' +
                         '<div class="modal-benefit-item">' +
-                            '<div class="benefit-icon-wrap">🎁</div>' +
+                            '<div class="benefit-icon-wrap">' + benefitIcons.gift + '</div>' +
                             '<div class="benefit-details">' +
                                 '<span class="benefit-name">Cashback Auto Vale</span>' +
                                 '<span class="benefit-value">2% de cashback em compras acima de R$50</span>' +
@@ -530,7 +566,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
             '</div>' +
             '<div class="modal-footer-section">' +
                 '<button class="modal-btn-use" onclick="solicitarUtilizacao(' + partner.id + ', \'' + partner.name.replace(/'/g, "\\'") + '\', ' + partner.points + ')">Utilizar Benefício</button>' +
-                '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">💬 WhatsApp</button>' +
+                '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">' + infoIcons.message + ' WhatsApp</button>' +
             '</div>';
 
         modal.style.display = 'flex';
@@ -549,7 +585,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         if (footerSection) {
             footerSection.innerHTML = 
                 '<div class="usage-request-success" style="text-align:center;padding:20px;background:rgba(0,166,81,0.1);border:1px solid rgba(0,166,81,0.3);border-radius:12px;margin-bottom:16px;">' +
-                    '<div style="font-size:32px;margin-bottom:12px;">✅</div>' +
+                    '<div style="font-size:32px;margin-bottom:12px;color:#00A651;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>' +
                     '<h3 style="color:#00A651;margin-bottom:8px;font-size:16px;">Solicitação Registrada!</h3>' +
                     '<div style="background:rgba(47,62,191,0.1);border:2px dashed rgba(47,62,191,0.4);border-radius:8px;padding:12px;margin:12px 0;">' +
                         '<span style="font-size:12px;color:#8A93A5;display:block;margin-bottom:4px;">Seu código de utilização:</span>' +

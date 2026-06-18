@@ -211,6 +211,12 @@ html.dark-mode .benefit-icon-wrap{background:rgba(0,166,81,.15)}
 html.dark-mode .modal-footer-section{border-top-color:rgba(255,255,255,.06)}
 html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2)}
 
+/* ===== SVG Icon Sizing (Lucide standard) ===== */
+.card-logo svg { width: 24px; height: 24px; }
+.modal-logo svg { width: 40px; height: 40px; }
+.modal-info-icon svg { width: 18px; height: 18px; }
+.benefit-icon-wrap svg { width: 20px; height: 20px; }
+
 /* ===== Responsive ===== */
 @media(max-width:1024px){
     .hero-title{font-size:1.75rem}
