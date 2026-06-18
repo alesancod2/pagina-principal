@@ -1763,14 +1763,14 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Notificações por Email</label>
-                        <select>
+                        <select id="notifEmail">
                             <option>Ativadas</option>
                             <option>Desativadas</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Notificações Push</label>
-                        <select>
+                        <select id="notifPush">
                             <option>Ativadas</option>
                             <option>Desativadas</option>
                         </select>
@@ -1779,14 +1779,14 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Alertas de Novo Parceiro</label>
-                        <select>
+                        <select id="notifParceiro">
                             <option>Ativados</option>
                             <option>Desativados</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Resumo Diário</label>
-                        <select>
+                        <select id="notifResumo">
                             <option>Ativado</option>
                             <option>Desativado</option>
                         </select>
@@ -1794,9 +1794,10 @@
                 </div>
             </div>
 
+            <div id="configFeedback" style="font-size:0.8rem;margin-top:12px;display:none;"></div>
             <div style="text-align:right;margin-top:20px">
-                <button class="btn btn-outline" style="margin-right:8px">Cancelar</button>
-                <button class="btn btn-green" onclick="alert('Configurações salvas com sucesso!')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Configurações</button>
+                <button class="btn btn-outline" style="margin-right:8px" onclick="cancelNotifConfig()">Cancelar</button>
+                <button class="btn btn-green" onclick="saveNotifConfig()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Configurações</button>
             </div>
         </div>
 
@@ -2166,6 +2167,50 @@ function savePassword() {
             btn.style.background = ''; btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
         }, 3000);
     }, 1500);
+}
+
+    
+// Notification config save/load/cancel
+function saveNotifConfig() {
+    var config = {
+        email: document.getElementById('notifEmail').value,
+        push: document.getElementById('notifPush').value,
+        parceiro: document.getElementById('notifParceiro').value,
+        resumo: document.getElementById('notifResumo').value
+    };
+    localStorage.setItem('avp_notif_config', JSON.stringify(config));
+    var fb = document.getElementById('configFeedback');
+    fb.style.display = 'block';
+    fb.style.color = '#00A651';
+    fb.textContent = '✓ Configurações de notificações salvas com sucesso.';
+    setTimeout(function() { fb.style.display = 'none'; }, 4000);
+}
+
+function cancelNotifConfig() {
+    loadNotifConfig();
+    var fb = document.getElementById('configFeedback');
+    fb.style.display = 'block';
+    fb.style.color = '#A8B4CC';
+    fb.textContent = 'Alterações descartadas.';
+    setTimeout(function() { fb.style.display = 'none'; }, 3000);
+}
+
+function loadNotifConfig() {
+    var saved = localStorage.getItem('avp_notif_config');
+    if (saved) {
+        var config = JSON.parse(saved);
+        if (document.getElementById('notifEmail')) document.getElementById('notifEmail').value = config.email || 'Ativadas';
+        if (document.getElementById('notifPush')) document.getElementById('notifPush').value = config.push || 'Ativadas';
+        if (document.getElementById('notifParceiro')) document.getElementById('notifParceiro').value = config.parceiro || 'Ativados';
+        if (document.getElementById('notifResumo')) document.getElementById('notifResumo').value = config.resumo || 'Ativado';
+    }
+}
+
+// Load on page ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadNotifConfig);
+} else {
+    setTimeout(loadNotifConfig, 200);
 }
 
     </script>
