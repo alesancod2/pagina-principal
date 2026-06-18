@@ -1569,10 +1569,12 @@
 
             <div style="margin-bottom:24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
                 <label style="font-size:13px;color:var(--text-secondary)">Período:</label>
-                <input type="date" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none" value="2025-01-01">
+                <input type="date" id="reportDateStart" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none" value="2025-01-01">
                 <span style="color:var(--text-secondary)">até</span>
-                <input type="date" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none" value="2025-01-31">
+                <input type="date" id="reportDateEnd" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none" value="2025-01-31">
             </div>
+            <!-- Inline feedback area -->
+            <div id="reportFeedback" style="margin-bottom:16px;padding:10px 16px;border-radius:8px;font-size:13px;display:none;"></div>
 
             <div class="reports-grid">
                 <div class="report-card">
@@ -1580,9 +1582,9 @@
                     <h4>Relatório de Parceiros</h4>
                     <p>Lista completa de parceiros com status, categorias e métricas de desempenho.</p>
                     <div class="report-buttons">
-                        <button class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
-                        <button class="btn btn-sm btn-green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
-                        <button class="btn btn-sm btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportReport('parceiros','pdf')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
+                        <button class="btn btn-sm btn-green" onclick="exportReport('parceiros','excel')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
+                        <button class="btn btn-sm btn-outline" onclick="exportReport('parceiros','csv')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
                     </div>
                 </div>
                 <div class="report-card">
@@ -1590,9 +1592,9 @@
                     <h4>Relatório de Benefícios</h4>
                     <p>Análise de benefícios mais utilizados, taxa de conversão e impacto financeiro.</p>
                     <div class="report-buttons">
-                        <button class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
-                        <button class="btn btn-sm btn-green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
-                        <button class="btn btn-sm btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportReport('beneficios','pdf')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
+                        <button class="btn btn-sm btn-green" onclick="exportReport('beneficios','excel')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
+                        <button class="btn btn-sm btn-outline" onclick="exportReport('beneficios','csv')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
                     </div>
                 </div>
                 <div class="report-card">
@@ -1600,9 +1602,9 @@
                     <h4>Relatório de Cupons</h4>
                     <p>Cupons gerados, utilizados, expirados e taxa de aproveitamento por parceiro.</p>
                     <div class="report-buttons">
-                        <button class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
-                        <button class="btn btn-sm btn-green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
-                        <button class="btn btn-sm btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportReport('cupons','pdf')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
+                        <button class="btn btn-sm btn-green" onclick="exportReport('cupons','excel')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
+                        <button class="btn btn-sm btn-outline" onclick="exportReport('cupons','csv')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
                     </div>
                 </div>
                 <div class="report-card">
@@ -1610,9 +1612,9 @@
                     <h4>Relatório de Associados</h4>
                     <p>Dados dos associados, planos ativos, pontos acumulados e histórico de uso.</p>
                     <div class="report-buttons">
-                        <button class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
-                        <button class="btn btn-sm btn-green"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
-                        <button class="btn btn-sm btn-outline"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportReport('associados','pdf')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF</button>
+                        <button class="btn btn-sm btn-green" onclick="exportReport('associados','excel')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Excel</button>
+                        <button class="btn btn-sm btn-outline" onclick="exportReport('associados','csv')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> CSV</button>
                     </div>
                 </div>
             </div>
@@ -2211,6 +2213,296 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadNotifConfig);
 } else {
     setTimeout(loadNotifConfig, 200);
+}
+
+// ===== RELATÓRIOS - EXPORT FUNCTIONALITY =====
+
+// Report feedback helper
+function showReportFeedback(message, type) {
+    var fb = document.getElementById('reportFeedback');
+    if (!fb) return;
+    fb.style.display = 'block';
+    if (type === 'error') {
+        fb.style.background = 'rgba(239,68,68,0.1)';
+        fb.style.border = '1px solid rgba(239,68,68,0.3)';
+        fb.style.color = '#ef4444';
+    } else if (type === 'success') {
+        fb.style.background = 'rgba(0,166,81,0.1)';
+        fb.style.border = '1px solid rgba(0,166,81,0.3)';
+        fb.style.color = '#00A651';
+    } else {
+        fb.style.background = 'rgba(47,62,191,0.1)';
+        fb.style.border = '1px solid rgba(47,62,191,0.3)';
+        fb.style.color = '#6b7fff';
+    }
+    fb.textContent = message;
+    if (type !== 'loading') {
+        setTimeout(function() { fb.style.display = 'none'; }, 5000);
+    }
+}
+
+// Validate date range
+function validateReportDates() {
+    var startInput = document.getElementById('reportDateStart');
+    var endInput = document.getElementById('reportDateEnd');
+    var start = startInput.value;
+    var end = endInput.value;
+
+    if (!start || !end) {
+        showReportFeedback('Preencha as duas datas do período para gerar o relatório.', 'error');
+        return null;
+    }
+
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        showReportFeedback('Formato de data inválido. Use o formato correto (AAAA-MM-DD).', 'error');
+        return null;
+    }
+
+    if (startDate > endDate) {
+        showReportFeedback('A data inicial não pode ser posterior à data final.', 'error');
+        startInput.style.borderColor = '#ef4444';
+        endInput.style.borderColor = '#ef4444';
+        setTimeout(function() { startInput.style.borderColor = ''; endInput.style.borderColor = ''; }, 3000);
+        return null;
+    }
+
+    var diffTime = Math.abs(endDate - startDate);
+    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 365) {
+        showReportFeedback('O período máximo permitido é de 365 dias.', 'error');
+        return null;
+    }
+
+    return { start: start, end: end, startDate: startDate, endDate: endDate };
+}
+
+// Mock data generators (simulating API/DB responses)
+function getReportData(type, dateRange) {
+    var start = dateRange.start;
+    var end = dateRange.end;
+
+    if (type === 'parceiros') {
+        return {
+            title: 'Relatório de Parceiros',
+            headers: ['ID', 'Nome', 'Categoria', 'Status', 'Cidade', 'Benefícios Ativos', 'Usos no Período', 'Data Cadastro'],
+            rows: [
+                ['1', 'Auto Peças Silva', 'Autopeças', 'Ativo', 'São Paulo', '3', '47', '2024-08-15'],
+                ['2', 'Oficina Central', 'Mecânica', 'Ativo', 'Campinas', '2', '32', '2024-09-01'],
+                ['3', 'Lava Rápido Express', 'Estética', 'Ativo', 'Santos', '1', '28', '2024-09-10'],
+                ['4', 'Pneus & Cia', 'Pneus', 'Inativo', 'Guarulhos', '0', '0', '2024-07-20'],
+                ['5', 'Elétrica Automotiva JR', 'Elétrica', 'Ativo', 'Osasco', '2', '19', '2024-10-05'],
+                ['6', 'Funilaria Premium', 'Funilaria', 'Ativo', 'São Bernardo', '1', '15', '2024-10-20'],
+                ['7', 'Troca de Óleo Rápida', 'Manutenção', 'Ativo', 'Barueri', '2', '41', '2024-06-12'],
+                ['8', 'Vidraçaria Auto Glass', 'Vidros', 'Pendente', 'Diadema', '0', '0', '2024-11-01']
+            ]
+        };
+    } else if (type === 'beneficios') {
+        return {
+            title: 'Relatório de Benefícios',
+            headers: ['ID', 'Benefício', 'Parceiro', 'Categoria', 'Usos Total', 'Usos no Período', 'Taxa Conversão (%)', 'Status'],
+            rows: [
+                ['1', '20% Troca de Óleo', 'Troca de Óleo Rápida', 'Manutenção', '156', '41', '68', 'Ativo'],
+                ['2', '15% Alinhamento', 'Pneus & Cia', 'Pneus', '89', '12', '52', 'Ativo'],
+                ['3', 'Lavagem Grátis', 'Lava Rápido Express', 'Estética', '134', '28', '74', 'Ativo'],
+                ['4', '10% Peças', 'Auto Peças Silva', 'Autopeças', '201', '47', '61', 'Ativo'],
+                ['5', 'Diagnóstico Grátis', 'Oficina Central', 'Mecânica', '98', '32', '45', 'Ativo'],
+                ['6', '25% Polimento', 'Lava Rápido Express', 'Estética', '67', '18', '39', 'Pausado'],
+                ['7', '10% Reparo Elétrico', 'Elétrica Automotiva JR', 'Elétrica', '45', '19', '42', 'Ativo']
+            ]
+        };
+    } else if (type === 'cupons') {
+        return {
+            title: 'Relatório de Cupons',
+            headers: ['Código', 'Parceiro', 'Benefício', 'Status', 'Data Geração', 'Data Uso', 'Associado'],
+            rows: [
+                ['AVP-001A3F', 'Auto Peças Silva', '10% Peças', 'Utilizado', '2025-01-05', '2025-01-06', 'João Silva'],
+                ['AVP-002B7C', 'Oficina Central', 'Diagnóstico Grátis', 'Utilizado', '2025-01-08', '2025-01-10', 'Maria Santos'],
+                ['AVP-003D2E', 'Lava Rápido Express', 'Lavagem Grátis', 'Expirado', '2025-01-02', '-', 'Carlos Lima'],
+                ['AVP-004F9A', 'Troca de Óleo Rápida', '20% Troca de Óleo', 'Utilizado', '2025-01-12', '2025-01-12', 'Ana Oliveira'],
+                ['AVP-005C1B', 'Pneus & Cia', '15% Alinhamento', 'Ativo', '2025-01-20', '-', 'Pedro Costa'],
+                ['AVP-006E4D', 'Elétrica Automotiva JR', '10% Reparo Elétrico', 'Utilizado', '2025-01-15', '2025-01-16', 'Lucas Almeida'],
+                ['AVP-007A8F', 'Auto Peças Silva', '10% Peças', 'Ativo', '2025-01-25', '-', 'Fernanda Rocha'],
+                ['AVP-008B2C', 'Funilaria Premium', '15% Funilaria', 'Expirado', '2025-01-03', '-', 'Roberto Nunes']
+            ]
+        };
+    } else if (type === 'associados') {
+        return {
+            title: 'Relatório de Associados',
+            headers: ['ID', 'Nome', 'CPF', 'Plano', 'Pontos Acumulados', 'Benefícios Usados', 'Status', 'Data Adesão'],
+            rows: [
+                ['1', 'João Silva', '***123.456-**', 'Premium', '1.250', '12', 'Adimplente', '2024-03-15'],
+                ['2', 'Maria Santos', '***789.012-**', 'Basic', '480', '5', 'Adimplente', '2024-05-20'],
+                ['3', 'Carlos Lima', '***345.678-**', 'Premium', '890', '8', 'Inadimplente', '2024-02-10'],
+                ['4', 'Ana Oliveira', '***901.234-**', 'Basic', '320', '3', 'Adimplente', '2024-07-01'],
+                ['5', 'Pedro Costa', '***567.890-**', 'Premium', '1.680', '15', 'Adimplente', '2024-01-05'],
+                ['6', 'Lucas Almeida', '***234.567-**', 'Basic', '210', '2', 'Adimplente', '2024-08-22'],
+                ['7', 'Fernanda Rocha', '***890.123-**', 'Premium', '950', '9', 'Adimplente', '2024-04-18'],
+                ['8', 'Roberto Nunes', '***456.789-**', 'Basic', '150', '1', 'Inadimplente', '2024-09-30']
+            ]
+        };
+    }
+    return null;
+}
+
+// Format date for display in reports
+function formatDateBR(dateStr) {
+    if (!dateStr || dateStr === '-') return dateStr;
+    var parts = dateStr.split('-');
+    if (parts.length === 3) return parts[2] + '/' + parts[1] + '/' + parts[0];
+    return dateStr;
+}
+
+// CSV Export
+function exportCSV(data, filename) {
+    var csvContent = '';
+    // BOM for UTF-8
+    var BOM = '\uFEFF';
+    // Headers
+    csvContent += data.headers.join(';') + '\n';
+    // Rows
+    for (var i = 0; i < data.rows.length; i++) {
+        csvContent += data.rows[i].join(';') + '\n';
+    }
+    var blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    downloadBlob(blob, filename + '.csv');
+}
+
+// Excel Export (Tab-separated with .xls extension for Excel compatibility)
+function exportExcel(data, filename) {
+    var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Relatório</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>';
+    html += '<body><table border="1">';
+    // Title
+    html += '<tr><td colspan="' + data.headers.length + '" style="font-weight:bold;font-size:14px;background:#2F3EBF;color:#fff;padding:8px;">' + data.title + '</td></tr>';
+    // Headers
+    html += '<tr>';
+    for (var h = 0; h < data.headers.length; h++) {
+        html += '<td style="font-weight:bold;background:#f0f0f0;padding:6px;border:1px solid #ccc;">' + data.headers[h] + '</td>';
+    }
+    html += '</tr>';
+    // Rows
+    for (var r = 0; r < data.rows.length; r++) {
+        html += '<tr>';
+        for (var c = 0; c < data.rows[r].length; c++) {
+            html += '<td style="padding:4px;border:1px solid #ddd;">' + data.rows[r][c] + '</td>';
+        }
+        html += '</tr>';
+    }
+    html += '</table></body></html>';
+    var blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    downloadBlob(blob, filename + '.xls');
+}
+
+// PDF Export (generates clean HTML-based PDF via print window)
+function exportPDF(data, filename) {
+    var win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) {
+        showReportFeedback('Bloqueador de popup ativo. Permita popups para exportar PDF.', 'error');
+        return;
+    }
+    var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + data.title + '</title>';
+    html += '<style>';
+    html += 'body{font-family:Arial,sans-serif;padding:30px;color:#333;}';
+    html += 'h1{font-size:20px;color:#2F3EBF;margin-bottom:4px;}';
+    html += 'p.subtitle{font-size:12px;color:#666;margin-bottom:20px;}';
+    html += 'table{width:100%;border-collapse:collapse;font-size:12px;}';
+    html += 'th{background:#2F3EBF;color:#fff;padding:8px 10px;text-align:left;font-size:11px;text-transform:uppercase;}';
+    html += 'td{padding:6px 10px;border-bottom:1px solid #e0e0e0;}';
+    html += 'tr:nth-child(even){background:#f9f9f9;}';
+    html += '.footer{margin-top:30px;font-size:10px;color:#999;border-top:1px solid #ddd;padding-top:10px;}';
+    html += '@media print{body{padding:15px;}@page{margin:1cm;}}';
+    html += '</style></head><body>';
+    html += '<h1>' + data.title + '</h1>';
+    html += '<p class="subtitle">Período: ' + formatDateBR(document.getElementById('reportDateStart').value) + ' a ' + formatDateBR(document.getElementById('reportDateEnd').value) + ' | Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '</p>';
+    html += '<table><thead><tr>';
+    for (var h = 0; h < data.headers.length; h++) {
+        html += '<th>' + data.headers[h] + '</th>';
+    }
+    html += '</tr></thead><tbody>';
+    for (var r = 0; r < data.rows.length; r++) {
+        html += '<tr>';
+        for (var c = 0; c < data.rows[r].length; c++) {
+            html += '<td>' + data.rows[r][c] + '</td>';
+        }
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    html += '<div class="footer">Auto Vale Prevenções - Clube de Benefícios | Total de registros: ' + data.rows.length + '</div>';
+    html += '<script>window.onload=function(){window.print();}<\/script>';
+    html += '</body></html>';
+    win.document.write(html);
+    win.document.close();
+}
+
+// Helper: trigger download from blob
+function downloadBlob(blob, filename) {
+    var link = document.createElement('a');
+    var url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function() {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+// Main export function
+function exportReport(type, format) {
+    // Validate dates
+    var dateRange = validateReportDates();
+    if (!dateRange) return;
+
+    // Show loading
+    showReportFeedback('Gerando relatório... Aguarde.', 'loading');
+
+    // Find the clicked button to show loading state
+    var btn = event ? event.target.closest('button') : null;
+    var originalHTML = '';
+    if (btn) {
+        originalHTML = btn.innerHTML;
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Gerando...';
+        btn.disabled = true;
+    }
+
+    // Simulate API call delay (in production this would be a real fetch to /api/reports/)
+    setTimeout(function() {
+        var data = getReportData(type, dateRange);
+
+        if (!data || data.rows.length === 0) {
+            showReportFeedback('Nenhum dado encontrado para o período selecionado. Tente alterar as datas.', 'error');
+            if (btn) { btn.innerHTML = originalHTML; btn.disabled = false; }
+            return;
+        }
+
+        try {
+            var typeNames = { parceiros: 'Parceiros', beneficios: 'Benefícios', cupons: 'Cupons', associados: 'Associados' };
+            var filename = 'relatorio_' + type + '_' + dateRange.start + '_' + dateRange.end;
+
+            if (format === 'csv') {
+                exportCSV(data, filename);
+            } else if (format === 'excel') {
+                exportExcel(data, filename);
+            } else if (format === 'pdf') {
+                exportPDF(data, filename);
+            }
+
+            showReportFeedback('Relatório de ' + typeNames[type] + ' exportado com sucesso em ' + format.toUpperCase() + '.', 'success');
+        } catch (err) {
+            showReportFeedback('Erro ao gerar relatório: ' + err.message, 'error');
+        }
+
+        // Restore button
+        if (btn) {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    }, 800);
 }
 
     </script>
