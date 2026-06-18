@@ -24,3 +24,9 @@ CREATE INDEX idx_usage_sessions_date ON usage_sessions(validated_at);
 INSERT INTO system_config (key, value, description) VALUES
 ('qr_code_payload', '"AVP_AUTH_2024"', 'Payload fixo do QR Code universal Auto Vale'),
 ('qr_code_url', '"https://clube.autovaleprevencoes.org.br/auth/qr"', 'URL encoded no QR Code');
+
+
+-- URL de redirecionamento para câmera nativa
+INSERT INTO system_config (key, value, description) VALUES
+('qr_redirect_url', '"https://clube.autovaleprevencoes.org.br/auth"', 'URL de redirecionamento quando QR é lido pela câmera nativa (fora do app)')
+ON CONFLICT (key) DO NOTHING;
