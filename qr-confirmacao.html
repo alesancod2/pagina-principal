@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benefício Validado - Auto Vale Prevenções</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:linear-gradient(135deg,#050A14 0%,#08101F 35%,#0D1728 100%); color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .container { max-width:440px; width:100%; }
+        .card { background:rgba(20,32,55,0.85); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:40px 32px; text-align:center; }
+        .success-icon { width:80px; height:80px; border-radius:50%; background:rgba(0,166,81,0.15); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; }
+        .success-icon svg { width:40px; height:40px; color:#00A651; }
+        .title { font-size:1.5rem; font-weight:800; margin-bottom:4px; color:#fff; }
+        .subtitle { font-size:0.9rem; color:#A8B4CC; margin-bottom:32px; }
+        .divider { height:1px; background:rgba(255,255,255,0.06); margin:24px 0; }
+        .info-section { text-align:left; }
+        .info-label { font-size:0.7rem; color:#7D8AA6; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .info-value { font-size:0.95rem; color:#fff; font-weight:600; margin-bottom:16px; }
+        .info-value.highlight { color:#00A651; font-size:1.1rem; }
+        .info-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .info-row .info-label { margin-bottom:0; }
+        .info-row .info-value { margin-bottom:0; }
+        .badge-status { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; background:rgba(0,166,81,0.12); color:#00A651; font-size:0.8rem; font-weight:600; }
+        .badge-status::before { content:''; width:8px; height:8px; border-radius:50%; background:#00A651; }
+        .code-box { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; text-align:center; margin-top:24px; }
+        .code-label { font-size:0.7rem; color:#7D8AA6; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
+        .code-value { font-size:1.3rem; font-weight:800; color:#2F3EBF; letter-spacing:2px; font-family:monospace; }
+        .partner-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; text-align:left; }
+        .partner-logo { width:50px; height:50px; border-radius:12px; background:rgba(47,62,191,0.1); display:flex; align-items:center; justify-content:center; }
+        .partner-logo svg { width:24px; height:24px; color:#2F3EBF; }
+        .partner-info { flex:1; }
+        .partner-name { font-size:1rem; font-weight:700; color:#fff; }
+        .partner-category { font-size:0.8rem; color:#A8B4CC; }
+        .footer { margin-top:32px; text-align:center; }
+        .footer-text { font-size:0.75rem; color:#5A6475; }
+        .footer-brand { font-size:0.8rem; font-weight:700; color:#2F3EBF; margin-top:8px; }
+        @media(max-width:480px) { .card { padding:32px 20px; border-radius:20px; } .title { font-size:1.3rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Success Icon -->
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <h1 class="title">Benefício Validado</h1>
+            <p class="subtitle">Utilização registrada com sucesso</p>
+
+            <!-- Partner Info -->
+            <div class="partner-header">
+                <div class="partner-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/></svg>
+                </div>
+                <div class="partner-info">
+                    <div class="partner-name">Lava Jato Premium</div>
+                    <div class="partner-category">Lava-Jato • Linhares - ES</div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Benefit Info -->
+            <div class="info-section">
+                <div class="info-label">Benefício</div>
+                <div class="info-value highlight">15% de desconto em lavagem completa</div>
+
+                <div class="info-row">
+                    <div>
+                        <div class="info-label">Data e hora</div>
+                        <div class="info-value">18/06/2026 • 11:43</div>
+                    </div>
+                    <div>
+                        <span class="badge-status">Liberado</span>
+                    </div>
+                </div>
+
+                <div class="info-label">Pontos ganhos</div>
+                <div class="info-value">+20 pontos</div>
+            </div>
+
+            <!-- Validation Code -->
+            <div class="code-box">
+                <div class="code-label">Código da validação</div>
+                <div class="code-value">#AVP-94F8D2</div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p class="footer-text">Apresente esta tela ao parceiro se solicitado.</p>
+                <p class="footer-brand">Auto Vale Prevenções</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

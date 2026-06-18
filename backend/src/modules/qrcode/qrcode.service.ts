@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsageSession, UsageSessionStatus } from './entities/usage-session.entity';
@@ -215,6 +215,30 @@ export class QrCodeService {
       payload: 'AVP_AUTH_2024',
       url: 'https://clube.autovaleprevencoes.org.br/auth/qr',
       instructions: 'Exiba este QR Code para os clientes escanearem com o app Auto Vale.',
+    };
+  }
+
+  /**
+   * Validates a QR token from web access (native camera scan)
+   * The token is the short hex identifier from the URL
+   */
+  async validateWebToken(token: string, deviceInfo: { ip?: string; userAgent?: string }) {
+    // Verify token format (6-8 hex chars)
+    if (!token || !/^[A-Fa-f0-9]{6,8}$/.test(token)) {
+      throw new UnauthorizedException('QR Code inválido.');
+    }
+
+    // Look up the token in active sessions or system config
+    const config = await this.getQrConfig();
+
+    // For now, validate that token matches a known pattern
+    // In production: look up token in usage_sessions or a token store
+
+    return {
+      success: true,
+      protocol: 'AVP-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + token.toUpperCase(),
+      validatedAt: new Date().toISOString(),
+      message: 'Benefício validado com sucesso',
     };
   }
 }

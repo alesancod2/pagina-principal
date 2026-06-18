@@ -84,4 +84,31 @@ export class QrCodeController {
   async getQrConfig() {
     return this.qrCodeService.getQrConfig();
   }
+
+  /**
+   * Web validation endpoint - when QR is scanned by native camera
+   * Redirects to confirmation page or error page
+   * GET /api/qrcode/q/:token
+   */
+  @Get('q/:token')
+  async validateFromWeb(@Param('token') token: string, @Req() req: any) {
+    try {
+      const result = await this.qrCodeService.validateWebToken(token, {
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+      // In production: redirect to confirmation page with session data
+      return {
+        success: true,
+        redirect: `/qr-confirmacao.html?session=${result.protocol}`,
+        data: result,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        redirect: '/qr-erro.html',
+        error: error.message,
+      };
+    }
+  }
 }
