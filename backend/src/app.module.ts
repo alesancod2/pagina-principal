@@ -9,6 +9,7 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { VouchersModule } from './modules/vouchers/vouchers.module';
+import { QrCodeModule } from './modules/qrcode/qrcode.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { VouchersModule } from './modules/vouchers/vouchers.module';
     CampaignsModule,
     AdminModule,
     VouchersModule,
+    QrCodeModule,
   ],
 })
 export class AppModule {}
