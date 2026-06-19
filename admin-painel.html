@@ -1334,15 +1334,15 @@
             <!-- Cards de resumo (calculados pelo filtro) -->
             <div class="pontuacao-config" id="pontSummaryCards">
                 <div class="config-item">
-                    <div class="config-value" id="pontTotalGanhos" style="color:var(--green)">8.410</div>
+                    <div class="config-value" id="pontTotalGanhos" style="color:var(--green)">--</div>
                     <div class="config-label">Pontos Ganhos no Período</div>
                 </div>
                 <div class="config-item">
-                    <div class="config-value" id="pontTotalUtilizados" style="color:#ef4444">1.300</div>
+                    <div class="config-value" id="pontTotalUtilizados" style="color:#ef4444">--</div>
                     <div class="config-label">Pontos Utilizados (Cupons)</div>
                 </div>
                 <div class="config-item">
-                    <div class="config-value" id="pontMedia">443</div>
+                    <div class="config-value" id="pontMedia">--</div>
                     <div class="config-label">Média por Período</div>
                 </div>
             </div>
@@ -1364,46 +1364,7 @@
                         </tr>
                     </thead>
                     <tbody id="pontRankingBody">
-                        <tr>
-                            <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> 1</td>
-                            <td><strong>Carlos Silva</strong></td>
-                            <td>carlos@email.com</td>
-                            <td><span style="color:var(--green);font-weight:700">2.450</span></td>
-                            <td><span style="color:#ef4444;font-weight:700">200</span></td>
-                            <td><strong>2.250</strong></td>
-                        </tr>
-                        <tr>
-                            <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> 2</td>
-                            <td><strong>Maria Santos</strong></td>
-                            <td>maria@email.com</td>
-                            <td><span style="color:var(--green);font-weight:700">1.890</span></td>
-                            <td><span style="color:#ef4444;font-weight:700">350</span></td>
-                            <td><strong>1.540</strong></td>
-                        </tr>
-                        <tr>
-                            <td><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> 3</td>
-                            <td><strong>João Oliveira</strong></td>
-                            <td>joao@email.com</td>
-                            <td><span style="color:var(--green);font-weight:700">1.650</span></td>
-                            <td><span style="color:#ef4444;font-weight:700">150</span></td>
-                            <td><strong>1.500</strong></td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td><strong>Ana Costa</strong></td>
-                            <td>ana@email.com</td>
-                            <td><span style="color:var(--green);font-weight:700">1.320</span></td>
-                            <td><span style="color:#ef4444;font-weight:700">500</span></td>
-                            <td><strong>820</strong></td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td><strong>Pedro Almeida</strong></td>
-                            <td>pedro@email.com</td>
-                            <td><span style="color:var(--green);font-weight:700">1.100</span></td>
-                            <td><span style="color:#ef4444;font-weight:700">100</span></td>
-                            <td><strong>1.000</strong></td>
-                        </tr>
+                        <!-- Populated by filtrarPontuacao() -->
                     </tbody>
                 </table>
             </div>
@@ -2713,14 +2674,14 @@ var pontTransacoes = [
 ];
 
 var pontCupons = [
-    { nome: 'Carlos Silva', cupom: 'Desconto 30% - Troca de Óleo', pontos: 200, data: '2026-06-19', status: 'Confirmado' },
-    { nome: 'Maria Santos', cupom: 'Lavagem Completa Grátis', pontos: 350, data: '2026-06-18', status: 'Confirmado' },
-    { nome: 'João Oliveira', cupom: '15% Alinhamento + Balanceamento', pontos: 150, data: '2026-06-17', status: 'Confirmado' },
-    { nome: 'Ana Costa', cupom: 'Polimento Cristalizado', pontos: 500, data: '2026-06-16', status: 'Pendente' },
-    { nome: 'Pedro Almeida', cupom: 'Diagnóstico Elétrico Grátis', pontos: 100, data: '2026-06-15', status: 'Confirmado' },
-    { nome: 'Roberto Nunes', cupom: '20% Revisão Completa', pontos: 250, data: '2026-06-10', status: 'Confirmado' },
-    { nome: 'Carlos Silva', cupom: 'Limpeza de Bicos', pontos: 180, data: '2026-06-05', status: 'Confirmado' },
-    { nome: 'Maria Santos', cupom: 'Troca de Pastilhas', pontos: 300, data: '2026-05-28', status: 'Confirmado' }
+    { nome: 'Carlos Silva', cupom: 'Desconto 30% - Troca de Óleo', pontos: 100, data: '2026-06-19', status: 'Confirmado' },
+    { nome: 'Maria Santos', cupom: 'Lavagem Completa Grátis', pontos: 80, data: '2026-06-18', status: 'Confirmado' },
+    { nome: 'João Oliveira', cupom: '15% Alinhamento + Balanceamento', pontos: 50, data: '2026-06-17', status: 'Confirmado' },
+    { nome: 'Ana Costa', cupom: 'Polimento Cristalizado', pontos: 60, data: '2026-06-16', status: 'Confirmado' },
+    { nome: 'Pedro Almeida', cupom: 'Diagnóstico Elétrico Grátis', pontos: 50, data: '2026-06-15', status: 'Confirmado' },
+    { nome: 'Roberto Nunes', cupom: '20% Revisão Completa', pontos: 70, data: '2026-06-10', status: 'Confirmado' },
+    { nome: 'Carlos Silva', cupom: 'Limpeza de Bicos', pontos: 50, data: '2026-06-05', status: 'Confirmado' },
+    { nome: 'Maria Santos', cupom: 'Troca de Pastilhas', pontos: 50, data: '2026-05-28', status: 'Confirmado' }
 ];
 
 function filtrarPontuacao() {
@@ -2781,8 +2742,10 @@ function filtrarPontuacao() {
         userMap[c.nome].utilizados += c.pontos;
     });
     var userList = Object.keys(userMap).map(function(nome) {
-        return { nome: nome, ganhos: userMap[nome].ganhos, utilizados: userMap[nome].utilizados, saldo: userMap[nome].ganhos - userMap[nome].utilizados };
-    }).sort(function(a, b) { return b.ganhos - a.ganhos; });
+        var saldo = userMap[nome].ganhos - userMap[nome].utilizados;
+        if (saldo < 0) saldo = 0; // Saldo nunca pode ser negativo
+        return { nome: nome, ganhos: userMap[nome].ganhos, utilizados: userMap[nome].utilizados, saldo: saldo };
+    }).sort(function(a, b) { return b.saldo - a.saldo; });
 
     var rankHtml = '';
     for (var i = 0; i < userList.length; i++) {
