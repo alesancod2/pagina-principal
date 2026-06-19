@@ -2684,7 +2684,45 @@ function initAssociados() {
     renderAssociados();
 }
 
-// ===== PONTUAÇÃO - DATE FILTER =====
+// ===== PONTUAÇÃO - DATE FILTER (ALL PANELS) =====
+
+// Mock data for Pontuação (with dates for filtering)
+var pontTransacoes = [
+    { nome: 'Carlos Silva', parceiro: 'Posto Shell Centro', pontos: 50, data: '2026-06-19', tipo: 'ganho' },
+    { nome: 'Maria Santos', parceiro: 'Lava-Jato Express', pontos: 50, data: '2026-06-18', tipo: 'ganho' },
+    { nome: 'João Oliveira', parceiro: 'Mecânica do João', pontos: 50, data: '2026-06-17', tipo: 'ganho' },
+    { nome: 'Ana Costa', parceiro: 'Estética Premium', pontos: 50, data: '2026-06-16', tipo: 'ganho' },
+    { nome: 'Pedro Almeida', parceiro: 'Pneu Forte', pontos: 50, data: '2026-06-15', tipo: 'ganho' },
+    { nome: 'Roberto Nunes', parceiro: 'Auto Elétrica Raio', pontos: 50, data: '2026-06-14', tipo: 'ganho' },
+    { nome: 'Carlos Silva', parceiro: 'Mecânica do João', pontos: 50, data: '2026-06-13', tipo: 'ganho' },
+    { nome: 'Maria Santos', parceiro: 'Posto Shell Centro', pontos: 50, data: '2026-06-12', tipo: 'ganho' },
+    { nome: 'João Oliveira', parceiro: 'Pneu Forte', pontos: 50, data: '2026-06-11', tipo: 'ganho' },
+    { nome: 'Ana Costa', parceiro: 'Lava-Jato Express', pontos: 50, data: '2026-06-10', tipo: 'ganho' },
+    { nome: 'Pedro Almeida', parceiro: 'Auto Elétrica Raio', pontos: 50, data: '2026-06-09', tipo: 'ganho' },
+    { nome: 'Carlos Silva', parceiro: 'Estética Premium', pontos: 50, data: '2026-06-08', tipo: 'ganho' },
+    { nome: 'Roberto Nunes', parceiro: 'Posto Shell Centro', pontos: 50, data: '2026-06-07', tipo: 'ganho' },
+    { nome: 'Maria Santos', parceiro: 'Mecânica do João', pontos: 50, data: '2026-06-06', tipo: 'ganho' },
+    { nome: 'João Oliveira', parceiro: 'Lava-Jato Express', pontos: 50, data: '2026-06-05', tipo: 'ganho' },
+    { nome: 'Ana Costa', parceiro: 'Posto Shell Centro', pontos: 50, data: '2026-06-04', tipo: 'ganho' },
+    { nome: 'Pedro Almeida', parceiro: 'Estética Premium', pontos: 50, data: '2026-06-03', tipo: 'ganho' },
+    { nome: 'Carlos Silva', parceiro: 'Pneu Forte', pontos: 50, data: '2026-06-02', tipo: 'ganho' },
+    { nome: 'Roberto Nunes', parceiro: 'Lava-Jato Express', pontos: 50, data: '2026-06-01', tipo: 'ganho' },
+    { nome: 'Maria Santos', parceiro: 'Auto Elétrica Raio', pontos: 50, data: '2026-05-30', tipo: 'ganho' },
+    { nome: 'João Oliveira', parceiro: 'Posto Shell Centro', pontos: 50, data: '2026-05-28', tipo: 'ganho' },
+    { nome: 'Carlos Silva', parceiro: 'Lava-Jato Express', pontos: 50, data: '2026-05-25', tipo: 'ganho' }
+];
+
+var pontCupons = [
+    { nome: 'Carlos Silva', cupom: 'Desconto 30% - Troca de Óleo', pontos: 200, data: '2026-06-19', status: 'Confirmado' },
+    { nome: 'Maria Santos', cupom: 'Lavagem Completa Grátis', pontos: 350, data: '2026-06-18', status: 'Confirmado' },
+    { nome: 'João Oliveira', cupom: '15% Alinhamento + Balanceamento', pontos: 150, data: '2026-06-17', status: 'Confirmado' },
+    { nome: 'Ana Costa', cupom: 'Polimento Cristalizado', pontos: 500, data: '2026-06-16', status: 'Pendente' },
+    { nome: 'Pedro Almeida', cupom: 'Diagnóstico Elétrico Grátis', pontos: 100, data: '2026-06-15', status: 'Confirmado' },
+    { nome: 'Roberto Nunes', cupom: '20% Revisão Completa', pontos: 250, data: '2026-06-10', status: 'Confirmado' },
+    { nome: 'Carlos Silva', cupom: 'Limpeza de Bicos', pontos: 180, data: '2026-06-05', status: 'Confirmado' },
+    { nome: 'Maria Santos', cupom: 'Troca de Pastilhas', pontos: 300, data: '2026-05-28', status: 'Confirmado' }
+];
+
 function filtrarPontuacao() {
     var startInput = document.getElementById('pontDateStart');
     var endInput = document.getElementById('pontDateEnd');
@@ -2705,19 +2743,124 @@ function filtrarPontuacao() {
         return;
     }
 
-    // Simulate recalculating (in production: API call with date range)
-    var diffDays = Math.ceil((new Date(end) - new Date(start)) / (1000*60*60*24)) + 1;
-    var pontosGanhos = Math.round(diffDays * 442.6);
-    var pontosUtilizados = Math.round(diffDays * 68.4);
-    var media = Math.round(pontosGanhos / Math.max(diffDays, 1));
+    var startDate = new Date(start);
+    var endDate = new Date(end);
+    var diffDays = Math.ceil((endDate - startDate) / (1000*60*60*24)) + 1;
 
-    document.getElementById('pontTotalGanhos').textContent = pontosGanhos.toLocaleString('pt-BR');
-    document.getElementById('pontTotalUtilizados').textContent = pontosUtilizados.toLocaleString('pt-BR');
+    // Filter transações by date
+    var filteredTrans = pontTransacoes.filter(function(t) {
+        var d = new Date(t.data);
+        return d >= startDate && d <= endDate;
+    });
+
+    // Filter cupons by date
+    var filteredCupons = pontCupons.filter(function(c) {
+        var d = new Date(c.data);
+        return d >= startDate && d <= endDate;
+    });
+
+    // Calculate summary cards
+    var totalGanhos = 0;
+    filteredTrans.forEach(function(t) { totalGanhos += t.pontos; });
+    var totalUtilizados = 0;
+    filteredCupons.forEach(function(c) { totalUtilizados += c.pontos; });
+    var media = diffDays > 0 ? Math.round(totalGanhos / diffDays) : 0;
+
+    document.getElementById('pontTotalGanhos').textContent = totalGanhos.toLocaleString('pt-BR');
+    document.getElementById('pontTotalUtilizados').textContent = totalUtilizados.toLocaleString('pt-BR');
     document.getElementById('pontMedia').textContent = media.toLocaleString('pt-BR');
 
+    // Render Top Usuários Ranking (aggregate by user from filtered data)
+    var userMap = {};
+    filteredTrans.forEach(function(t) {
+        if (!userMap[t.nome]) userMap[t.nome] = { ganhos: 0, utilizados: 0 };
+        userMap[t.nome].ganhos += t.pontos;
+    });
+    filteredCupons.forEach(function(c) {
+        if (!userMap[c.nome]) userMap[c.nome] = { ganhos: 0, utilizados: 0 };
+        userMap[c.nome].utilizados += c.pontos;
+    });
+    var userList = Object.keys(userMap).map(function(nome) {
+        return { nome: nome, ganhos: userMap[nome].ganhos, utilizados: userMap[nome].utilizados, saldo: userMap[nome].ganhos - userMap[nome].utilizados };
+    }).sort(function(a, b) { return b.ganhos - a.ganhos; });
+
+    var rankHtml = '';
+    for (var i = 0; i < userList.length; i++) {
+        var u = userList[i];
+        var medalSvg = i < 3 ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> ' : '';
+        rankHtml += '<tr><td>' + medalSvg + (i+1) + '</td>';
+        rankHtml += '<td><strong>' + u.nome + '</strong></td>';
+        rankHtml += '<td>' + (u.nome.split(' ')[0].toLowerCase()) + '@email.com</td>';
+        rankHtml += '<td><span style="color:var(--green);font-weight:700">' + u.ganhos.toLocaleString('pt-BR') + '</span></td>';
+        rankHtml += '<td><span style="color:#ef4444;font-weight:700">' + u.utilizados.toLocaleString('pt-BR') + '</span></td>';
+        rankHtml += '<td><strong>' + u.saldo.toLocaleString('pt-BR') + '</strong></td></tr>';
+    }
+    if (rankHtml === '') rankHtml = '<tr><td colspan="6" style="text-align:center;color:var(--text-secondary);padding:20px;">Nenhum dado para o período selecionado.</td></tr>';
+    document.getElementById('pontRankingBody').innerHTML = rankHtml;
+
+    // Render Ranking Benefícios (aggregate by parceiro)
+    var parcMap = {};
+    filteredTrans.forEach(function(t) {
+        if (!parcMap[t.parceiro]) parcMap[t.parceiro] = { usos: 0, ultima: t.data };
+        parcMap[t.parceiro].usos++;
+        if (t.data > parcMap[t.parceiro].ultima) parcMap[t.parceiro].ultima = t.data;
+    });
+    var parcList = Object.keys(parcMap).map(function(p) {
+        return { parceiro: p, usos: parcMap[p].usos, ultima: parcMap[p].ultima };
+    }).sort(function(a, b) { return b.usos - a.usos; });
+
+    var benefRankHtml = '';
+    for (var j = 0; j < parcList.length; j++) {
+        var p = parcList[j];
+        var numStyle = j < 3 ? ' style="color:var(--green)"' : '';
+        var dateFormatted = formatDateBR(p.ultima);
+        benefRankHtml += '<tr><td><strong' + numStyle + '>' + (j+1) + '</strong></td>';
+        benefRankHtml += '<td><strong>' + p.parceiro + '</strong></td>';
+        benefRankHtml += '<td><span style="font-weight:700">' + p.usos + '</span></td>';
+        benefRankHtml += '<td>' + dateFormatted + '</td></tr>';
+    }
+    if (benefRankHtml === '') benefRankHtml = '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);padding:20px;">Nenhum dado para o período selecionado.</td></tr>';
+    document.getElementById('pontBenefRankBody').innerHTML = benefRankHtml;
+
+    // Render Transações Recentes
+    var transHtml = '';
+    for (var k = 0; k < filteredTrans.length && k < 8; k++) {
+        var t = filteredTrans[k];
+        transHtml += '<div class="activity-item"><div class="activity-dot"></div>';
+        transHtml += '<div class="activity-text">' + t.nome + ' ganhou <strong>' + t.pontos + ' pts</strong> - utilização no ' + t.parceiro + '</div>';
+        transHtml += '<div class="activity-time">' + formatDateBR(t.data) + '</div></div>';
+    }
+    if (transHtml === '') transHtml = '<div style="text-align:center;color:var(--text-secondary);padding:20px;">Nenhuma transação no período selecionado.</div>';
+    document.getElementById('pontTransacoesBody').innerHTML = transHtml;
+
+    // Render Pontos Utilizados (Cupons)
+    var cuponsHtml = '';
+    for (var m = 0; m < filteredCupons.length; m++) {
+        var c = filteredCupons[m];
+        var statusBadge = c.status === 'Confirmado' ? 'badge-green' : 'badge-yellow';
+        cuponsHtml += '<tr><td><strong>' + c.nome + '</strong></td>';
+        cuponsHtml += '<td>' + c.cupom + '</td>';
+        cuponsHtml += '<td><span style="color:#ef4444;font-weight:700">-' + c.pontos + ' pts</span></td>';
+        cuponsHtml += '<td>' + formatDateBR(c.data) + '</td>';
+        cuponsHtml += '<td><span class="badge ' + statusBadge + '">' + c.status + '</span></td></tr>';
+    }
+    if (cuponsHtml === '') cuponsHtml = '<tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:20px;">Nenhum resgate no período selecionado.</td></tr>';
+    document.getElementById('pontCuponsBody').innerHTML = cuponsHtml;
+
+    // Success feedback
     fb.style.display = 'block'; fb.style.background = 'rgba(0,166,81,0.1)'; fb.style.border = '1px solid rgba(0,166,81,0.3)'; fb.style.color = '#00A651';
-    fb.textContent = 'Dados atualizados para o período de ' + diffDays + ' dia(s).';
-    setTimeout(function() { fb.style.display = 'none'; }, 4000);
+    fb.textContent = 'Todos os painéis atualizados para o período de ' + diffDays + ' dia(s). (' + filteredTrans.length + ' transações, ' + filteredCupons.length + ' resgates)';
+    setTimeout(function() { fb.style.display = 'none'; }, 5000);
+}
+
+// Initialize Pontuação on page load
+function initPontuacao() {
+    filtrarPontuacao();
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPontuacao);
+} else {
+    setTimeout(initPontuacao, 200);
 }
 
 if (document.readyState === 'loading') {
