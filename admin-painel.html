@@ -1446,15 +1446,18 @@
             <div class="table-container">
                 <div class="table-header">
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                        <input type="text" class="table-search" placeholder="Buscar associado..." onkeyup="searchTable(this, 'associados-table')">
-                        <select style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none">
-                            <option>Todos os status</option>
-                            <option>Ativo</option>
-                            <option>Inativo</option>
-                            <option>Pendente</option>
+                        <input type="text" id="assocSearchInput" class="table-search" placeholder="Buscar associado..." onkeyup="filterAssociados()">
+                        <select id="assocStatusFilter" onchange="filterAssociados()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none">
+                            <option value="">Todos os status</option>
+                            <option value="Ativo">Ativo</option>
+                            <option value="Inativo">Inativo</option>
+                            <option value="Pendente">Pendente</option>
                         </select>
                     </div>
-                    <button class="btn btn-green">+ Novo Associado</button>
+                    <button class="btn btn-green" onclick="openNovoAssociado()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Novo Associado
+                    </button>
                 </div>
                 <div style="overflow-x:auto">
                 <table id="associados-table">
@@ -1470,95 +1473,116 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Carlos Silva</strong></td>
-                            <td>123.456.789-00</td>
-                            <td>carlos@email.com</td>
-                            <td>(11) 99999-1234</td>
-                            <td><span class="badge badge-purple">Premium</span></td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td><strong>2.450</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Maria Santos</strong></td>
-                            <td>234.567.890-11</td>
-                            <td>maria@email.com</td>
-                            <td>(11) 98888-5678</td>
-                            <td><span class="badge badge-purple">Premium</span></td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td><strong>1.890</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>João Oliveira</strong></td>
-                            <td>345.678.901-22</td>
-                            <td>joao@email.com</td>
-                            <td>(19) 97777-9012</td>
-                            <td><span class="badge badge-blue">Básico</span></td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td><strong>1.650</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Ana Costa</strong></td>
-                            <td>456.789.012-33</td>
-                            <td>ana@email.com</td>
-                            <td>(13) 96666-3456</td>
-                            <td><span class="badge badge-blue">Básico</span></td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td><strong>1.320</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Pedro Almeida</strong></td>
-                            <td>567.890.123-44</td>
-                            <td>pedro@email.com</td>
-                            <td>(11) 95555-7890</td>
-                            <td><span class="badge badge-blue">Básico</span></td>
-                            <td><span class="badge badge-yellow">Pendente</span></td>
-                            <td><strong>1.100</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Fernanda Lima</strong></td>
-                            <td>678.901.234-55</td>
-                            <td>fernanda@email.com</td>
-                            <td>(16) 94444-1234</td>
-                            <td><span class="badge badge-purple">Premium</span></td>
-                            <td><span class="badge badge-red">Inativo</span></td>
-                            <td><strong>450</strong></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Ver</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                            </td>
-                        </tr>
+                    <tbody id="associados-tbody">
                     </tbody>
                 </table>
                 </div>
-                <div class="pagination">
-                    <button class="page-btn">‹</button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <button class="page-btn">›</button>
+                <!-- Empty state -->
+                <div id="assocEmptyState" style="display:none;text-align:center;padding:40px 20px;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-bottom:12px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <p style="color:var(--text-secondary);font-size:14px;">Nenhum associado encontrado para os filtros selecionados.</p>
                 </div>
+                <div class="pagination" id="assocPagination">
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Ver Associado -->
+        <div id="modalVerAssociado" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalVerAssociado')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    Detalhes do Associado
+                </h2>
+                <div id="verAssocContent">
+                    <!-- Filled dynamically -->
+                </div>
+                <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="closeModal('modalVerAssociado');openEditarAssociadoById(window._currentAssocId)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        Editar
+                    </button>
+                    <button class="btn btn-outline" onclick="closeModal('modalVerAssociado')">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Editar Associado -->
+        <div id="modalEditarAssociado" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalEditarAssociado')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Editar Associado
+                </h2>
+                <div id="editarAssocContent">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Novo Associado -->
+        <div id="modalNovoAssociado" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalNovoAssociado')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    Novo Associado
+                </h2>
+                <form id="formNovoAssociado" onsubmit="salvarNovoAssociado(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="novoAssocNome" required placeholder="Nome completo">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF *</label>
+                            <input type="text" id="novoAssocCpf" required placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="novoAssocEmail" required placeholder="email@exemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone *</label>
+                            <input type="text" id="novoAssocTelefone" required placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Plano</label>
+                            <select id="novoAssocPlano" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="Básico">Básico</option>
+                                <option value="Premium">Premium</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="novoAssocStatus" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="Ativo">Ativo</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="novoAssocFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" class="btn btn-green" id="btnSalvarNovoAssoc">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Salvar
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modalNovoAssociado')">Cancelar</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -2213,6 +2237,340 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadNotifConfig);
 } else {
     setTimeout(loadNotifConfig, 200);
+}
+
+// ===== ASSOCIADOS - FULL FUNCTIONALITY =====
+
+// Associados data store (simulating API/DB)
+var associadosData = [
+    { id: 1, nome: 'Carlos Silva', cpf: '123.456.789-00', email: 'carlos@email.com', telefone: '(11) 99999-1234', plano: 'Premium', status: 'Ativo', pontos: 2450, dataAdesao: '2024-03-15', beneficiosUsados: 12, ultimoAcesso: '2025-01-28' },
+    { id: 2, nome: 'Maria Santos', cpf: '234.567.890-11', email: 'maria@email.com', telefone: '(11) 98888-5678', plano: 'Premium', status: 'Ativo', pontos: 1890, dataAdesao: '2024-05-20', beneficiosUsados: 8, ultimoAcesso: '2025-01-27' },
+    { id: 3, nome: 'João Oliveira', cpf: '345.678.901-22', email: 'joao@email.com', telefone: '(19) 97777-9012', plano: 'Básico', status: 'Ativo', pontos: 1650, dataAdesao: '2024-02-10', beneficiosUsados: 6, ultimoAcesso: '2025-01-25' },
+    { id: 4, nome: 'Ana Costa', cpf: '456.789.012-33', email: 'ana@email.com', telefone: '(13) 96666-3456', plano: 'Básico', status: 'Ativo', pontos: 1320, dataAdesao: '2024-07-01', beneficiosUsados: 4, ultimoAcesso: '2025-01-26' },
+    { id: 5, nome: 'Pedro Almeida', cpf: '567.890.123-44', email: 'pedro@email.com', telefone: '(11) 95555-7890', plano: 'Básico', status: 'Pendente', pontos: 1100, dataAdesao: '2024-08-22', beneficiosUsados: 2, ultimoAcesso: '2025-01-20' },
+    { id: 6, nome: 'Fernanda Lima', cpf: '678.901.234-55', email: 'fernanda@email.com', telefone: '(16) 94444-1234', plano: 'Premium', status: 'Inativo', pontos: 450, dataAdesao: '2024-09-30', beneficiosUsados: 1, ultimoAcesso: '2024-12-15' },
+    { id: 7, nome: 'Roberto Nunes', cpf: '789.012.345-66', email: 'roberto@email.com', telefone: '(11) 93333-5678', plano: 'Premium', status: 'Ativo', pontos: 2100, dataAdesao: '2024-01-05', beneficiosUsados: 15, ultimoAcesso: '2025-01-28' },
+    { id: 8, nome: 'Juliana Ferreira', cpf: '890.123.456-77', email: 'juliana@email.com', telefone: '(21) 92222-9012', plano: 'Básico', status: 'Ativo', pontos: 980, dataAdesao: '2024-06-12', beneficiosUsados: 5, ultimoAcesso: '2025-01-24' },
+    { id: 9, nome: 'Marcos Souza', cpf: '901.234.567-88', email: 'marcos@email.com', telefone: '(31) 91111-3456', plano: 'Premium', status: 'Pendente', pontos: 750, dataAdesao: '2024-10-05', beneficiosUsados: 3, ultimoAcesso: '2025-01-18' },
+    { id: 10, nome: 'Luciana Dias', cpf: '012.345.678-99', email: 'luciana@email.com', telefone: '(47) 90000-7890', plano: 'Básico', status: 'Inativo', pontos: 200, dataAdesao: '2024-11-01', beneficiosUsados: 0, ultimoAcesso: '2024-11-20' },
+    { id: 11, nome: 'Ricardo Mendes', cpf: '111.222.333-44', email: 'ricardo@email.com', telefone: '(11) 98765-4321', plano: 'Premium', status: 'Ativo', pontos: 3200, dataAdesao: '2023-12-01', beneficiosUsados: 22, ultimoAcesso: '2025-01-28' },
+    { id: 12, nome: 'Camila Rocha', cpf: '222.333.444-55', email: 'camila@email.com', telefone: '(19) 97654-3210', plano: 'Básico', status: 'Ativo', pontos: 670, dataAdesao: '2024-04-18', beneficiosUsados: 3, ultimoAcesso: '2025-01-22' },
+    { id: 13, nome: 'Thiago Barbosa', cpf: '333.444.555-66', email: 'thiago@email.com', telefone: '(21) 96543-2109', plano: 'Premium', status: 'Ativo', pontos: 1450, dataAdesao: '2024-03-05', beneficiosUsados: 9, ultimoAcesso: '2025-01-27' },
+    { id: 14, nome: 'Patricia Gomes', cpf: '444.555.666-77', email: 'patricia@email.com', telefone: '(13) 95432-1098', plano: 'Básico', status: 'Pendente', pontos: 90, dataAdesao: '2025-01-10', beneficiosUsados: 0, ultimoAcesso: '2025-01-10' },
+    { id: 15, nome: 'André Martins', cpf: '555.666.777-88', email: 'andre@email.com', telefone: '(11) 94321-0987', plano: 'Premium', status: 'Ativo', pontos: 1800, dataAdesao: '2024-02-28', beneficiosUsados: 11, ultimoAcesso: '2025-01-26' },
+    { id: 16, nome: 'Isabela Castro', cpf: '666.777.888-99', email: 'isabela@email.com', telefone: '(16) 93210-9876', plano: 'Básico', status: 'Inativo', pontos: 310, dataAdesao: '2024-08-15', beneficiosUsados: 2, ultimoAcesso: '2024-10-30' }
+];
+
+var assocCurrentPage = 1;
+var assocPerPage = 6;
+var assocFilteredData = [];
+
+// Filter associados by search + status
+function filterAssociados() {
+    var search = (document.getElementById('assocSearchInput').value || '').toLowerCase();
+    var status = document.getElementById('assocStatusFilter').value;
+
+    assocFilteredData = associadosData.filter(function(a) {
+        var matchSearch = !search || a.nome.toLowerCase().indexOf(search) !== -1 || a.cpf.indexOf(search) !== -1 || a.email.toLowerCase().indexOf(search) !== -1;
+        var matchStatus = !status || a.status === status;
+        return matchSearch && matchStatus;
+    });
+
+    assocCurrentPage = 1;
+    renderAssociados();
+}
+
+// Render table rows and pagination
+function renderAssociados() {
+    var tbody = document.getElementById('associados-tbody');
+    var emptyState = document.getElementById('assocEmptyState');
+    var paginationEl = document.getElementById('assocPagination');
+
+    if (!tbody) return;
+
+    var totalPages = Math.ceil(assocFilteredData.length / assocPerPage) || 1;
+    if (assocCurrentPage > totalPages) assocCurrentPage = totalPages;
+
+    var start = (assocCurrentPage - 1) * assocPerPage;
+    var end = start + assocPerPage;
+    var pageData = assocFilteredData.slice(start, end);
+
+    // Empty state
+    if (assocFilteredData.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        paginationEl.innerHTML = '';
+        return;
+    } else {
+        emptyState.style.display = 'none';
+    }
+
+    // Render rows
+    var html = '';
+    for (var i = 0; i < pageData.length; i++) {
+        var a = pageData[i];
+        var planoBadge = a.plano === 'Premium' ? 'badge-purple' : 'badge-blue';
+        var statusBadge = a.status === 'Ativo' ? 'badge-green' : (a.status === 'Inativo' ? 'badge-red' : 'badge-yellow');
+        html += '<tr>';
+        html += '<td><strong>' + a.nome + '</strong></td>';
+        html += '<td>' + a.cpf + '</td>';
+        html += '<td>' + a.email + '</td>';
+        html += '<td>' + a.telefone + '</td>';
+        html += '<td><span class="badge ' + planoBadge + '">' + a.plano + '</span></td>';
+        html += '<td><span class="badge ' + statusBadge + '">' + a.status + '</span></td>';
+        html += '<td><strong>' + a.pontos.toLocaleString('pt-BR') + '</strong></td>';
+        html += '<td style="white-space:nowrap">';
+        html += '<button class="btn btn-sm btn-outline" onclick="verAssociado(' + a.id + ')">Ver</button> ';
+        html += '<button class="btn btn-sm btn-primary" onclick="editarAssociado(' + a.id + ')">Editar</button>';
+        html += '</td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+
+    // Render pagination
+    var pagHtml = '';
+    pagHtml += '<button class="page-btn" onclick="assocGoToPage(' + (assocCurrentPage - 1) + ')"' + (assocCurrentPage === 1 ? ' disabled style="opacity:0.4;cursor:not-allowed"' : '') + '>&lsaquo;</button>';
+    for (var p = 1; p <= totalPages; p++) {
+        pagHtml += '<button class="page-btn' + (p === assocCurrentPage ? ' active' : '') + '" onclick="assocGoToPage(' + p + ')">' + p + '</button>';
+    }
+    pagHtml += '<button class="page-btn" onclick="assocGoToPage(' + (assocCurrentPage + 1) + ')"' + (assocCurrentPage === totalPages ? ' disabled style="opacity:0.4;cursor:not-allowed"' : '') + '>&rsaquo;</button>';
+    paginationEl.innerHTML = pagHtml;
+}
+
+// Pagination navigation
+function assocGoToPage(page) {
+    var totalPages = Math.ceil(assocFilteredData.length / assocPerPage) || 1;
+    if (page < 1 || page > totalPages) return;
+    assocCurrentPage = page;
+    renderAssociados();
+}
+
+// Modal helpers
+function openModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) modal.style.display = 'flex';
+}
+function closeModal(id) {
+    var modal = document.getElementById(id);
+    if (modal) modal.style.display = 'none';
+}
+
+// VER ASSOCIADO (Detail View)
+window._currentAssocId = null;
+function verAssociado(id) {
+    var a = associadosData.find(function(x) { return x.id === id; });
+    if (!a) return;
+    window._currentAssocId = id;
+
+    var statusBadge = a.status === 'Ativo' ? 'badge-green' : (a.status === 'Inativo' ? 'badge-red' : 'badge-yellow');
+    var planoBadge = a.plano === 'Premium' ? 'badge-purple' : 'badge-blue';
+
+    var html = '';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Nome</span><strong>' + a.nome + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">CPF</span><strong>' + a.cpf + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Email</span><strong>' + a.email + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Telefone</span><strong>' + a.telefone + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Plano</span><span class="badge ' + planoBadge + '">' + a.plano + '</span></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Status</span><span class="badge ' + statusBadge + '">' + a.status + '</span></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Pontos Acumulados</span><strong style="font-size:18px;color:var(--green);">' + a.pontos.toLocaleString('pt-BR') + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Benefícios Usados</span><strong style="font-size:18px;">' + a.beneficiosUsados + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Data de Adesão</span><strong>' + formatDateBR(a.dataAdesao) + '</strong></div>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;"><span style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">Último Acesso</span><strong>' + formatDateBR(a.ultimoAcesso) + '</strong></div>';
+    html += '</div>';
+
+    // Histórico de benefícios recentes (mock)
+    html += '<div style="margin-top:24px;"><h4 style="font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Histórico Recente</h4>';
+    html += '<div style="background:var(--dark-bg);border-radius:10px;padding:16px;">';
+    if (a.beneficiosUsados > 0) {
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--dark-border);"><span style="font-size:13px;">20% Troca de Óleo</span><span style="font-size:12px;color:var(--text-secondary);">15/01/2025</span></div>';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--dark-border);"><span style="font-size:13px;">Lavagem Grátis</span><span style="font-size:12px;color:var(--text-secondary);">08/01/2025</span></div>';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;"><span style="font-size:13px;">10% Autopeças</span><span style="font-size:12px;color:var(--text-secondary);">02/01/2025</span></div>';
+    } else {
+        html += '<p style="font-size:13px;color:var(--text-secondary);text-align:center;padding:12px 0;">Nenhum benefício utilizado ainda.</p>';
+    }
+    html += '</div></div>';
+
+    document.getElementById('verAssocContent').innerHTML = html;
+    openModal('modalVerAssociado');
+}
+
+// Helper for Edit from View modal
+function openEditarAssociadoById(id) {
+    if (id) editarAssociado(id);
+}
+
+// EDITAR ASSOCIADO
+function editarAssociado(id) {
+    var a = associadosData.find(function(x) { return x.id === id; });
+    if (!a) return;
+
+    var html = '';
+    html += '<form id="formEditarAssociado" onsubmit="salvarEdicaoAssociado(event, ' + id + ')">';
+    html += '<div class="form-row"><div class="form-group"><label>Nome Completo</label><input type="text" id="editAssocNome" value="' + a.nome + '" required></div>';
+    html += '<div class="form-group"><label>CPF</label><input type="text" value="' + a.cpf + '" readonly style="opacity:0.6;cursor:not-allowed;"></div></div>';
+    html += '<div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="editAssocEmail" value="' + a.email + '" required></div>';
+    html += '<div class="form-group"><label>Telefone</label><input type="text" id="editAssocTelefone" value="' + a.telefone + '" required maxlength="15" oninput="maskPhone(this)"></div></div>';
+    html += '<div class="form-row"><div class="form-group"><label>Plano</label><select id="editAssocPlano" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">';
+    html += '<option value="Básico"' + (a.plano === 'Básico' ? ' selected' : '') + '>Básico</option>';
+    html += '<option value="Premium"' + (a.plano === 'Premium' ? ' selected' : '') + '>Premium</option>';
+    html += '</select></div>';
+    html += '<div class="form-group"><label>Status</label><select id="editAssocStatus" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">';
+    html += '<option value="Ativo"' + (a.status === 'Ativo' ? ' selected' : '') + '>Ativo</option>';
+    html += '<option value="Pendente"' + (a.status === 'Pendente' ? ' selected' : '') + '>Pendente</option>';
+    html += '<option value="Inativo"' + (a.status === 'Inativo' ? ' selected' : '') + '>Inativo</option>';
+    html += '</select></div></div>';
+    html += '<div id="editAssocFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>';
+    html += '<div style="margin-top:24px;display:flex;gap:12px;">';
+    html += '<button type="submit" class="btn btn-primary" id="btnSalvarEditar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Alterações</button>';
+    html += '<button type="button" class="btn btn-outline" onclick="closeModal(\'modalEditarAssociado\')">Cancelar</button>';
+    html += '</div></form>';
+
+    document.getElementById('editarAssocContent').innerHTML = html;
+    openModal('modalEditarAssociado');
+}
+
+// Salvar edição
+function salvarEdicaoAssociado(event, id) {
+    event.preventDefault();
+    var btn = document.getElementById('btnSalvarEditar');
+    var fb = document.getElementById('editAssocFeedback');
+    var nome = document.getElementById('editAssocNome').value.trim();
+    var email = document.getElementById('editAssocEmail').value.trim();
+    var telefone = document.getElementById('editAssocTelefone').value.trim();
+    var plano = document.getElementById('editAssocPlano').value;
+    var status = document.getElementById('editAssocStatus').value;
+
+    if (!nome || !email || !telefone) {
+        fb.style.display = 'block'; fb.style.color = '#ef4444';
+        fb.textContent = 'Preencha todos os campos obrigatórios.';
+        return;
+    }
+
+    // Show loading
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Salvando...';
+    btn.disabled = true;
+
+    setTimeout(function() {
+        // Update local data
+        var a = associadosData.find(function(x) { return x.id === id; });
+        if (a) { a.nome = nome; a.email = email; a.telefone = telefone; a.plano = plano; a.status = status; }
+
+        fb.style.display = 'block'; fb.style.color = '#00A651';
+        fb.textContent = '✓ Associado atualizado com sucesso!';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg> Salvo!';
+        btn.style.background = '#00A651';
+
+        // Re-render table
+        filterAssociados();
+
+        setTimeout(function() { closeModal('modalEditarAssociado'); }, 1500);
+    }, 800);
+}
+
+// NOVO ASSOCIADO
+function openNovoAssociado() {
+    document.getElementById('formNovoAssociado').reset();
+    var fb = document.getElementById('novoAssocFeedback');
+    if (fb) fb.style.display = 'none';
+    openModal('modalNovoAssociado');
+}
+
+function salvarNovoAssociado(event) {
+    event.preventDefault();
+    var btn = document.getElementById('btnSalvarNovoAssoc');
+    var fb = document.getElementById('novoAssocFeedback');
+    var nome = document.getElementById('novoAssocNome').value.trim();
+    var cpf = document.getElementById('novoAssocCpf').value.trim();
+    var email = document.getElementById('novoAssocEmail').value.trim();
+    var telefone = document.getElementById('novoAssocTelefone').value.trim();
+    var plano = document.getElementById('novoAssocPlano').value;
+    var status = document.getElementById('novoAssocStatus').value;
+
+    // Validations
+    if (!nome || !cpf || !email || !telefone) {
+        fb.style.display = 'block'; fb.style.color = '#ef4444';
+        fb.textContent = 'Preencha todos os campos obrigatórios.';
+        return;
+    }
+    if (cpf.length < 14) {
+        fb.style.display = 'block'; fb.style.color = '#ef4444';
+        fb.textContent = 'CPF inválido. Use o formato 000.000.000-00.';
+        return;
+    }
+    // Check duplicate CPF
+    var exists = associadosData.find(function(x) { return x.cpf === cpf; });
+    if (exists) {
+        fb.style.display = 'block'; fb.style.color = '#ef4444';
+        fb.textContent = 'CPF já cadastrado no sistema.';
+        return;
+    }
+
+    // Loading state
+    var originalHTML = btn.innerHTML;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Salvando...';
+    btn.disabled = true;
+
+    setTimeout(function() {
+        // Add to data
+        var newId = associadosData.length > 0 ? Math.max.apply(null, associadosData.map(function(x){ return x.id; })) + 1 : 1;
+        var today = new Date().toISOString().split('T')[0];
+        associadosData.push({
+            id: newId, nome: nome, cpf: cpf, email: email, telefone: telefone,
+            plano: plano, status: status, pontos: 0, dataAdesao: today,
+            beneficiosUsados: 0, ultimoAcesso: today
+        });
+
+        fb.style.display = 'block'; fb.style.color = '#00A651';
+        fb.textContent = '✓ Associado cadastrado com sucesso!';
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg> Salvo!';
+        btn.style.background = '#00A651';
+
+        // Re-render table
+        filterAssociados();
+
+        setTimeout(function() {
+            closeModal('modalNovoAssociado');
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+            btn.disabled = false;
+        }, 1500);
+    }, 800);
+}
+
+// Input masks
+function maskCPF(input) {
+    var v = input.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.substring(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    input.value = v;
+}
+
+function maskPhone(input) {
+    var v = input.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.substring(0, 11);
+    if (v.length > 6) {
+        v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    } else if (v.length > 0) {
+        v = v.replace(/^(\d{0,2})/, '($1');
+    }
+    input.value = v;
+}
+
+// Initialize associados on page load
+function initAssociados() {
+    assocFilteredData = associadosData.slice();
+    renderAssociados();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAssociados);
+} else {
+    setTimeout(initAssociados, 150);
 }
 
 // ===== RELATÓRIOS - EXPORT FUNCTIONALITY =====
