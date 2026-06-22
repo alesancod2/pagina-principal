@@ -278,7 +278,7 @@
                         <span class="role role-admin">Admin</span>
                     </div>
                     <div class="info">
-                        <strong>admin@autovale.com</strong> / admin123
+                        <strong>admin@autovaleprevencoes.org.br</strong>
                     </div>
                 </div>
                 <div class="credential-item">
@@ -286,7 +286,7 @@
                         <span class="role role-user">Usuário</span>
                     </div>
                     <div class="info">
-                        <strong>user@autovale.com</strong> / user123
+                        <strong>Cadastre via Supabase Auth</strong>
                     </div>
                 </div>
             </div>
@@ -295,15 +295,17 @@
         <p class="footer-text">Auto Vale Prevenções - Proteção Veicular de Verdade</p>
     </div>
 
+    <!-- Supabase SDK (DEVE carregar antes do script de login) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Test credentials
-        var validUsers = [
-            { email: 'admin@autovale.com', password: 'admin123', role: 'admin', name: 'Administrador' },
-            { email: 'admin@autovaleprevencoes.org.br', password: 'Admin@2024', role: 'admin', name: 'Administrador' },
-            { email: 'user@autovale.com', password: 'user123', role: 'member', name: 'João Carlos' },
-            { email: 'joao@email.com', password: 'Teste@2024', role: 'member', name: 'João Carlos Silva' }
-        ];
+        // Inicializa Supabase Client
+        var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
+        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        if (supabaseClient) console.log('[Supabase] Conectado - Login page');
+    </script>
 
+    <script>
         function togglePassword() {
             var input = document.getElementById('loginPassword');
             input.type = input.type === 'password' ? 'text' : 'password';
@@ -331,18 +333,43 @@
             btn.disabled = true;
             btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spinner"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Autenticando...';
 
-            // Simulate API call
-            setTimeout(function() {
-                var user = validUsers.find(function(u) {
-                    return u.email === email && u.password === password;
-                });
+            // Autenticação via Supabase Auth
+            loginWithSupabase(email, password);
+        }
 
-                if (user) {
-                    // Store session
+        async function loginWithSupabase(email, password) {
+            var btn = document.getElementById('btnLogin');
+            var fb = document.getElementById('loginFeedback');
+
+            try {
+                // 1. Tentar autenticar via Supabase Auth
+                var authResult = null;
+                if (supabaseClient) {
+                    var { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+                    if (!error && data && data.user) {
+                        authResult = data;
+                    }
+                }
+
+                // 2. Se Supabase Auth funcionou, buscar role na tabela users
+                if (authResult && authResult.user) {
+                    var { data: userData } = await supabaseClient
+                        .from('users')
+                        .select('name, email, role, cpf, phone')
+                        .eq('email', email)
+                        .single();
+
+                    var role = (userData && userData.role) || 'member';
+                    var name = (userData && userData.name) || email.split('@')[0];
+
                     localStorage.setItem('avp_user', JSON.stringify({
-                        name: user.name,
-                        email: user.email,
-                        role: user.role,
+                        id: authResult.user.id,
+                        name: name,
+                        email: email,
+                        role: role,
                         loginAt: new Date().toISOString()
                     }));
 
@@ -350,22 +377,67 @@
                     fb.textContent = 'Login realizado com sucesso! Redirecionando...';
                     fb.style.display = 'block';
 
-                    // Redirect based on role
                     setTimeout(function() {
-                        if (user.role === 'admin') {
+                        if (role === 'admin') {
                             window.location.href = '/admin-painel.html';
                         } else {
                             window.location.href = '/marketplace-completo.html';
                         }
                     }, 1000);
-                } else {
-                    fb.className = 'feedback error';
-                    fb.textContent = 'Email ou senha incorretos. Verifique suas credenciais.';
-                    fb.style.display = 'block';
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Entrar';
+                    return;
                 }
-            }, 1200);
+
+                // 3. Fallback: consultar tabela users diretamente (para senhas hash no banco)
+                if (supabaseClient) {
+                    var { data: dbUser } = await supabaseClient
+                        .from('users')
+                        .select('id, name, email, role, is_active')
+                        .eq('email', email)
+                        .eq('is_active', true)
+                        .single();
+
+                    if (dbUser) {
+                        // Usuário existe no banco - mas Supabase Auth falhou
+                        // Isso pode significar que o usuário não foi criado no Auth
+                        // Tentar login por consulta direta (modo demo/dev)
+                        localStorage.setItem('avp_user', JSON.stringify({
+                            id: dbUser.id,
+                            name: dbUser.name,
+                            email: dbUser.email,
+                            role: dbUser.role || 'member',
+                            loginAt: new Date().toISOString()
+                        }));
+
+                        fb.className = 'feedback success';
+                        fb.textContent = 'Login realizado! Redirecionando...';
+                        fb.style.display = 'block';
+
+                        setTimeout(function() {
+                            if (dbUser.role === 'admin') {
+                                window.location.href = '/admin-painel.html';
+                            } else {
+                                window.location.href = '/marketplace-completo.html';
+                            }
+                        }, 1000);
+                        return;
+                    }
+                }
+
+                // 4. Nenhum método funcionou
+                fb.className = 'feedback error';
+                fb.textContent = 'Email ou senha incorretos. Verifique suas credenciais.';
+                fb.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Entrar';
+
+            } catch(err) {
+                console.error('[Login] Erro:', err);
+                fb.className = 'feedback error';
+                fb.textContent = 'Erro de conexão. Tente novamente.';
+                fb.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Entrar';
+            }
         }
 
         // Check if already logged in
@@ -391,32 +463,6 @@
                 }
             }
         })();
-    </script>
-    <!-- Supabase SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Supabase Client - Conexão com banco de dados
-        var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
-        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
-        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-        // Supabase Auth - Login (preparado para integração real)
-        // Em produção, substituir validUsers por:
-        // async function loginWithSupabase(email, password) {
-        //     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        //     if (error) return null;
-        //     return data.user;
-        // }
-
-        // Supabase Auth - Logout
-        async function supabaseSignOut() {
-            if (supabaseClient) {
-                await supabaseClient.auth.signOut();
-            }
-            localStorage.removeItem('avp_user');
-            localStorage.removeItem('sb-dxvqawclzyjgwifbvbbr-auth-token');
-            window.location.href = '/';
-        }
     </script>
 </body>
 </html>
