@@ -3182,5 +3182,68 @@ function exportReport(type, format) {
 }
 
     </script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Client - Conexão com banco de dados (Admin Panel)
+        var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
+        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // Helper: Query Supabase tables (admin tem acesso a todas as tabelas)
+        async function supabaseQuery(table, options) {
+            if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            var query = supabaseClient.from(table).select(options && options.select || '*');
+            if (options && options.filter) {
+                for (var key in options.filter) {
+                    query = query.eq(key, options.filter[key]);
+                }
+            }
+            if (options && options.order) query = query.order(options.order, { ascending: options.ascending || false });
+            if (options && options.limit) query = query.limit(options.limit);
+            return await query;
+        }
+
+        // Helper: Insert into Supabase
+        async function supabaseInsert(table, data) {
+            if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            return await supabaseClient.from(table).insert(data).select();
+        }
+
+        // Helper: Update in Supabase
+        async function supabaseUpdate(table, id, data) {
+            if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            return await supabaseClient.from(table).update(data).eq('id', id).select();
+        }
+
+        // Helper: Delete from Supabase
+        async function supabaseDelete(table, id) {
+            if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            return await supabaseClient.from(table).delete().eq('id', id);
+        }
+
+        // Admin Dashboard: Fetch stats from Supabase
+        async function fetchDashboardStats() {
+            if (!supabaseClient) return;
+            try {
+                var [partners, users, benefits, points] = await Promise.all([
+                    supabaseClient.from('partners').select('id, status', { count: 'exact' }),
+                    supabaseClient.from('users').select('id', { count: 'exact' }).eq('role', 'member'),
+                    supabaseClient.from('benefit_usages').select('id', { count: 'exact' }),
+                    supabaseClient.from('point_transactions').select('amount').eq('type', 'earned')
+                ]);
+                // Log para debug (remover em produção)
+                console.log('[Supabase] Dashboard stats loaded:', { partners, users, benefits, points });
+            } catch(e) {
+                console.warn('[Supabase] Erro ao buscar stats:', e.message);
+            }
+        }
+
+        // Inicializa conexão ao carregar
+        if (supabaseClient) {
+            console.log('[Supabase] Conectado ao projeto: dxvqawclzyjgwifbvbbr');
+            fetchDashboardStats();
+        }
+    </script>
 </body>
 </html>

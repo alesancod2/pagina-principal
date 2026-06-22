@@ -392,5 +392,31 @@
             }
         })();
     </script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Client - Conexão com banco de dados
+        var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
+        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // Supabase Auth - Login (preparado para integração real)
+        // Em produção, substituir validUsers por:
+        // async function loginWithSupabase(email, password) {
+        //     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        //     if (error) return null;
+        //     return data.user;
+        // }
+
+        // Supabase Auth - Logout
+        async function supabaseSignOut() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            localStorage.removeItem('avp_user');
+            localStorage.removeItem('sb-dxvqawclzyjgwifbvbbr-auth-token');
+            window.location.href = '/';
+        }
+    </script>
 </body>
 </html>
