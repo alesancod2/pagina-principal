@@ -1,11 +1,10 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/login", "dest": "/login.html" },
-    { "src": "/admin", "dest": "/admin-painel.html" },
-    { "src": "/marketplace", "dest": "/marketplace-completo.html" },
-    { "src": "/qr-confirmacao", "dest": "/qr-confirmacao.html" },
-    { "src": "/qr-erro", "dest": "/qr-erro.html" }
+  "rewrites": [
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin-painel.html" },
+    { "source": "/marketplace", "destination": "/marketplace-completo.html" },
+    { "source": "/qr-confirmacao", "destination": "/qr-confirmacao.html" },
+    { "source": "/qr-erro", "destination": "/qr-erro.html" }
   ],
   "headers": [
     {
