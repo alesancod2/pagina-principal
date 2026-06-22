@@ -836,8 +836,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         </div>
     </div>
 
-    <!-- Supabase Integration -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <!-- Supabase SDK (DEVE carregar antes do script) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
     (function(){
         'use strict';
@@ -845,7 +845,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         // Supabase initialization
         var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
-        var supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        if (supabaseClient) console.log('[Supabase] Conectado - Marketplace page');
 
         // Get current user from localStorage
         function getCurrentUser() {
@@ -857,9 +858,9 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 
         // Query user data filtered by user_id
         async function getUserData(table, userId) {
-            if (!supabase) return null;
-            var { data, error } = await supabase.from(table).select('*').eq('user_id', userId);
-            if (error) { console.error('Supabase error:', error); return null; }
+            if (!supabaseClient) return null;
+            var { data, error } = await supabaseClient.from(table).select('*').eq('user_id', userId);
+            if (error) { console.error('[Supabase] Erro em getUserData:', error); return null; }
             return data;
         }
 
@@ -873,16 +874,16 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
             return getUserData('coupons', userId);
         }
 
-        // Query user history
+        // Query user history (benefit_usages table)
         async function getUserHistory(userId) {
-            return getUserData('usage_history', userId);
+            return getUserData('benefit_usages', userId);
         }
 
         // Query user profile
         async function getUserProfile(userId) {
-            if (!supabase) return null;
-            var { data, error } = await supabase.from('users').select('*').eq('id', userId).single();
-            if (error) { console.error('Supabase error:', error); return null; }
+            if (!supabaseClient) return null;
+            var { data, error } = await supabaseClient.from('users').select('*').eq('id', userId).single();
+            if (error) { console.error('[Supabase] Erro em getUserProfile:', error); return null; }
             return data;
         }
 
