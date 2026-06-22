@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Clube de Benefícios Auto Vale</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-blue: #2F3EBF;
+            --green: #00A651;
+            --dark-bg: #050A14;
+            --dark-card: #0D1520;
+            --dark-border: #1a2332;
+            --text-primary: #ffffff;
+            --text-secondary: #8892a4;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        .login-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 20px;
+            padding: 40px 32px;
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-logo img {
+            height: 60px;
+            width: auto;
+            margin-bottom: 12px;
+        }
+        .login-logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--green), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-logo p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+        .form-group input {
+            width: 100%;
+            background: var(--dark-bg);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            padding: 12px 14px 12px 42px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            border-color: var(--primary-blue);
+        }
+        .form-group input::placeholder {
+            color: #4a5568;
+        }
+        .toggle-pass {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+        }
+        .toggle-pass:hover {
+            color: var(--text-primary);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-blue), var(--green));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-login:hover {
+            opacity: 0.9;
+        }
+        .btn-login:active {
+            transform: scale(0.98);
+        }
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .feedback {
+            margin-top: 16px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+        .feedback.error {
+            display: block;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444;
+        }
+        .feedback.success {
+            display: block;
+            background: rgba(0,166,81,0.1);
+            border: 1px solid rgba(0,166,81,0.3);
+            color: #00A651;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            gap: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--dark-border);
+        }
+        .divider span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .test-credentials {
+            background: var(--dark-bg);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .test-credentials h4 {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--dark-border);
+        }
+        .credential-item:last-child {
+            border-bottom: none;
+        }
+        .credential-item .role {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .role-admin {
+            background: rgba(47,62,191,0.15);
+            color: #6b7fff;
+        }
+        .role-user {
+            background: rgba(0,166,81,0.15);
+            color: #00A651;
+        }
+        .credential-item .info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .credential-item .info strong {
+            color: var(--text-primary);
+        }
+        .footer-text {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="assets/Logomarca 2.png" alt="Auto Vale Prevenções">
+                <h1>Clube de Benefícios</h1>
+                <p>Faça login para acessar a plataforma</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <div class="input-wrapper">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <input type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="input-wrapper">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="current-password">
+                        <button type="button" class="toggle-pass" onclick="togglePassword()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="btnLogin">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    Entrar
+                </button>
+            </form>
+
+            <div id="loginFeedback" class="feedback"></div>
+
+            <div class="divider"><span>Acessos de Teste</span></div>
+
+            <div class="test-credentials">
+                <h4>Credenciais para demonstração</h4>
+                <div class="credential-item">
+                    <div>
+                        <span class="role role-admin">Admin</span>
+                    </div>
+                    <div class="info">
+                        <strong>admin@autovale.com</strong> / admin123
+                    </div>
+                </div>
+                <div class="credential-item">
+                    <div>
+                        <span class="role role-user">Usuário</span>
+                    </div>
+                    <div class="info">
+                        <strong>user@autovale.com</strong> / user123
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="footer-text">Auto Vale Prevenções - Proteção Veicular de Verdade</p>
+    </div>
+
+    <script>
+        // Test credentials
+        var validUsers = [
+            { email: 'admin@autovale.com', password: 'admin123', role: 'admin', name: 'Administrador' },
+            { email: 'admin@autovaleprevencoes.org.br', password: 'Admin@2024', role: 'admin', name: 'Administrador' },
+            { email: 'user@autovale.com', password: 'user123', role: 'member', name: 'João Carlos' },
+            { email: 'joao@email.com', password: 'Teste@2024', role: 'member', name: 'João Carlos Silva' }
+        ];
+
+        function togglePassword() {
+            var input = document.getElementById('loginPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            var password = document.getElementById('loginPassword').value;
+            var btn = document.getElementById('btnLogin');
+            var fb = document.getElementById('loginFeedback');
+
+            // Hide previous feedback
+            fb.className = 'feedback';
+            fb.style.display = 'none';
+
+            if (!email || !password) {
+                fb.className = 'feedback error';
+                fb.textContent = 'Preencha email e senha.';
+                fb.style.display = 'block';
+                return;
+            }
+
+            // Show loading
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spinner"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Autenticando...';
+
+            // Simulate API call
+            setTimeout(function() {
+                var user = validUsers.find(function(u) {
+                    return u.email === email && u.password === password;
+                });
+
+                if (user) {
+                    // Store session
+                    localStorage.setItem('avp_user', JSON.stringify({
+                        name: user.name,
+                        email: user.email,
+                        role: user.role,
+                        loginAt: new Date().toISOString()
+                    }));
+
+                    fb.className = 'feedback success';
+                    fb.textContent = 'Login realizado com sucesso! Redirecionando...';
+                    fb.style.display = 'block';
+
+                    // Redirect based on role
+                    setTimeout(function() {
+                        if (user.role === 'admin') {
+                            window.location.href = '/admin-painel.html';
+                        } else {
+                            window.location.href = '/index.html';
+                        }
+                    }, 1000);
+                } else {
+                    fb.className = 'feedback error';
+                    fb.textContent = 'Email ou senha incorretos. Verifique suas credenciais.';
+                    fb.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Entrar';
+                }
+            }, 1200);
+        }
+
+        // Check if already logged in
+        (function() {
+            var stored = localStorage.getItem('avp_user');
+            if (stored) {
+                try {
+                    var user = JSON.parse(stored);
+                    // Session valid for 24h
+                    var loginTime = new Date(user.loginAt).getTime();
+                    var now = Date.now();
+                    if (now - loginTime < 24 * 60 * 60 * 1000) {
+                        if (user.role === 'admin') {
+                            window.location.href = '/admin-painel.html';
+                        } else {
+                            window.location.href = '/index.html';
+                        }
+                    } else {
+                        localStorage.removeItem('avp_user');
+                    }
+                } catch(e) {
+                    localStorage.removeItem('avp_user');
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

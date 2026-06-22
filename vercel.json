@@ -1,6 +1,7 @@
 {
   "version": 2,
   "routes": [
+    { "src": "/login", "dest": "/login.html" },
     { "src": "/admin", "dest": "/admin-painel.html" },
     { "src": "/marketplace", "dest": "/marketplace-completo.html" },
     { "src": "/qr-confirmacao", "dest": "/qr-confirmacao.html" },
