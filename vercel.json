@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "name": "pagina-principal",
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/admin", "dest": "/admin-painel.html" },
+    { "src": "/marketplace", "dest": "/marketplace-completo.html" },
+    { "src": "/qr-confirmacao", "dest": "/qr-confirmacao.html" },
+    { "src": "/qr-erro", "dest": "/qr-erro.html" },
+    { "src": "/(.*)\\.html", "dest": "/$1.html" },
+    { "src": "/", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
+  ]
+}
