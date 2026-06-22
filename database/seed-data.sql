@@ -1,12 +1,20 @@
 -- ============================================
--- SEED DATA - Dados iniciais para o Clube de Beneficios
--- Seguro para executar MULTIPLAS VEZES (idempotente)
--- Execute no Supabase SQL Editor
+-- SEED DATA - Clube de Beneficios Auto Vale
+-- 100% IDEMPOTENTE - pode executar quantas vezes quiser
+-- Execute APÓS o supabase-full-schema.sql
 -- ============================================
 
 -- ============================================
--- 1. SYSTEM_CONFIG
--- (ON CONFLICT atualiza se já existir)
+-- 1. LIMPAR CONFLITOS DE EXECUÇÕES ANTERIORES
+-- ============================================
+DELETE FROM system_config WHERE key NOT IN (
+    'points_per_usage','points_expiry_days','min_redeem_points',
+    'max_coupon_validity_days','compliance_check_enabled','geolocation_radius_km',
+    'qr_redirect_url','app_name','app_version'
+);
+
+-- ============================================
+-- 2. SYSTEM_CONFIG (atualiza se já existir)
 -- ============================================
 INSERT INTO system_config (key, value, description) VALUES
 ('points_per_usage', '50', 'Pontos ganhos por utilização de parceiro'),
@@ -21,8 +29,7 @@ INSERT INTO system_config (key, value, description) VALUES
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
 
 -- ============================================
--- 2. PARCEIROS
--- (ON CONFLICT ignora se CNPJ já existir)
+-- 3. PARCEIROS (ignora se CNPJ já existir)
 -- ============================================
 INSERT INTO partners (company_name, trade_name, cnpj, category, description, address, city, state, phone, whatsapp, rating, status) VALUES
 ('Auto Posto São Jorge Ltda', 'Auto Posto São Jorge', '12.345.678/0001-01', 'postos', 'Combustível de qualidade com bandeira premium. Gasolina aditivada, etanol e diesel S-10.', 'Av. Augusto Pestana, 1250 - Centro', 'Linhares', 'ES', '(27) 3264-1234', '(27) 99812-3456', 4.8, 'active'),
@@ -40,8 +47,8 @@ INSERT INTO partners (company_name, trade_name, cnpj, category, description, add
 ON CONFLICT (cnpj) DO NOTHING;
 
 -- ============================================
--- 3. BENEFÍCIOS DOS PARCEIROS
--- (não duplica pois checa existência antes)
+-- 4. BENEFÍCIOS DOS PARCEIROS
+-- (verifica se já existe antes de inserir)
 -- ============================================
 DO $$
 DECLARE
@@ -131,11 +138,11 @@ BEGIN
         VALUES (v_partner_id, 'Desconto V-Power', 'Combustível aditivado com desconto', 'discount_percent', 3, 50, true);
     END IF;
 
-    RAISE NOTICE 'Benefícios inseridos com sucesso!';
+    RAISE NOTICE 'Beneficios inseridos com sucesso!';
 END $$;
 
 -- ============================================
--- 4. VERIFICAÇÃO FINAL
+-- 5. VERIFICAÇÃO FINAL
 -- ============================================
 DO $$
 DECLARE
@@ -149,9 +156,9 @@ BEGIN
     SELECT COUNT(*) INTO v_configs FROM system_config;
     SELECT COUNT(*) INTO v_users FROM users;
     
-    RAISE NOTICE '=== SEED CONCLUIDO ===';
+    RAISE NOTICE '=== SEED CONCLUIDO COM SUCESSO ===';
     RAISE NOTICE 'Parceiros: %', v_partners;
-    RAISE NOTICE 'Benefícios: %', v_benefits;
+    RAISE NOTICE 'Beneficios: %', v_benefits;
     RAISE NOTICE 'Configs: %', v_configs;
-    RAISE NOTICE 'Usuários: %', v_users;
+    RAISE NOTICE 'Usuarios: %', v_users;
 END $$;

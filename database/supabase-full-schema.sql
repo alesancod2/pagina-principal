@@ -519,7 +519,15 @@ CREATE TRIGGER trg_benefit_usage_count
 
 -- ============================================
 -- DADOS INICIAIS (SEED)
+-- Seguro para re-execução (idempotente)
 -- ============================================
+
+-- Limpar configs órfãs de execuções anteriores (evita conflito)
+DELETE FROM system_config WHERE key NOT IN (
+    'points_per_usage','points_expiry_days','min_redeem_points',
+    'max_coupon_validity_days','compliance_check_enabled','geolocation_radius_km',
+    'qr_redirect_url','app_name','app_version'
+) AND key IS NOT NULL;
 
 -- Configurações do sistema
 INSERT INTO system_config (key, value, description) VALUES
@@ -542,15 +550,62 @@ INSERT INTO users (name, email, cpf, phone, password_hash, role, is_active, emai
 ON CONFLICT (email) DO NOTHING;
 
 -- ============================================
+-- RLS POLICIES (acesso via anon key)
+-- ============================================
+
+-- Permitir leitura da tabela users para login funcionar
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_users" ON users;
+CREATE POLICY "allow_public_read_users" ON users FOR SELECT USING (true);
+
+-- Permitir leitura de parceiros (público)
+ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_partners" ON partners;
+CREATE POLICY "allow_public_read_partners" ON partners FOR SELECT USING (true);
+
+-- Permitir leitura de benefícios (público)
+ALTER TABLE partner_benefits ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_benefits" ON partner_benefits;
+CREATE POLICY "allow_public_read_benefits" ON partner_benefits FOR SELECT USING (true);
+
+-- Permitir leitura de configs (público)
+ALTER TABLE system_config ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_config" ON system_config;
+CREATE POLICY "allow_public_read_config" ON system_config FOR SELECT USING (true);
+
+-- Permitir leitura de pontos do próprio usuário
+ALTER TABLE user_points ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_user_points" ON user_points;
+CREATE POLICY "allow_public_read_user_points" ON user_points FOR SELECT USING (true);
+
+-- Permitir leitura de transações de pontos
+ALTER TABLE point_transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_point_transactions" ON point_transactions;
+CREATE POLICY "allow_public_read_point_transactions" ON point_transactions FOR SELECT USING (true);
+
+-- Permitir leitura de cupons
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_coupons" ON coupons;
+CREATE POLICY "allow_public_read_coupons" ON coupons FOR SELECT USING (true);
+
+-- Permitir leitura de usages
+ALTER TABLE benefit_usages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_benefit_usages" ON benefit_usages;
+CREATE POLICY "allow_public_read_benefit_usages" ON benefit_usages FOR SELECT USING (true);
+
+-- ============================================
 -- VERIFICAÇÃO FINAL
 -- ============================================
 DO $$
 DECLARE
     table_count INTEGER;
+    config_count INTEGER;
 BEGIN
     SELECT COUNT(*) INTO table_count
     FROM information_schema.tables
     WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
     
-    RAISE NOTICE '✓ Schema criado com sucesso! Total de tabelas: %', table_count;
+    SELECT COUNT(*) INTO config_count FROM system_config;
+    
+    RAISE NOTICE 'Schema criado com sucesso! Tabelas: %, Configs: %', table_count, config_count;
 END $$;
