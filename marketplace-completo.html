@@ -265,6 +265,18 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 </style>
 </head>
 <body>
+<script>
+// Auth guard - redireciona para login se não autenticado
+(function(){
+    var stored = localStorage.getItem('avp_user');
+    if (!stored) { window.location.href = '/'; return; }
+    try {
+        var user = JSON.parse(stored);
+        var loginTime = new Date(user.loginAt).getTime();
+        if (Date.now() - loginTime > 24*60*60*1000) { localStorage.removeItem('avp_user'); window.location.href = '/'; return; }
+    } catch(e) { localStorage.removeItem('avp_user'); window.location.href = '/'; }
+})();
+</script>
     <!-- Header / Navbar -->
     <header class="navbar">
         <div class="navbar-container">
