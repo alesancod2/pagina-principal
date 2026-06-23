@@ -142,7 +142,84 @@ BEGIN
 END $$;
 
 -- ============================================
--- 5. VERIFICAÇÃO FINAL
+-- 5. CUPONS DE EXEMPLO
+-- (usa a função create_coupon do schema)
+-- ============================================
+DO $$
+DECLARE
+    v_partner_id UUID;
+    v_benefit_id UUID;
+    v_admin_id UUID;
+    v_coupon_id UUID;
+BEGIN
+    -- Buscar admin
+    SELECT id INTO v_admin_id FROM users WHERE email = 'admin@autovaleprevencoes.org.br' LIMIT 1;
+
+    -- Cupom 1: Desconto Combustível (percentual)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Auto Posto São Jorge' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Desconto Combustível' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
+        VALUES ('AV-7X2K-9M4P', 'Desconto Combustível', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 5, NOW() + INTERVAL '30 days');
+    END IF;
+
+    -- Cupom 2: Lavagem Premium (percentual)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Lava Jato Premium' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Lavagem Premium' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
+        VALUES ('AV-3F8N-1L5Q', 'Lavagem Premium', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '30 days');
+    END IF;
+
+    -- Cupom 3: Cashback Mecânica (percentual)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Mecânica Central' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Cashback Mecânica' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, status, used_at, expires_at)
+        VALUES ('AV-9D4R-6H2W', 'Cashback Mecânica', v_partner_id, v_benefit_id, v_admin_id, 'cashback', 'percentual', 10, 'used', NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days');
+    END IF;
+
+    -- Cupom 4: Pontos em Dobro (expirado)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Pneus & Cia' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Pontos Dobrados' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, status, expires_at)
+        VALUES ('AV-2B7T-8K3J', 'Pontos Dobrados', v_partner_id, v_benefit_id, v_admin_id, 'pontos_dobro', 'percentual', 0, 'expired', NOW() - INTERVAL '10 days');
+    END IF;
+
+    -- Cupom 5: Desconto Polimento (percentual)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Estética Car Pro' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Desconto Polimento' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
+        VALUES ('AV-5G1M-4N8V', 'Desconto Polimento', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '60 days');
+    END IF;
+
+    -- Cupom 6: Revisão com Desconto (valor fixo R$50)
+    SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
+    FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
+    WHERE p.trade_name = 'Auto Elétrica Rápida' LIMIT 1;
+
+    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Revisão com Desconto' AND partner_id = v_partner_id) THEN
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
+        VALUES ('AV-6C9P-2R7X', 'Revisão com Desconto', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'valor_fixo', 50, NOW() + INTERVAL '90 days');
+    END IF;
+
+    RAISE NOTICE 'Cupons de exemplo inseridos com sucesso!';
+END $$;
+
+-- ============================================
+-- 6. VERIFICAÇÃO FINAL
 -- ============================================
 DO $$
 DECLARE
@@ -150,15 +227,18 @@ DECLARE
     v_benefits INTEGER;
     v_configs INTEGER;
     v_users INTEGER;
+    v_coupons INTEGER;
 BEGIN
     SELECT COUNT(*) INTO v_partners FROM partners;
     SELECT COUNT(*) INTO v_benefits FROM partner_benefits;
     SELECT COUNT(*) INTO v_configs FROM system_config;
     SELECT COUNT(*) INTO v_users FROM users;
+    SELECT COUNT(*) INTO v_coupons FROM coupons;
     
     RAISE NOTICE '=== SEED CONCLUIDO COM SUCESSO ===';
     RAISE NOTICE 'Parceiros: %', v_partners;
     RAISE NOTICE 'Beneficios: %', v_benefits;
+    RAISE NOTICE 'Cupons: %', v_coupons;
     RAISE NOTICE 'Configs: %', v_configs;
     RAISE NOTICE 'Usuarios: %', v_users;
 END $$;
