@@ -113,9 +113,15 @@
             background: rgba(0,166,81,0.1);
         }
         .sidebar.collapsed .sidebar-pin {
-            right: 50%;
-            transform: translateX(50%);
-            top: 78px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .sidebar.collapsed.hover-expand .sidebar-pin {
+            opacity: 1;
+            pointer-events: auto;
+            right: 12px;
+            transform: none;
+            top: 28px;
         }
         /* Hover expand (when collapsed and not pinned) */
         .sidebar.collapsed.hover-expand {
