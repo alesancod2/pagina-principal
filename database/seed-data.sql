@@ -143,14 +143,13 @@ END $$;
 
 -- ============================================
 -- 5. CUPONS DE EXEMPLO
--- (usa a função create_coupon do schema)
+-- (idempotente - ignora se código já existir)
 -- ============================================
 DO $$
 DECLARE
     v_partner_id UUID;
     v_benefit_id UUID;
     v_admin_id UUID;
-    v_coupon_id UUID;
 BEGIN
     -- Buscar admin
     SELECT id INTO v_admin_id FROM users WHERE email = 'admin@autovaleprevencoes.org.br' LIMIT 1;
@@ -159,60 +158,60 @@ BEGIN
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Auto Posto São Jorge' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Desconto Combustível' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
-        VALUES ('AV-7X2K-9M4P', 'Desconto Combustível', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 5, NOW() + INTERVAL '30 days');
+        VALUES ('AV-7X2K-9M4P', 'Desconto Combustível', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 5, NOW() + INTERVAL '30 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
     -- Cupom 2: Lavagem Premium (percentual)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Lava Jato Premium' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Lavagem Premium' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
-        VALUES ('AV-3F8N-1L5Q', 'Lavagem Premium', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '30 days');
+        VALUES ('AV-3F8N-1L5Q', 'Lavagem Premium', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '30 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
-    -- Cupom 3: Cashback Mecânica (percentual)
+    -- Cupom 3: Cashback Mecânica (usado)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Mecânica Central' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Cashback Mecânica' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, status, used_at, expires_at)
-        VALUES ('AV-9D4R-6H2W', 'Cashback Mecânica', v_partner_id, v_benefit_id, v_admin_id, 'cashback', 'percentual', 10, 'used', NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days');
+        VALUES ('AV-9D4R-6H2W', 'Cashback Mecânica', v_partner_id, v_benefit_id, v_admin_id, 'cashback', 'percentual', 10, 'used', NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
     -- Cupom 4: Pontos em Dobro (expirado)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Pneus & Cia' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Pontos Dobrados' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, status, expires_at)
-        VALUES ('AV-2B7T-8K3J', 'Pontos Dobrados', v_partner_id, v_benefit_id, v_admin_id, 'pontos_dobro', 'percentual', 0, 'expired', NOW() - INTERVAL '10 days');
+        VALUES ('AV-2B7T-8K3J', 'Pontos Dobrados', v_partner_id, v_benefit_id, v_admin_id, 'pontos_dobro', 'percentual', 0, 'expired', NOW() - INTERVAL '10 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
     -- Cupom 5: Desconto Polimento (percentual)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Estética Car Pro' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Desconto Polimento' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
-        VALUES ('AV-5G1M-4N8V', 'Desconto Polimento', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '60 days');
+        VALUES ('AV-5G1M-4N8V', 'Desconto Polimento', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 15, NOW() + INTERVAL '60 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
     -- Cupom 6: Revisão com Desconto (valor fixo R$50)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Auto Elétrica Rápida' LIMIT 1;
-
-    IF v_partner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM coupons WHERE name = 'Revisão com Desconto' AND partner_id = v_partner_id) THEN
+    IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, expires_at)
-        VALUES ('AV-6C9P-2R7X', 'Revisão com Desconto', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'valor_fixo', 50, NOW() + INTERVAL '90 days');
+        VALUES ('AV-6C9P-2R7X', 'Revisão com Desconto', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'valor_fixo', 50, NOW() + INTERVAL '90 days')
+        ON CONFLICT (code) DO NOTHING;
     END IF;
 
     RAISE NOTICE 'Cupons de exemplo inseridos com sucesso!';
