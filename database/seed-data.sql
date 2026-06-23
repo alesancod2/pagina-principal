@@ -218,6 +218,48 @@ BEGIN
 END $$;
 
 -- ============================================
+-- 5b. CAMPANHAS DE EXEMPLO
+-- ============================================
+DO $$
+DECLARE
+    v_admin_id UUID;
+BEGIN
+    SELECT id INTO v_admin_id FROM users WHERE email = 'admin@autovaleprevencoes.org.br' LIMIT 1;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Verão Premiado 2025') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, target_categories, created_by)
+        VALUES ('Verão Premiado 2025', 'Pontos em dobro em todos os postos parceiros durante o verão.', 'double_points', 2.0, '2025-01-01', '2025-02-28', true, ARRAY['postos'], v_admin_id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Semana do Carro Limpo') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, target_categories, created_by)
+        VALUES ('Semana do Carro Limpo', 'Lavagem completa com 50% de desconto usando pontos.', 'special_cashback', 1.0, '2025-01-15', '2025-01-22', true, ARRAY['lava-jato'], v_admin_id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Maratona de Pontos') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, target_categories, created_by)
+        VALUES ('Maratona de Pontos', 'Acumule 1000 pontos e ganhe uma troca de óleo grátis.', 'double_points', 2.0, '2025-03-01', '2025-03-31', true, ARRAY['mecanica'], v_admin_id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Natal Premiado 2024') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, created_by)
+        VALUES ('Natal Premiado 2024', 'Sorteio de prêmios para quem acumulou mais de 500 pontos.', 'custom', 1.0, '2024-12-01', '2024-12-25', false, v_admin_id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Cashback de Aniversário') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, created_by)
+        VALUES ('Cashback de Aniversário', '10% de cashback em todos os serviços durante o mês de aniversário do associado.', 'special_cashback', 1.0, '2025-04-01', '2025-04-30', true, v_admin_id);
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Indique e Ganhe') THEN
+        INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, created_by)
+        VALUES ('Indique e Ganhe', 'Indique um amigo e ambos ganham 200 pontos bônus na primeira utilização.', 'member_month', 1.0, '2025-02-01', '2025-06-30', true, v_admin_id);
+    END IF;
+
+    RAISE NOTICE 'Campanhas de exemplo inseridas com sucesso!';
+END $$;
+
+-- ============================================
 -- 6. VERIFICAÇÃO FINAL
 -- ============================================
 DO $$
@@ -227,17 +269,20 @@ DECLARE
     v_configs INTEGER;
     v_users INTEGER;
     v_coupons INTEGER;
+    v_campaigns INTEGER;
 BEGIN
     SELECT COUNT(*) INTO v_partners FROM partners;
     SELECT COUNT(*) INTO v_benefits FROM partner_benefits;
     SELECT COUNT(*) INTO v_configs FROM system_config;
     SELECT COUNT(*) INTO v_users FROM users;
     SELECT COUNT(*) INTO v_coupons FROM coupons;
+    SELECT COUNT(*) INTO v_campaigns FROM campaigns;
     
     RAISE NOTICE '=== SEED CONCLUIDO COM SUCESSO ===';
     RAISE NOTICE 'Parceiros: %', v_partners;
     RAISE NOTICE 'Beneficios: %', v_benefits;
     RAISE NOTICE 'Cupons: %', v_coupons;
+    RAISE NOTICE 'Campanhas: %', v_campaigns;
     RAISE NOTICE 'Configs: %', v_configs;
     RAISE NOTICE 'Usuarios: %', v_users;
 END $$;

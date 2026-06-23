@@ -631,9 +631,10 @@
             border: 1px solid var(--dark-border);
             border-radius: 12px;
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
+            cursor: pointer;
         }
-        .campaign-card:hover { transform: translateY(-2px); }
+        .campaign-card:hover { transform: translateY(-2px); border-color: var(--primary-blue); }
         .campaign-banner {
             height: 140px;
             background: linear-gradient(135deg, var(--primary-blue), var(--green));
@@ -1419,57 +1420,138 @@
         <div class="section" id="sec-campanhas">
             <h1 class="section-title">Campanhas</h1>
             <p class="section-subtitle">Gerencie campanhas promocionais</p>
-            <div style="margin-bottom:20px;text-align:right">
-                <button class="btn btn-green">+ Nova Campanha</button>
+
+            <!-- Filtros + Botão Nova -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    <label style="font-size:13px;color:var(--text-secondary);">Status:</label>
+                    <select id="campanhasFilterStatus" onchange="renderCampanhas()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="all">Todas</option>
+                        <option value="ativa">Ativas</option>
+                        <option value="agendada">Agendadas</option>
+                        <option value="encerrada">Encerradas</option>
+                    </select>
+                    <input type="text" id="campanhasSearch" placeholder="Buscar campanha..." onkeyup="renderCampanhas()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;width:200px;">
+                </div>
+                <button class="btn btn-green" onclick="openModal('modalNovaCampanha')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nova Campanha
+                </button>
             </div>
-            <div class="campaigns-grid">
-                <div class="campaign-card">
-                    <div class="campaign-banner" style="background:linear-gradient(135deg,#ff6b35,#f7c948)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></div>
-                    <div class="campaign-body">
-                        <div style="margin-bottom:8px"><span class="badge badge-green">Ativa</span></div>
-                        <h4>Verão Premiado 2025</h4>
-                        <p>Pontos em dobro em todos os postos parceiros durante o verão.</p>
-                        <div class="campaign-meta">
-                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>01/01 - 28/02/2025</span>
-                            <span>Posto Shell Centro</span>
+
+            <!-- Grid de Cards (renderizado por JS) -->
+            <div class="campaigns-grid" id="campanhasGrid">
+                <!-- Rendered by renderCampanhas() -->
+            </div>
+        </div>
+
+        <!-- MODAL: Nova Campanha -->
+        <div id="modalNovaCampanha" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalNovaCampanha')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                    Nova Campanha
+                </h2>
+                <form id="formNovaCampanha" onsubmit="salvarCampanha(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input type="text" id="campTitulo" required placeholder="Ex: Verão Premiado 2025" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo *</label>
+                            <select id="campTipo" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione</option>
+                                <option value="double_points">Pontos em Dobro</option>
+                                <option value="partner_month">Parceiro do Mês</option>
+                                <option value="special_cashback">Cashback Especial</option>
+                                <option value="member_month">Membro do Mês</option>
+                                <option value="custom">Personalizada</option>
+                            </select>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <textarea id="campDescricao" required placeholder="Descreva a campanha..." rows="3" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data Início *</label>
+                            <input type="date" id="campInicio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim *</label>
+                            <input type="date" id="campFim" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Parceiro (opcional)</label>
+                            <select id="campParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Todos os parceiros</option>
+                                <option value="Posto Shell Centro">Posto Shell Centro</option>
+                                <option value="Lava-Jato Express">Lava-Jato Express</option>
+                                <option value="Mecânica do João">Mecânica do João</option>
+                                <option value="Pneu Forte">Pneu Forte</option>
+                                <option value="Estética Premium">Estética Premium</option>
+                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                <option value="Borracharia 24h">Borracharia 24h</option>
+                                <option value="Guincho Express">Guincho Express</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Multiplicador de Pontos</label>
+                            <input type="number" id="campMultiplicador" placeholder="2.0" min="1" max="5" step="0.5" value="2.0" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cor do Banner *</label>
+                            <select id="campCor" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="orange">Laranja / Amarelo</option>
+                                <option value="blue">Azul / Roxo</option>
+                                <option value="green">Verde</option>
+                                <option value="red">Vermelho</option>
+                                <option value="gray">Cinza</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Público-alvo</label>
+                            <select id="campPublico" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="todos">Todos os associados</option>
+                                <option value="premium">Apenas Premium</option>
+                                <option value="novos">Novos associados</option>
+                                <option value="inativos">Associados inativos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="novaCampanhaFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" class="btn btn-green" id="btnSalvarCampanha">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Salvar Campanha
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modalNovaCampanha')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: Detalhes Campanha -->
+        <div id="modalDetalhesCampanha" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;padding:0;position:relative;overflow:hidden;">
+                <button onclick="closeModal('modalDetalhesCampanha')" style="position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.3);border:none;color:#fff;cursor:pointer;padding:6px;border-radius:50%;z-index:10;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div id="detalhesCampanhaBanner" style="height:160px;display:flex;align-items:center;justify-content:center;"></div>
+                <div style="padding:32px;" id="detalhesCampanhaContent">
+                    <!-- Filled dynamically -->
                 </div>
-                <div class="campaign-card">
-                    <div class="campaign-banner" style="background:linear-gradient(135deg,#2F3EBF,#6b7fff)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
-                    <div class="campaign-body">
-                        <div style="margin-bottom:8px"><span class="badge badge-green">Ativa</span></div>
-                        <h4>Semana do Carro Limpo</h4>
-                        <p>Lavagem completa com 50% de desconto usando pontos.</p>
-                        <div class="campaign-meta">
-                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>15/01 - 22/01/2025</span>
-                            <span>Lava-Jato Express</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="campaign-card">
-                    <div class="campaign-banner" style="background:linear-gradient(135deg,#00A651,#00d68f)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
-                    <div class="campaign-body">
-                        <div style="margin-bottom:8px"><span class="badge badge-blue">Agendada</span></div>
-                        <h4>Maratona de Pontos</h4>
-                        <p>Acumule 1000 pontos e ganhe uma troca de óleo grátis.</p>
-                        <div class="campaign-meta">
-                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>01/03 - 31/03/2025</span>
-                            <span>Mecânica do João</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="campaign-card">
-                    <div class="campaign-banner" style="background:linear-gradient(135deg,#718096,#4a5568)"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></div>
-                    <div class="campaign-body">
-                        <div style="margin-bottom:8px"><span class="badge badge-red">Encerrada</span></div>
-                        <h4>Natal Premiado 2024</h4>
-                        <p>Sorteio de prêmios para quem acumulou mais de 500 pontos.</p>
-                        <div class="campaign-meta">
-                            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>01/12 - 25/12/2024</span>
-                            <span>Todos os parceiros</span>
-                        </div>
-                    </div>
+                <div style="padding:0 32px 32px;display:flex;gap:12px;flex-wrap:wrap;" id="detalhesCampanhaActions">
+                    <!-- Filled dynamically -->
                 </div>
             </div>
         </div>
@@ -3961,6 +4043,206 @@ function salvarCupomLote(event) {
         }, 2000);
     }, 1000);
 }
+
+// ===== CAMPANHAS - SISTEMA COMPLETO =====
+var campanhasData = [
+    { id:1, titulo:'Verão Premiado 2025', tipo:'double_points', descricao:'Pontos em dobro em todos os postos parceiros durante o verão.', inicio:'2025-01-01', fim:'2025-02-28', parceiro:'Posto Shell Centro', multiplicador:2, cor:'orange', status:'ativa', publico:'todos', icon:'sun' },
+    { id:2, titulo:'Semana do Carro Limpo', tipo:'special_cashback', descricao:'Lavagem completa com 50% de desconto usando pontos.', inicio:'2025-01-15', fim:'2025-01-22', parceiro:'Lava-Jato Express', multiplicador:1, cor:'blue', status:'ativa', publico:'todos', icon:'car' },
+    { id:3, titulo:'Maratona de Pontos', tipo:'double_points', descricao:'Acumule 1000 pontos e ganhe uma troca de óleo grátis.', inicio:'2025-03-01', fim:'2025-03-31', parceiro:'Mecânica do João', multiplicador:2, cor:'green', status:'agendada', publico:'premium', icon:'trophy' },
+    { id:4, titulo:'Natal Premiado 2024', tipo:'custom', descricao:'Sorteio de prêmios para quem acumulou mais de 500 pontos.', inicio:'2024-12-01', fim:'2024-12-25', parceiro:'Todos os parceiros', multiplicador:1, cor:'gray', status:'encerrada', publico:'todos', icon:'gift' },
+    { id:5, titulo:'Cashback de Aniversário', tipo:'special_cashback', descricao:'10% de cashback em todos os serviços durante o mês de aniversário do associado.', inicio:'2025-04-01', fim:'2025-04-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'red', status:'agendada', publico:'todos', icon:'percent' },
+    { id:6, titulo:'Indique e Ganhe', tipo:'member_month', descricao:'Indique um amigo e ambos ganham 200 pontos bônus na primeira utilização.', inicio:'2025-02-01', fim:'2025-06-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'green', status:'ativa', publico:'todos', icon:'users' }
+];
+
+var campanhaGradients = {
+    orange: 'linear-gradient(135deg,#ff6b35,#f7c948)',
+    blue: 'linear-gradient(135deg,#2F3EBF,#6b7fff)',
+    green: 'linear-gradient(135deg,#00A651,#00d68f)',
+    red: 'linear-gradient(135deg,#ef4444,#f97316)',
+    gray: 'linear-gradient(135deg,#718096,#4a5568)'
+};
+
+var campanhaIcons = {
+    sun: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+    car: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
+    trophy: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+    gift: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>',
+    percent: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+    users: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+};
+
+function formatDateBRShort(dateStr) {
+    if (!dateStr) return '';
+    var d = dateStr.split('-');
+    return d[2] + '/' + d[1];
+}
+
+function getCampanhaStatusBadge(status) {
+    if (status === 'ativa') return '<span class="badge badge-green">Ativa</span>';
+    if (status === 'agendada') return '<span class="badge badge-blue">Agendada</span>';
+    return '<span class="badge badge-red">Encerrada</span>';
+}
+
+function renderCampanhas() {
+    var search = (document.getElementById('campanhasSearch').value || '').toLowerCase();
+    var statusFilter = document.getElementById('campanhasFilterStatus').value;
+    var grid = document.getElementById('campanhasGrid');
+    if (!grid) return;
+
+    var filtered = campanhasData.filter(function(c) {
+        var matchSearch = !search || c.titulo.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.descricao.toLowerCase().indexOf(search) > -1;
+        var matchStatus = statusFilter === 'all' || c.status === statusFilter;
+        return matchSearch && matchStatus;
+    });
+
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:48px;color:var(--text-secondary);">Nenhuma campanha encontrada</div>';
+        return;
+    }
+
+    grid.innerHTML = filtered.map(function(c) {
+        var gradient = campanhaGradients[c.cor] || campanhaGradients.blue;
+        var icon = campanhaIcons[c.icon] || campanhaIcons.sun;
+        var calIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+        return '<div class="campaign-card" onclick="verDetalhesCampanha(' + c.id + ')">' +
+            '<div class="campaign-banner" style="background:' + gradient + '">' + icon + '</div>' +
+            '<div class="campaign-body">' +
+                '<div style="margin-bottom:8px">' + getCampanhaStatusBadge(c.status) + '</div>' +
+                '<h4>' + c.titulo + '</h4>' +
+                '<p>' + c.descricao + '</p>' +
+                '<div class="campaign-meta">' +
+                    '<span>' + calIcon + formatDateBRShort(c.inicio) + ' - ' + formatDateBRShort(c.fim) + '/' + c.fim.split('-')[0] + '</span>' +
+                    '<span>' + c.parceiro + '</span>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function verDetalhesCampanha(id) {
+    var c = campanhasData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    window._currentCampanhaId = id;
+
+    var banner = document.getElementById('detalhesCampanhaBanner');
+    var content = document.getElementById('detalhesCampanhaContent');
+    var actions = document.getElementById('detalhesCampanhaActions');
+    var gradient = campanhaGradients[c.cor] || campanhaGradients.blue;
+    var icon = campanhaIcons[c.icon] || campanhaIcons.sun;
+
+    banner.style.background = gradient;
+    banner.innerHTML = icon;
+
+    var tipoLabel = { double_points:'Pontos em Dobro', partner_month:'Parceiro do Mês', special_cashback:'Cashback Especial', member_month:'Membro do Mês', custom:'Personalizada' };
+    var publicoLabel = { todos:'Todos os associados', premium:'Apenas Premium', novos:'Novos associados', inativos:'Associados inativos' };
+
+    content.innerHTML =
+        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">' + getCampanhaStatusBadge(c.status) + '<span style="font-size:12px;color:var(--text-secondary);">' + (tipoLabel[c.tipo] || c.tipo) + '</span></div>' +
+        '<h2 style="font-size:22px;font-weight:700;margin-bottom:12px;">' + c.titulo + '</h2>' +
+        '<p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:24px;">' + c.descricao + '</p>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Período</div>' +
+                '<div style="font-size:14px;font-weight:600;">' + formatDateBRShort(c.inicio) + ' - ' + formatDateBRShort(c.fim) + '/' + c.fim.split('-')[0] + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parceiro</div>' +
+                '<div style="font-size:14px;font-weight:600;">' + c.parceiro + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Multiplicador</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--green);">' + c.multiplicador + 'x Pontos</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Público-alvo</div>' +
+                '<div style="font-size:14px;font-weight:600;">' + (publicoLabel[c.publico] || c.publico) + '</div>' +
+            '</div>' +
+        '</div>';
+
+    var actionsHtml = '';
+    if (c.status === 'ativa') {
+        actionsHtml = '<button class="btn btn-red" onclick="encerrarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Encerrar</button>';
+    } else if (c.status === 'agendada') {
+        actionsHtml = '<button class="btn btn-green" onclick="ativarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ativar Agora</button>' +
+            '<button class="btn btn-red" onclick="encerrarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>';
+    }
+    actionsHtml += '<button class="btn btn-outline" onclick="closeModal(\'modalDetalhesCampanha\')">Fechar</button>';
+    actions.innerHTML = actionsHtml;
+
+    openModal('modalDetalhesCampanha');
+}
+
+function encerrarCampanha() {
+    var id = window._currentCampanhaId;
+    var c = campanhasData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    if (!confirm('Tem certeza que deseja encerrar a campanha "' + c.titulo + '"?')) return;
+    c.status = 'encerrada';
+    closeModal('modalDetalhesCampanha');
+    renderCampanhas();
+}
+
+function ativarCampanha() {
+    var id = window._currentCampanhaId;
+    var c = campanhasData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    c.status = 'ativa';
+    closeModal('modalDetalhesCampanha');
+    renderCampanhas();
+}
+
+function salvarCampanha(event) {
+    event.preventDefault();
+    var titulo = document.getElementById('campTitulo').value;
+    var tipo = document.getElementById('campTipo').value;
+    var descricao = document.getElementById('campDescricao').value;
+    var inicio = document.getElementById('campInicio').value;
+    var fim = document.getElementById('campFim').value;
+    var parceiro = document.getElementById('campParceiro').value || 'Todos os parceiros';
+    var multiplicador = parseFloat(document.getElementById('campMultiplicador').value) || 1;
+    var cor = document.getElementById('campCor').value;
+    var publico = document.getElementById('campPublico').value;
+    var fb = document.getElementById('novaCampanhaFeedback');
+
+    // Determinar status baseado nas datas
+    var hoje = new Date().toISOString().split('T')[0];
+    var status = inicio > hoje ? 'agendada' : (fim < hoje ? 'encerrada' : 'ativa');
+
+    // Determinar ícone baseado no tipo
+    var iconMap = { double_points:'trophy', partner_month:'sun', special_cashback:'percent', member_month:'users', custom:'gift' };
+
+    var novaCampanha = {
+        id: campanhasData.length + 1,
+        titulo: titulo,
+        tipo: tipo,
+        descricao: descricao,
+        inicio: inicio,
+        fim: fim,
+        parceiro: parceiro,
+        multiplicador: multiplicador,
+        cor: cor,
+        status: status,
+        publico: publico,
+        icon: iconMap[tipo] || 'sun'
+    };
+    campanhasData.unshift(novaCampanha);
+
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(0,166,81,0.1)';
+    fb.style.border = '1px solid rgba(0,166,81,0.3)';
+    fb.style.color = '#00A651';
+    fb.textContent = 'Campanha "' + titulo + '" criada com sucesso! Status: ' + status;
+
+    setTimeout(function() {
+        fb.style.display = 'none';
+        closeModal('modalNovaCampanha');
+        document.getElementById('formNovaCampanha').reset();
+        renderCampanhas();
+    }, 1500);
+}
+
+// Init campanhas on load
+document.addEventListener('DOMContentLoaded', function() { renderCampanhas(); });
 
 // Init cupons table on load
 document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); });
