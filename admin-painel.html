@@ -351,6 +351,11 @@
             color: white;
         }
         .btn-green:hover { background: #008c44; }
+        .btn-red {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-red:hover { background: #dc2626; }
         .btn-sm {
             padding: 6px 12px;
             font-size: 12px;
@@ -1259,12 +1264,24 @@
             <h1 class="section-title">Cupons</h1>
             <p class="section-subtitle">Gerencie cupons de desconto</p>
 
+            <!-- Filtro por status -->
+            <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <label style="font-size:13px;color:var(--text-secondary)">Status:</label>
+                <select id="cuponsFilterStatus" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                    <option value="all">Todos</option>
+                    <option value="Válido">Válido</option>
+                    <option value="Usado">Usado</option>
+                    <option value="Expirado">Expirado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+
             <div class="table-container">
                 <div class="table-header">
-                    <input type="text" class="table-search" placeholder="Buscar cupom..." onkeyup="searchTable(this, 'cupons-table')">
+                    <input type="text" class="table-search" id="cuponsSearchInput" placeholder="Buscar por código, parceiro..." onkeyup="filterCuponsTable()">
                     <div style="display:flex;gap:8px">
-                        <button class="btn btn-primary"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> Gerar Cupom</button>
-                        <button class="btn btn-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Gerar em Lote</button>
+                        <button class="btn btn-primary" onclick="openModal('modalGerarCupom')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> Gerar Cupom</button>
+                        <button class="btn btn-green" onclick="openModal('modalGerarLote')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Gerar em Lote</button>
                     </div>
                 </div>
                 <div style="overflow-x:auto">
@@ -1280,67 +1297,209 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-7X2K-9M4P</code></td>
-                            <td>Posto Shell Centro</td>
-                            <td>Desconto 5% Combustível</td>
-                            <td>10/01/2025</td>
-                            <td>10/02/2025</td>
-                            <td><span class="badge badge-green">Válido</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-3F8N-1L5Q</code></td>
-                            <td>Lava-Jato Express</td>
-                            <td>Lavagem Premium Grátis</td>
-                            <td>08/01/2025</td>
-                            <td>08/02/2025</td>
-                            <td><span class="badge badge-green">Válido</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-9D4R-6H2W</code></td>
-                            <td>Mecânica do João</td>
-                            <td>Cashback 10%</td>
-                            <td>05/01/2025</td>
-                            <td>05/02/2025</td>
-                            <td><span class="badge badge-yellow">Usado</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-2B7T-8K3J</code></td>
-                            <td>Pneu Forte</td>
-                            <td>Pontos em Dobro</td>
-                            <td>01/01/2025</td>
-                            <td>15/01/2025</td>
-                            <td><span class="badge badge-red">Expirado</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-5G1M-4N8V</code></td>
-                            <td>Estética Premium</td>
-                            <td>Desconto 15% Polimento</td>
-                            <td>12/01/2025</td>
-                            <td>12/03/2025</td>
-                            <td><span class="badge badge-green">Válido</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
-                        <tr>
-                            <td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">AV-6C9P-2R7X</code></td>
-                            <td>Auto Elétrica Raio</td>
-                            <td>Revisão com Desconto</td>
-                            <td>14/01/2025</td>
-                            <td>14/04/2025</td>
-                            <td><span class="badge badge-green">Válido</span></td>
-                            <td><button class="btn btn-sm btn-outline">Detalhes</button></td>
-                        </tr>
+                    <tbody id="cuponsTableBody">
+                        <!-- Rendered by JS -->
                     </tbody>
                 </table>
+                </div>
+                <!-- Paginação -->
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--dark-border);margin-top:8px;">
+                    <span style="font-size:13px;color:var(--text-secondary)" id="cuponsPageInfo">Mostrando 1-6 de 6</span>
+                    <div style="display:flex;gap:4px" id="cuponsPagination"></div>
                 </div>
             </div>
         </div>
 
+        </div>
+
+        <!-- MODAL: Gerar Cupom -->
+        <div id="modalGerarCupom" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalGerarCupom')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+                    Gerar Cupom
+                </h2>
+                <form id="formGerarCupom" onsubmit="salvarCupom(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Parceiro *</label>
+                            <select id="cupomParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o parceiro</option>
+                                <option value="Posto Shell Centro">Posto Shell Centro</option>
+                                <option value="Lava-Jato Express">Lava-Jato Express</option>
+                                <option value="Mecânica do João">Mecânica do João</option>
+                                <option value="Pneu Forte">Pneu Forte</option>
+                                <option value="Estética Premium">Estética Premium</option>
+                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                <option value="Borracharia 24h">Borracharia 24h</option>
+                                <option value="Guincho Express">Guincho Express</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Benefício *</label>
+                            <select id="cupomBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o benefício</option>
+                                <option value="Desconto 5% Combustível">Desconto 5% Combustível</option>
+                                <option value="Desconto 10% Serviços">Desconto 10% Serviços</option>
+                                <option value="Desconto 15% Polimento">Desconto 15% Polimento</option>
+                                <option value="Desconto 20% Revisão">Desconto 20% Revisão</option>
+                                <option value="Lavagem Premium Grátis">Lavagem Premium Grátis</option>
+                                <option value="Cashback 10%">Cashback 10%</option>
+                                <option value="Pontos em Dobro">Pontos em Dobro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Desconto *</label>
+                            <select id="cupomTipoDesconto" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="percent">Percentual (%)</option>
+                                <option value="fixed">Valor Fixo (R$)</option>
+                                <option value="freebie">Gratuito</option>
+                                <option value="points">Pontos em Dobro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor do Desconto *</label>
+                            <input type="number" id="cupomValorDesconto" required placeholder="Ex: 10" min="0" step="0.01" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Validade (dias) *</label>
+                            <input type="number" id="cupomValidade" required placeholder="30" min="1" max="365" value="30" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Associado (opcional)</label>
+                            <input type="text" id="cupomAssociado" placeholder="Nome ou email do associado" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="cupomObs" placeholder="Observações adicionais..." rows="3" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+                    </div>
+                    <div id="gerarCupomFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" class="btn btn-primary" id="btnSalvarCupom">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+                            Gerar Cupom
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modalGerarCupom')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: Gerar em Lote -->
+        <div id="modalGerarLote" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalGerarLote')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    Gerar Cupons em Lote
+                </h2>
+                <form id="formGerarLote" onsubmit="salvarCupomLote(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Parceiro *</label>
+                            <select id="loteParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o parceiro</option>
+                                <option value="Posto Shell Centro">Posto Shell Centro</option>
+                                <option value="Lava-Jato Express">Lava-Jato Express</option>
+                                <option value="Mecânica do João">Mecânica do João</option>
+                                <option value="Pneu Forte">Pneu Forte</option>
+                                <option value="Estética Premium">Estética Premium</option>
+                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                <option value="Borracharia 24h">Borracharia 24h</option>
+                                <option value="Guincho Express">Guincho Express</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Benefício *</label>
+                            <select id="loteBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o benefício</option>
+                                <option value="Desconto 5% Combustível">Desconto 5% Combustível</option>
+                                <option value="Desconto 10% Serviços">Desconto 10% Serviços</option>
+                                <option value="Desconto 15% Polimento">Desconto 15% Polimento</option>
+                                <option value="Desconto 20% Revisão">Desconto 20% Revisão</option>
+                                <option value="Lavagem Premium Grátis">Lavagem Premium Grátis</option>
+                                <option value="Cashback 10%">Cashback 10%</option>
+                                <option value="Pontos em Dobro">Pontos em Dobro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Quantidade de Cupons *</label>
+                            <input type="number" id="loteQuantidade" required placeholder="Ex: 50" min="1" max="500" value="10" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Validade (dias) *</label>
+                            <input type="number" id="loteValidade" required placeholder="30" min="1" max="365" value="30" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tipo de Desconto *</label>
+                            <select id="loteTipoDesconto" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="percent">Percentual (%)</option>
+                                <option value="fixed">Valor Fixo (R$)</option>
+                                <option value="freebie">Gratuito</option>
+                                <option value="points">Pontos em Dobro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor do Desconto *</label>
+                            <input type="number" id="loteValorDesconto" required placeholder="Ex: 10" min="0" step="0.01" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Distribuição</label>
+                        <select id="loteDistribuicao" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <option value="todos">Todos os associados ativos</option>
+                            <option value="premium">Apenas plano Premium</option>
+                            <option value="novos">Novos associados (últimos 30 dias)</option>
+                            <option value="sem_uso">Associados sem uso recente</option>
+                        </select>
+                    </div>
+                    <div id="gerarLoteFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" class="btn btn-green" id="btnSalvarLote">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                            Gerar Lote
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modalGerarLote')">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: Detalhes do Cupom -->
+        <div id="modalDetalhesCupom" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalDetalhesCupom')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+                    Detalhes do Cupom
+                </h2>
+                <div id="detalhesCupomContent">
+                    <!-- Filled dynamically -->
+                </div>
+                <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-red" id="btnCancelarCupom" onclick="cancelarCupom()" style="display:none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        Cancelar Cupom
+                    </button>
+                    <button class="btn btn-outline" onclick="closeModal('modalDetalhesCupom')">Fechar</button>
+                </div>
+            </div>
         </div>
 
         <!-- 7. PONTUAÇÃO -->
@@ -3180,6 +3339,252 @@ function exportReport(type, format) {
         }
     }, 800);
 }
+
+// ===== CUPONS - SISTEMA COMPLETO =====
+var cuponsData = [
+    { id:1, code:'AV-7X2K-9M4P', parceiro:'Posto Shell Centro', beneficio:'Desconto 5% Combustível', tipo:'percent', valor:5, emitido:'10/01/2025', validade:'10/02/2025', status:'Válido', associado:'João Carlos Silva', email:'joao@email.com', obs:'' },
+    { id:2, code:'AV-3F8N-1L5Q', parceiro:'Lava-Jato Express', beneficio:'Lavagem Premium Grátis', tipo:'freebie', valor:0, emitido:'08/01/2025', validade:'08/02/2025', status:'Válido', associado:'Maria Fernanda', email:'maria@email.com', obs:'' },
+    { id:3, code:'AV-9D4R-6H2W', parceiro:'Mecânica do João', beneficio:'Cashback 10%', tipo:'percent', valor:10, emitido:'05/01/2025', validade:'05/02/2025', status:'Usado', associado:'Pedro Henrique', email:'pedro@email.com', obs:'Usado em 20/01/2025' },
+    { id:4, code:'AV-2B7T-8K3J', parceiro:'Pneu Forte', beneficio:'Pontos em Dobro', tipo:'points', valor:0, emitido:'01/01/2025', validade:'15/01/2025', status:'Expirado', associado:'Ana Beatriz', email:'ana@email.com', obs:'' },
+    { id:5, code:'AV-5G1M-4N8V', parceiro:'Estética Premium', beneficio:'Desconto 15% Polimento', tipo:'percent', valor:15, emitido:'12/01/2025', validade:'12/03/2025', status:'Válido', associado:'Lucas Oliveira', email:'lucas@email.com', obs:'' },
+    { id:6, code:'AV-6C9P-2R7X', parceiro:'Auto Elétrica Raio', beneficio:'Revisão com Desconto', tipo:'percent', valor:20, emitido:'14/01/2025', validade:'14/04/2025', status:'Válido', associado:'Fernanda Costa', email:'fernanda@email.com', obs:'' },
+    { id:7, code:'AV-8H3M-5T9R', parceiro:'Borracharia 24h', beneficio:'Desconto 10% Serviços', tipo:'percent', valor:10, emitido:'20/01/2025', validade:'20/02/2025', status:'Válido', associado:'Ricardo Alves', email:'ricardo@email.com', obs:'' },
+    { id:8, code:'AV-1K7P-4W2N', parceiro:'Guincho Express', beneficio:'Desconto 20% Revisão', tipo:'percent', valor:20, emitido:'22/01/2025', validade:'22/03/2025', status:'Cancelado', associado:'Camila Santos', email:'camila@email.com', obs:'Cancelado a pedido do cliente' }
+];
+var cuponsPage = 1;
+var cuponsPerPage = 6;
+
+function generateCupomCode() {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var p1 = '', p2 = '';
+    for (var i = 0; i < 4; i++) { p1 += chars.charAt(Math.floor(Math.random() * chars.length)); p2 += chars.charAt(Math.floor(Math.random() * chars.length)); }
+    return 'AV-' + p1 + '-' + p2;
+}
+
+function getStatusBadge(status) {
+    var cls = status === 'Válido' ? 'badge-green' : status === 'Usado' ? 'badge-yellow' : status === 'Expirado' ? 'badge-red' : 'badge-red';
+    return '<span class="badge ' + cls + '">' + status + '</span>';
+}
+
+function filterCuponsTable() {
+    cuponsPage = 1;
+    renderCuponsTable();
+}
+
+function getFilteredCupons() {
+    var search = (document.getElementById('cuponsSearchInput').value || '').toLowerCase();
+    var statusFilter = document.getElementById('cuponsFilterStatus').value;
+    return cuponsData.filter(function(c) {
+        var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1;
+        var matchStatus = statusFilter === 'all' || c.status === statusFilter;
+        return matchSearch && matchStatus;
+    });
+}
+
+function renderCuponsTable() {
+    var filtered = getFilteredCupons();
+    var total = filtered.length;
+    var start = (cuponsPage - 1) * cuponsPerPage;
+    var end = Math.min(start + cuponsPerPage, total);
+    var page = filtered.slice(start, end);
+    var tbody = document.getElementById('cuponsTableBody');
+    if (!tbody) return;
+
+    if (page.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
+    } else {
+        tbody.innerHTML = page.map(function(c) {
+            return '<tr>' +
+                '<td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">' + c.code + '</code></td>' +
+                '<td>' + c.parceiro + '</td>' +
+                '<td>' + c.beneficio + '</td>' +
+                '<td>' + c.emitido + '</td>' +
+                '<td>' + c.validade + '</td>' +
+                '<td>' + getStatusBadge(c.status) + '</td>' +
+                '<td><button class="btn btn-sm btn-outline" onclick="verDetalhesCupom(' + c.id + ')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Detalhes</button></td>' +
+            '</tr>';
+        }).join('');
+    }
+    document.getElementById('cuponsPageInfo').textContent = 'Mostrando ' + (total > 0 ? start + 1 : 0) + '-' + end + ' de ' + total;
+    renderCuponsPagination(total);
+}
+
+function renderCuponsPagination(total) {
+    var pages = Math.ceil(total / cuponsPerPage);
+    var container = document.getElementById('cuponsPagination');
+    if (!container) return;
+    var html = '';
+    for (var i = 1; i <= pages; i++) {
+        var active = i === cuponsPage ? 'background:var(--primary-blue);color:#fff;' : 'background:var(--dark-bg);color:var(--text-secondary);';
+        html += '<button onclick="cuponsPage=' + i + ';renderCuponsTable()" style="' + active + 'border:1px solid var(--dark-border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">' + i + '</button>';
+    }
+    container.innerHTML = html;
+}
+
+function verDetalhesCupom(id) {
+    var c = cuponsData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    window._currentCupomId = id;
+    var content = document.getElementById('detalhesCupomContent');
+    var tipoLabel = c.tipo === 'percent' ? 'Percentual' : c.tipo === 'fixed' ? 'Valor Fixo' : c.tipo === 'freebie' ? 'Gratuito' : 'Pontos em Dobro';
+    var valorLabel = c.tipo === 'percent' ? c.valor + '%' : c.tipo === 'fixed' ? 'R$ ' + c.valor.toFixed(2) : c.tipo === 'freebie' ? 'Grátis' : '2x Pontos';
+
+    content.innerHTML =
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Código</div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--text-primary);font-family:monospace;">' + c.code + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Status</div>' +
+                '<div>' + getStatusBadge(c.status) + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parceiro</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.parceiro + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Benefício</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.beneficio + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Tipo / Valor</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--green);">' + tipoLabel + ' - ' + valorLabel + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Associado</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.associado + '</div>' +
+                '<div style="font-size:12px;color:var(--text-secondary);">' + c.email + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Emitido em</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.emitido + '</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Validade</div>' +
+                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.validade + '</div>' +
+            '</div>' +
+        '</div>' +
+        (c.obs ? '<div style="margin-top:16px;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Observações</div><div style="font-size:14px;color:var(--text-primary);">' + c.obs + '</div></div>' : '');
+
+    var btnCancelar = document.getElementById('btnCancelarCupom');
+    btnCancelar.style.display = (c.status === 'Válido') ? 'inline-flex' : 'none';
+    openModal('modalDetalhesCupom');
+}
+
+function cancelarCupom() {
+    var id = window._currentCupomId;
+    var c = cuponsData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    if (!confirm('Tem certeza que deseja cancelar o cupom ' + c.code + '?')) return;
+    c.status = 'Cancelado';
+    c.obs = 'Cancelado manualmente em ' + new Date().toLocaleDateString('pt-BR');
+    closeModal('modalDetalhesCupom');
+    renderCuponsTable();
+}
+
+function salvarCupom(event) {
+    event.preventDefault();
+    var parceiro = document.getElementById('cupomParceiro').value;
+    var beneficio = document.getElementById('cupomBeneficio').value;
+    var tipo = document.getElementById('cupomTipoDesconto').value;
+    var valor = parseFloat(document.getElementById('cupomValorDesconto').value) || 0;
+    var validade = parseInt(document.getElementById('cupomValidade').value) || 30;
+    var associado = document.getElementById('cupomAssociado').value || 'Sem associado';
+    var obs = document.getElementById('cupomObs').value || '';
+    var fb = document.getElementById('gerarCupomFeedback');
+
+    var hoje = new Date();
+    var vencimento = new Date(hoje.getTime() + validade * 24 * 60 * 60 * 1000);
+    var emitidoStr = hoje.toLocaleDateString('pt-BR');
+    var validadeStr = vencimento.toLocaleDateString('pt-BR');
+
+    var novoCupom = {
+        id: cuponsData.length + 1,
+        code: generateCupomCode(),
+        parceiro: parceiro,
+        beneficio: beneficio,
+        tipo: tipo,
+        valor: valor,
+        emitido: emitidoStr,
+        validade: validadeStr,
+        status: 'Válido',
+        associado: associado,
+        email: '',
+        obs: obs
+    };
+    cuponsData.unshift(novoCupom);
+
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(0,166,81,0.1)';
+    fb.style.border = '1px solid rgba(0,166,81,0.3)';
+    fb.style.color = '#00A651';
+    fb.textContent = 'Cupom ' + novoCupom.code + ' gerado com sucesso!';
+
+    setTimeout(function() {
+        fb.style.display = 'none';
+        closeModal('modalGerarCupom');
+        document.getElementById('formGerarCupom').reset();
+        cuponsPage = 1;
+        renderCuponsTable();
+    }, 1500);
+}
+
+function salvarCupomLote(event) {
+    event.preventDefault();
+    var parceiro = document.getElementById('loteParceiro').value;
+    var beneficio = document.getElementById('loteBeneficio').value;
+    var quantidade = parseInt(document.getElementById('loteQuantidade').value) || 10;
+    var validade = parseInt(document.getElementById('loteValidade').value) || 30;
+    var tipo = document.getElementById('loteTipoDesconto').value;
+    var valor = parseFloat(document.getElementById('loteValorDesconto').value) || 0;
+    var fb = document.getElementById('gerarLoteFeedback');
+
+    var btn = document.getElementById('btnSalvarLote');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Gerando...';
+
+    var hoje = new Date();
+    var vencimento = new Date(hoje.getTime() + validade * 24 * 60 * 60 * 1000);
+    var emitidoStr = hoje.toLocaleDateString('pt-BR');
+    var validadeStr = vencimento.toLocaleDateString('pt-BR');
+
+    setTimeout(function() {
+        for (var i = 0; i < quantidade; i++) {
+            cuponsData.unshift({
+                id: cuponsData.length + 1 + i,
+                code: generateCupomCode(),
+                parceiro: parceiro,
+                beneficio: beneficio,
+                tipo: tipo,
+                valor: valor,
+                emitido: emitidoStr,
+                validade: validadeStr,
+                status: 'Válido',
+                associado: 'Lote #' + (i + 1),
+                email: '',
+                obs: 'Gerado em lote (' + quantidade + ' cupons)'
+            });
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Gerar Lote';
+        fb.style.display = 'block';
+        fb.style.background = 'rgba(0,166,81,0.1)';
+        fb.style.border = '1px solid rgba(0,166,81,0.3)';
+        fb.style.color = '#00A651';
+        fb.textContent = quantidade + ' cupons gerados com sucesso para ' + parceiro + '!';
+        setTimeout(function() {
+            fb.style.display = 'none';
+            closeModal('modalGerarLote');
+            document.getElementById('formGerarLote').reset();
+            cuponsPage = 1;
+            renderCuponsTable();
+        }, 2000);
+    }, 1000);
+}
+
+// Init cupons table on load
+document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); });
 
     </script>
     <!-- Supabase SDK -->
