@@ -200,7 +200,7 @@
             padding: 24px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
             border-bottom: 1px solid var(--dark-border);
         }
         .sidebar-logo img {
@@ -219,6 +219,11 @@
             flex: 1;
             padding: 16px 12px;
             overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .sidebar-menu::-webkit-scrollbar {
+            display: none;
         }
         .menu-item {
             display: flex;
@@ -886,7 +891,6 @@
         </button>
         <div class="sidebar-logo">
             <img src="assets/Logomarca 2.png" alt="Auto Vale">
-            <h2>AUTO VALE</h2>
         </div>
         <nav class="sidebar-menu">
             <div class="menu-item active" data-section="dashboard">
