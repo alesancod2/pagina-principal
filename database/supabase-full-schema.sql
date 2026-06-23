@@ -225,24 +225,30 @@ CREATE TABLE IF NOT EXISTS campaigns (
     updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- COUPONS
+-- COUPONS (cupons de desconto vinculados a parceiros e associados)
 CREATE TABLE IF NOT EXISTS coupons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(20) UNIQUE NOT NULL,
-    name VARCHAR(255),
-    partner_id UUID REFERENCES partners(id),
-    benefit_id UUID REFERENCES partner_benefits(id),
-    campaign_id UUID REFERENCES campaigns(id),
-    user_id UUID REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    partner_id UUID REFERENCES partners(id) ON DELETE SET NULL,
+    benefit_id UUID REFERENCES partner_benefits(id) ON DELETE SET NULL,
+    campaign_id UUID REFERENCES campaigns(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_by UUID REFERENCES users(id),
     status coupon_status DEFAULT 'active',
-    benefit_type VARCHAR(30) DEFAULT 'desconto',
+    benefit_type VARCHAR(30) NOT NULL DEFAULT 'desconto',
+    discount_type VARCHAR(20) NOT NULL DEFAULT 'percentual',
+    discount_value DECIMAL(10,2) DEFAULT 0,
     max_uses INTEGER DEFAULT 1,
     current_uses INTEGER DEFAULT 0,
-    discount_value DECIMAL(10,2),
-    discount_type VARCHAR(20) DEFAULT 'percent',
+    batch_id UUID,
+    notes TEXT,
     issued_at TIMESTAMP DEFAULT NOW(),
     expires_at TIMESTAMP NOT NULL,
-    used_at TIMESTAMP
+    used_at TIMESTAMP,
+    cancelled_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- NOTIFICATIONS
@@ -375,6 +381,11 @@ CREATE INDEX IF NOT EXISTS idx_points_created ON point_transactions(created_at);
 CREATE INDEX IF NOT EXISTS idx_coupons_code ON coupons(code);
 CREATE INDEX IF NOT EXISTS idx_coupons_user ON coupons(user_id);
 CREATE INDEX IF NOT EXISTS idx_coupons_status ON coupons(status);
+CREATE INDEX IF NOT EXISTS idx_coupons_partner ON coupons(partner_id);
+CREATE INDEX IF NOT EXISTS idx_coupons_benefit_type ON coupons(benefit_type);
+CREATE INDEX IF NOT EXISTS idx_coupons_batch ON coupons(batch_id);
+CREATE INDEX IF NOT EXISTS idx_coupons_expires ON coupons(expires_at);
+CREATE INDEX IF NOT EXISTS idx_coupons_created ON coupons(created_at);
 
 CREATE INDEX IF NOT EXISTS idx_campaigns_active ON campaigns(is_active, start_date, end_date);
 
@@ -519,6 +530,232 @@ CREATE TRIGGER trg_benefit_usage_count
     AFTER INSERT ON benefit_usages
     FOR EACH ROW EXECUTE FUNCTION increment_benefit_usage();
 
+-- Trigger: Atualizar updated_at na tabela coupons
+DROP TRIGGER IF EXISTS trg_coupons_updated ON coupons;
+CREATE TRIGGER trg_coupons_updated
+    BEFORE UPDATE ON coupons FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Função: Gerar código único para cupom (formato AV-XXXX-XXXX)
+CREATE OR REPLACE FUNCTION generate_coupon_code()
+RETURNS VARCHAR(12) AS $$
+DECLARE
+    chars TEXT := 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    result TEXT := 'AV-';
+    i INTEGER;
+BEGIN
+    FOR i IN 1..4 LOOP
+        result := result || substr(chars, floor(random() * length(chars) + 1)::int, 1);
+    END LOOP;
+    result := result || '-';
+    FOR i IN 1..4 LOOP
+        result := result || substr(chars, floor(random() * length(chars) + 1)::int, 1);
+    END LOOP;
+    RETURN result;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Usar cupom (valida e atualiza status + debita pontos se necessário)
+CREATE OR REPLACE FUNCTION use_coupon(
+    p_coupon_code VARCHAR,
+    p_user_id UUID
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_coupon RECORD;
+    v_result JSONB;
+BEGIN
+    -- Buscar cupom
+    SELECT * INTO v_coupon FROM coupons WHERE code = p_coupon_code;
+    
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom não encontrado');
+    END IF;
+
+    -- Validações
+    IF v_coupon.status != 'active' THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom não está ativo (status: ' || v_coupon.status || ')');
+    END IF;
+
+    IF v_coupon.expires_at < NOW() THEN
+        UPDATE coupons SET status = 'expired', updated_at = NOW() WHERE id = v_coupon.id;
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom expirado');
+    END IF;
+
+    IF v_coupon.current_uses >= v_coupon.max_uses THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom já atingiu o limite de usos');
+    END IF;
+
+    -- Verificar se cupom é vinculado a um usuário específico
+    IF v_coupon.user_id IS NOT NULL AND v_coupon.user_id != p_user_id THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom não pertence a este usuário');
+    END IF;
+
+    -- Marcar como usado
+    UPDATE coupons SET
+        status = 'used',
+        current_uses = current_uses + 1,
+        used_at = NOW(),
+        updated_at = NOW()
+    WHERE id = v_coupon.id;
+
+    -- Registrar uso no benefit_usages (se tem benefício vinculado)
+    IF v_coupon.benefit_id IS NOT NULL AND v_coupon.partner_id IS NOT NULL THEN
+        INSERT INTO benefit_usages (user_id, partner_id, benefit_id, coupon_id, discount_applied, points_earned)
+        VALUES (p_user_id, v_coupon.partner_id, v_coupon.benefit_id, v_coupon.id, v_coupon.discount_value, 0);
+    END IF;
+
+    RETURN jsonb_build_object(
+        'success', true,
+        'coupon_id', v_coupon.id,
+        'name', v_coupon.name,
+        'benefit_type', v_coupon.benefit_type,
+        'discount_type', v_coupon.discount_type,
+        'discount_value', v_coupon.discount_value,
+        'partner_id', v_coupon.partner_id
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Gerar cupom individual
+CREATE OR REPLACE FUNCTION create_coupon(
+    p_name VARCHAR,
+    p_partner_id UUID,
+    p_benefit_type VARCHAR,
+    p_discount_type VARCHAR,
+    p_discount_value DECIMAL,
+    p_validity_days INTEGER DEFAULT 30,
+    p_user_id UUID DEFAULT NULL,
+    p_benefit_id UUID DEFAULT NULL,
+    p_notes TEXT DEFAULT NULL,
+    p_created_by UUID DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+    v_code VARCHAR(12);
+    v_coupon_id UUID;
+    v_attempts INTEGER := 0;
+BEGIN
+    -- Gerar código único (até 10 tentativas)
+    LOOP
+        v_code := generate_coupon_code();
+        EXIT WHEN NOT EXISTS (SELECT 1 FROM coupons WHERE code = v_code);
+        v_attempts := v_attempts + 1;
+        IF v_attempts > 10 THEN
+            RAISE EXCEPTION 'Não foi possível gerar código único para cupom';
+        END IF;
+    END LOOP;
+
+    INSERT INTO coupons (code, name, partner_id, benefit_id, user_id, created_by, benefit_type, discount_type, discount_value, notes, expires_at)
+    VALUES (v_code, p_name, p_partner_id, p_benefit_id, p_user_id, p_created_by, p_benefit_type, p_discount_type, p_discount_value, p_notes, NOW() + (p_validity_days || ' days')::INTERVAL)
+    RETURNING id INTO v_coupon_id;
+
+    RETURN v_coupon_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Gerar cupons em lote
+CREATE OR REPLACE FUNCTION create_coupon_batch(
+    p_name VARCHAR,
+    p_partner_id UUID,
+    p_benefit_type VARCHAR,
+    p_discount_type VARCHAR,
+    p_discount_value DECIMAL,
+    p_quantity INTEGER,
+    p_validity_days INTEGER DEFAULT 30,
+    p_benefit_id UUID DEFAULT NULL,
+    p_notes TEXT DEFAULT NULL,
+    p_created_by UUID DEFAULT NULL
+)
+RETURNS UUID AS $$
+DECLARE
+    v_batch_id UUID := uuid_generate_v4();
+    v_code VARCHAR(12);
+    v_attempts INTEGER;
+    i INTEGER;
+BEGIN
+    FOR i IN 1..p_quantity LOOP
+        v_attempts := 0;
+        LOOP
+            v_code := generate_coupon_code();
+            EXIT WHEN NOT EXISTS (SELECT 1 FROM coupons WHERE code = v_code);
+            v_attempts := v_attempts + 1;
+            IF v_attempts > 10 THEN
+                RAISE EXCEPTION 'Não foi possível gerar código único para cupom #%', i;
+            END IF;
+        END LOOP;
+
+        INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, batch_id, notes, expires_at)
+        VALUES (v_code, p_name, p_partner_id, p_benefit_id, p_created_by, p_benefit_type, p_discount_type, p_discount_value, v_batch_id, p_notes, NOW() + (p_validity_days || ' days')::INTERVAL);
+    END LOOP;
+
+    RETURN v_batch_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Cancelar cupom
+CREATE OR REPLACE FUNCTION cancel_coupon(p_coupon_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+    UPDATE coupons SET
+        status = 'cancelled',
+        cancelled_at = NOW(),
+        updated_at = NOW()
+    WHERE id = p_coupon_id AND status = 'active';
+    
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Expirar cupons vencidos (executar via cron ou manualmente)
+CREATE OR REPLACE FUNCTION expire_old_coupons()
+RETURNS INTEGER AS $$
+DECLARE
+    v_count INTEGER;
+BEGIN
+    UPDATE coupons SET
+        status = 'expired',
+        updated_at = NOW()
+    WHERE status = 'active' AND expires_at < NOW();
+    
+    GET DIAGNOSTICS v_count = ROW_COUNT;
+    RETURN v_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função: Usar cupom consome pontos do usuário (para cupons tipo resgate)
+CREATE OR REPLACE FUNCTION redeem_coupon_with_points(
+    p_coupon_id UUID,
+    p_user_id UUID,
+    p_points_cost INTEGER
+)
+RETURNS JSONB AS $$
+DECLARE
+    v_balance INTEGER;
+    v_coupon RECORD;
+BEGIN
+    -- Verificar saldo do usuário
+    SELECT balance INTO v_balance FROM user_points WHERE user_id = p_user_id;
+    IF v_balance IS NULL OR v_balance < p_points_cost THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Saldo insuficiente. Necessário: ' || p_points_cost || ', Disponível: ' || COALESCE(v_balance, 0));
+    END IF;
+
+    -- Buscar cupom
+    SELECT * INTO v_coupon FROM coupons WHERE id = p_coupon_id AND status = 'active';
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Cupom não disponível');
+    END IF;
+
+    -- Debitar pontos
+    INSERT INTO point_transactions (user_id, partner_id, type, amount, balance_after, description, reference_id)
+    VALUES (p_user_id, v_coupon.partner_id, 'redeemed', p_points_cost, v_balance - p_points_cost, 'Resgate de cupom: ' || v_coupon.name, v_coupon.id);
+
+    -- Vincular cupom ao usuário
+    UPDATE coupons SET user_id = p_user_id, updated_at = NOW() WHERE id = p_coupon_id;
+
+    RETURN jsonb_build_object('success', true, 'coupon_code', v_coupon.code, 'points_debited', p_points_cost, 'new_balance', v_balance - p_points_cost);
+END;
+$$ LANGUAGE plpgsql;
+
 -- ============================================
 -- DADOS INICIAIS (SEED)
 -- Seguro para re-execução (idempotente)
@@ -602,10 +839,7 @@ CREATE POLICY "allow_public_read_benefit_usages" ON benefit_usages FOR SELECT US
 -- Adicionar coluna 'name' na tabela coupons (se não existir)
 DO $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'coupons' AND column_name = 'name'
-    ) THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'name') THEN
         ALTER TABLE coupons ADD COLUMN name VARCHAR(255);
     END IF;
 END $$;
@@ -613,13 +847,72 @@ END $$;
 -- Adicionar coluna 'benefit_type' na tabela coupons (se não existir)
 DO $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'coupons' AND column_name = 'benefit_type'
-    ) THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'benefit_type') THEN
         ALTER TABLE coupons ADD COLUMN benefit_type VARCHAR(30) DEFAULT 'desconto';
     END IF;
 END $$;
+
+-- Adicionar coluna 'batch_id' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'batch_id') THEN
+        ALTER TABLE coupons ADD COLUMN batch_id UUID;
+    END IF;
+END $$;
+
+-- Adicionar coluna 'notes' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'notes') THEN
+        ALTER TABLE coupons ADD COLUMN notes TEXT;
+    END IF;
+END $$;
+
+-- Adicionar coluna 'created_by' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_by') THEN
+        ALTER TABLE coupons ADD COLUMN created_by UUID REFERENCES users(id);
+    END IF;
+END $$;
+
+-- Adicionar coluna 'cancelled_at' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'cancelled_at') THEN
+        ALTER TABLE coupons ADD COLUMN cancelled_at TIMESTAMP;
+    END IF;
+END $$;
+
+-- Adicionar coluna 'created_at' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_at') THEN
+        ALTER TABLE coupons ADD COLUMN created_at TIMESTAMP DEFAULT NOW();
+    END IF;
+END $$;
+
+-- Adicionar coluna 'updated_at' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'updated_at') THEN
+        ALTER TABLE coupons ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
+    END IF;
+END $$;
+
+-- Atualizar discount_type existente: 'percent' -> 'percentual' para consistência
+UPDATE coupons SET discount_type = 'percentual' WHERE discount_type = 'percent';
+UPDATE coupons SET discount_type = 'valor_fixo' WHERE discount_type = 'fixed';
+
+-- RLS policy para INSERT/UPDATE em coupons (admin pode tudo)
+DROP POLICY IF EXISTS "allow_admin_insert_coupons" ON coupons;
+CREATE POLICY "allow_admin_insert_coupons" ON coupons FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_admin_update_coupons" ON coupons;
+CREATE POLICY "allow_admin_update_coupons" ON coupons FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "allow_admin_delete_coupons" ON coupons;
+CREATE POLICY "allow_admin_delete_coupons" ON coupons FOR DELETE USING (true);
 
 -- ============================================
 -- VERIFICAÇÃO FINAL
