@@ -1489,18 +1489,36 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Parceiro (opcional)</label>
-                            <select id="campParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                                <option value="">Todos os parceiros</option>
-                                <option value="Posto Shell Centro">Posto Shell Centro</option>
-                                <option value="Lava-Jato Express">Lava-Jato Express</option>
-                                <option value="Mecânica do João">Mecânica do João</option>
-                                <option value="Pneu Forte">Pneu Forte</option>
-                                <option value="Estética Premium">Estética Premium</option>
-                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
-                                <option value="Borracharia 24h">Borracharia 24h</option>
-                                <option value="Guincho Express">Guincho Express</option>
+                            <label>Parceiros / Categorias</label>
+                            <select id="campParceiro" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                                <optgroup label="Todos">
+                                    <option value="todos" selected>Todos os parceiros</option>
+                                </optgroup>
+                                <optgroup label="Por Categoria">
+                                    <option value="cat:postos">Postos de Combustível</option>
+                                    <option value="cat:lava-jato">Lava-Jatos</option>
+                                    <option value="cat:mecanica">Mecânicas</option>
+                                    <option value="cat:estetica">Estética Automotiva</option>
+                                    <option value="cat:pneus">Pneus e Rodas</option>
+                                    <option value="cat:eletrica">Auto Elétricas</option>
+                                    <option value="cat:borracharia">Borracharias</option>
+                                    <option value="cat:guincho">Guincho e Reboque</option>
+                                    <option value="cat:alimentacao">Alimentação</option>
+                                    <option value="cat:saude">Saúde e Bem-estar</option>
+                                    <option value="cat:educacao">Educação</option>
+                                </optgroup>
+                                <optgroup label="Parceiro Específico">
+                                    <option value="Posto Shell Centro">Posto Shell Centro</option>
+                                    <option value="Lava-Jato Express">Lava-Jato Express</option>
+                                    <option value="Mecânica do João">Mecânica do João</option>
+                                    <option value="Pneu Forte">Pneu Forte</option>
+                                    <option value="Estética Premium">Estética Premium</option>
+                                    <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                    <option value="Borracharia 24h">Borracharia 24h</option>
+                                    <option value="Guincho Express">Guincho Express</option>
+                                </optgroup>
                             </select>
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para selecionar múltiplos. Selecione "Todos" para aplicar a todos.</span>
                         </div>
                         <div class="form-group">
                             <label>Multiplicador de Pontos</label>
@@ -1566,6 +1584,130 @@
                 <div style="padding:0 32px 32px;display:flex;gap:12px;flex-wrap:wrap;" id="detalhesCampanhaActions">
                     <!-- Filled dynamically -->
                 </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Editar Campanha -->
+        <div id="modalEditarCampanha" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalEditarCampanha')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Editar Campanha
+                </h2>
+                <form id="formEditarCampanha" onsubmit="salvarEdicaoCampanha(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título *</label>
+                            <input type="text" id="editCampTitulo" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo *</label>
+                            <select id="editCampTipo" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="double_points">Pontos em Dobro</option>
+                                <option value="partner_month">Parceiro do Mês</option>
+                                <option value="special_cashback">Cashback Especial</option>
+                                <option value="member_month">Membro do Mês</option>
+                                <option value="custom">Personalizada</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <textarea id="editCampDescricao" required rows="3" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;resize:vertical;font-family:inherit;"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Data Início *</label>
+                            <input type="date" id="editCampInicio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim *</label>
+                            <input type="date" id="editCampFim" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Parceiros / Categorias</label>
+                            <select id="editCampParceiro" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                                <optgroup label="Todos">
+                                    <option value="todos">Todos os parceiros</option>
+                                </optgroup>
+                                <optgroup label="Por Categoria">
+                                    <option value="cat:postos">Postos de Combustível</option>
+                                    <option value="cat:lava-jato">Lava-Jatos</option>
+                                    <option value="cat:mecanica">Mecânicas</option>
+                                    <option value="cat:estetica">Estética Automotiva</option>
+                                    <option value="cat:pneus">Pneus e Rodas</option>
+                                    <option value="cat:eletrica">Auto Elétricas</option>
+                                    <option value="cat:borracharia">Borracharias</option>
+                                    <option value="cat:guincho">Guincho e Reboque</option>
+                                    <option value="cat:alimentacao">Alimentação</option>
+                                    <option value="cat:saude">Saúde e Bem-estar</option>
+                                    <option value="cat:educacao">Educação</option>
+                                </optgroup>
+                                <optgroup label="Parceiro Específico">
+                                    <option value="Posto Shell Centro">Posto Shell Centro</option>
+                                    <option value="Lava-Jato Express">Lava-Jato Express</option>
+                                    <option value="Mecânica do João">Mecânica do João</option>
+                                    <option value="Pneu Forte">Pneu Forte</option>
+                                    <option value="Estética Premium">Estética Premium</option>
+                                    <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                    <option value="Borracharia 24h">Borracharia 24h</option>
+                                    <option value="Guincho Express">Guincho Express</option>
+                                </optgroup>
+                            </select>
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplos.</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Multiplicador de Pontos</label>
+                            <input type="number" id="editCampMultiplicador" min="1" max="5" step="0.5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cor do Banner *</label>
+                            <select id="editCampCor" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="orange">Laranja / Amarelo</option>
+                                <option value="blue">Azul / Roxo</option>
+                                <option value="green">Verde</option>
+                                <option value="red">Vermelho</option>
+                                <option value="gray">Cinza</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Público-alvo</label>
+                            <select id="editCampPublico" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="todos">Todos os associados</option>
+                                <option value="premium">Apenas Premium</option>
+                                <option value="novos">Novos associados</option>
+                                <option value="inativos">Associados inativos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:4px;">
+                        <label>Imagem do Banner</label>
+                        <div id="editCampBannerPreview" style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;height:120px;background:var(--dark-bg);border:1px solid var(--dark-border);position:relative;">
+                            <img id="editCampBannerImg" style="width:100%;height:100%;object-fit:cover;" alt="Preview">
+                            <button type="button" onclick="removeEditCampBanner()" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">&times;</button>
+                        </div>
+                        <label for="editCampBannerFile" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:2px dashed var(--dark-border);border-radius:10px;cursor:pointer;color:var(--text-secondary);font-size:13px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--dark-border)';this.style.color='var(--text-secondary)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span id="editCampBannerLabel">Clique para alterar imagem</span>
+                        </label>
+                        <input type="file" id="editCampBannerFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewEditCampBanner(this)">
+                    </div>
+                    <div id="editCampanhaFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" class="btn btn-primary" id="btnSalvarEdicaoCamp">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Salvar Alterações
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="closeModal('modalEditarCampanha')">Cancelar</button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -4225,11 +4367,11 @@ function verDetalhesCampanha(id) {
             '</div>' +
         '</div>';
 
-    var actionsHtml = '';
+    var actionsHtml = '<button class="btn btn-primary" onclick="editarCampanha(' + c.id + ')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button>';
     if (c.status === 'ativa') {
-        actionsHtml = '<button class="btn btn-red" onclick="encerrarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Encerrar</button>';
+        actionsHtml += '<button class="btn btn-red" onclick="encerrarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Encerrar</button>';
     } else if (c.status === 'agendada') {
-        actionsHtml = '<button class="btn btn-green" onclick="ativarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ativar Agora</button>' +
+        actionsHtml += '<button class="btn btn-green" onclick="ativarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ativar Agora</button>' +
             '<button class="btn btn-red" onclick="encerrarCampanha()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>';
     }
     actionsHtml += '<button class="btn btn-outline" onclick="closeModal(\'modalDetalhesCampanha\')">Fechar</button>';
@@ -4264,7 +4406,7 @@ function salvarCampanha(event) {
     var descricao = document.getElementById('campDescricao').value;
     var inicio = document.getElementById('campInicio').value;
     var fim = document.getElementById('campFim').value;
-    var parceiro = document.getElementById('campParceiro').value || 'Todos os parceiros';
+    var parceiro = getSelectedParceiros('campParceiro');
     var multiplicador = parseFloat(document.getElementById('campMultiplicador').value) || 1;
     var cor = document.getElementById('campCor').value;
     var publico = document.getElementById('campPublico').value;
@@ -4335,6 +4477,139 @@ function finalizarSalvarCampanha(novaCampanha, btn, fb, titulo, status) {
 
 // Init campanhas on load
 document.addEventListener('DOMContentLoaded', function() { renderCampanhas(); });
+
+// ===== EDITAR CAMPANHA =====
+var editCampBannerFileData = null;
+
+function previewEditCampBanner(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Imagem deve ter no máximo 2MB.'); input.value = ''; return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        editCampBannerFileData = e.target.result;
+        document.getElementById('editCampBannerImg').src = e.target.result;
+        document.getElementById('editCampBannerPreview').style.display = 'block';
+        document.getElementById('editCampBannerLabel').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeEditCampBanner() {
+    editCampBannerFileData = 'removed';
+    document.getElementById('editCampBannerFile').value = '';
+    document.getElementById('editCampBannerPreview').style.display = 'none';
+    document.getElementById('editCampBannerLabel').textContent = 'Clique para enviar imagem';
+}
+
+function editarCampanha(id) {
+    var c = campanhasData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    window._editCampanhaId = id;
+    closeModal('modalDetalhesCampanha');
+
+    // Preencher campos
+    document.getElementById('editCampTitulo').value = c.titulo;
+    document.getElementById('editCampTipo').value = c.tipo;
+    document.getElementById('editCampDescricao').value = c.descricao;
+    document.getElementById('editCampInicio').value = c.inicio;
+    document.getElementById('editCampFim').value = c.fim;
+    document.getElementById('editCampMultiplicador').value = c.multiplicador;
+    document.getElementById('editCampCor').value = c.cor;
+    document.getElementById('editCampPublico').value = c.publico;
+
+    // Selecionar parceiros no multi-select
+    var selectEl = document.getElementById('editCampParceiro');
+    for (var i = 0; i < selectEl.options.length; i++) {
+        selectEl.options[i].selected = false;
+        if (c.parceiro === 'Todos os parceiros' && selectEl.options[i].value === 'todos') {
+            selectEl.options[i].selected = true;
+        } else if (selectEl.options[i].value === c.parceiro) {
+            selectEl.options[i].selected = true;
+        }
+    }
+
+    // Banner preview
+    editCampBannerFileData = null;
+    if (c.bannerUrl) {
+        document.getElementById('editCampBannerImg').src = c.bannerUrl;
+        document.getElementById('editCampBannerPreview').style.display = 'block';
+        document.getElementById('editCampBannerLabel').textContent = 'Clique para alterar imagem';
+    } else {
+        document.getElementById('editCampBannerPreview').style.display = 'none';
+        document.getElementById('editCampBannerLabel').textContent = 'Clique para enviar imagem';
+    }
+
+    openModal('modalEditarCampanha');
+}
+
+function salvarEdicaoCampanha(event) {
+    event.preventDefault();
+    var id = window._editCampanhaId;
+    var c = campanhasData.find(function(x) { return x.id === id; });
+    if (!c) return;
+
+    c.titulo = document.getElementById('editCampTitulo').value;
+    c.tipo = document.getElementById('editCampTipo').value;
+    c.descricao = document.getElementById('editCampDescricao').value;
+    c.inicio = document.getElementById('editCampInicio').value;
+    c.fim = document.getElementById('editCampFim').value;
+    c.multiplicador = parseFloat(document.getElementById('editCampMultiplicador').value) || 1;
+    c.cor = document.getElementById('editCampCor').value;
+    c.publico = document.getElementById('editCampPublico').value;
+
+    // Parceiro(s) selecionado(s)
+    var selectEl = document.getElementById('editCampParceiro');
+    var selected = [];
+    for (var i = 0; i < selectEl.options.length; i++) {
+        if (selectEl.options[i].selected) selected.push(selectEl.options[i].value);
+    }
+    if (selected.indexOf('todos') > -1) {
+        c.parceiro = 'Todos os parceiros';
+    } else {
+        c.parceiro = selected.map(function(v) { return v.replace('cat:', ''); }).join(', ');
+    }
+
+    // Banner
+    if (editCampBannerFileData === 'removed') {
+        c.bannerUrl = null;
+    } else if (editCampBannerFileData) {
+        c.bannerUrl = editCampBannerFileData;
+    }
+
+    // Atualizar ícone baseado no tipo
+    var iconMap = { double_points:'trophy', partner_month:'sun', special_cashback:'percent', member_month:'users', custom:'gift' };
+    c.icon = iconMap[c.tipo] || 'sun';
+
+    // Atualizar status baseado nas datas
+    var hoje = new Date().toISOString().split('T')[0];
+    if (c.status !== 'encerrada') {
+        c.status = c.inicio > hoje ? 'agendada' : (c.fim < hoje ? 'encerrada' : 'ativa');
+    }
+
+    var fb = document.getElementById('editCampanhaFeedback');
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(0,166,81,0.1)';
+    fb.style.border = '1px solid rgba(0,166,81,0.3)';
+    fb.style.color = '#00A651';
+    fb.textContent = 'Campanha atualizada com sucesso!';
+
+    setTimeout(function() {
+        fb.style.display = 'none';
+        closeModal('modalEditarCampanha');
+        renderCampanhas();
+    }, 1200);
+}
+
+function getSelectedParceiros(selectId) {
+    var el = document.getElementById(selectId);
+    var selected = [];
+    for (var i = 0; i < el.options.length; i++) {
+        if (el.options[i].selected) selected.push(el.options[i].value);
+    }
+    if (selected.indexOf('todos') > -1) return 'Todos os parceiros';
+    return selected.map(function(v) { return v.replace('cat:', ''); }).join(', ') || 'Todos os parceiros';
+}
 
 // Init cupons table on load
 document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); });
