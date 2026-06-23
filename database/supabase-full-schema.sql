@@ -596,6 +596,32 @@ DROP POLICY IF EXISTS "allow_public_read_benefit_usages" ON benefit_usages;
 CREATE POLICY "allow_public_read_benefit_usages" ON benefit_usages FOR SELECT USING (true);
 
 -- ============================================
+-- MIGRAÇÕES (seguro para bancos já existentes)
+-- ============================================
+
+-- Adicionar coluna 'name' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'coupons' AND column_name = 'name'
+    ) THEN
+        ALTER TABLE coupons ADD COLUMN name VARCHAR(255);
+    END IF;
+END $$;
+
+-- Adicionar coluna 'benefit_type' na tabela coupons (se não existir)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'coupons' AND column_name = 'benefit_type'
+    ) THEN
+        ALTER TABLE coupons ADD COLUMN benefit_type VARCHAR(30) DEFAULT 'desconto';
+    END IF;
+END $$;
+
+-- ============================================
 -- VERIFICAÇÃO FINAL
 -- ============================================
 DO $$
