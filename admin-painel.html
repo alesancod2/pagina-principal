@@ -1290,7 +1290,8 @@
                         <tr>
                             <th>Código</th>
                             <th>Parceiro</th>
-                            <th>Benefício</th>
+                            <th>Nome do Cupom</th>
+                            <th>Tipo</th>
                             <th>Emitido em</th>
                             <th>Validade</th>
                             <th>Status</th>
@@ -1325,6 +1326,10 @@
                 <form id="formGerarCupom" onsubmit="salvarCupom(event)">
                     <div class="form-row">
                         <div class="form-group">
+                            <label>Nome do Cupom *</label>
+                            <input type="text" id="cupomNome" required placeholder="Ex: Desconto Dia das Mães" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
                             <label>Parceiro *</label>
                             <select id="cupomParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
@@ -1338,33 +1343,21 @@
                                 <option value="Guincho Express">Guincho Express</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Benefício *</label>
-                            <select id="cupomBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                                <option value="">Selecione o benefício</option>
-                                <option value="Desconto 5% Combustível">Desconto 5% Combustível</option>
-                                <option value="Desconto 10% Serviços">Desconto 10% Serviços</option>
-                                <option value="Desconto 15% Polimento">Desconto 15% Polimento</option>
-                                <option value="Desconto 20% Revisão">Desconto 20% Revisão</option>
-                                <option value="Lavagem Premium Grátis">Lavagem Premium Grátis</option>
-                                <option value="Cashback 10%">Cashback 10%</option>
-                                <option value="Pontos em Dobro">Pontos em Dobro</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Tipo de Desconto *</label>
-                            <select id="cupomTipoDesconto" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                                <option value="percent">Percentual (%)</option>
-                                <option value="fixed">Valor Fixo (R$)</option>
-                                <option value="freebie">Gratuito</option>
-                                <option value="points">Pontos em Dobro</option>
+                            <label>Tipo de Benefício *</label>
+                            <select id="cupomTipoBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o tipo</option>
+                                <option value="desconto">Desconto</option>
+                                <option value="cashback">Cashback</option>
+                                <option value="pontos_dobro">Pontos em Dobro</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Valor do Desconto *</label>
+                            <label>Valor *</label>
                             <input type="number" id="cupomValorDesconto" required placeholder="Ex: 10" min="0" step="0.01" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Para Desconto/Cashback: valor em %. Para Pontos em Dobro: deixe 0</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1406,6 +1399,10 @@
                 <form id="formGerarLote" onsubmit="salvarCupomLote(event)">
                     <div class="form-row">
                         <div class="form-group">
+                            <label>Nome do Cupom *</label>
+                            <input type="text" id="loteNome" required placeholder="Ex: Promoção Inverno 2025" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
                             <label>Parceiro *</label>
                             <select id="loteParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
@@ -1419,18 +1416,21 @@
                                 <option value="Guincho Express">Guincho Express</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label>Benefício *</label>
-                            <select id="loteBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                                <option value="">Selecione o benefício</option>
-                                <option value="Desconto 5% Combustível">Desconto 5% Combustível</option>
-                                <option value="Desconto 10% Serviços">Desconto 10% Serviços</option>
-                                <option value="Desconto 15% Polimento">Desconto 15% Polimento</option>
-                                <option value="Desconto 20% Revisão">Desconto 20% Revisão</option>
-                                <option value="Lavagem Premium Grátis">Lavagem Premium Grátis</option>
-                                <option value="Cashback 10%">Cashback 10%</option>
-                                <option value="Pontos em Dobro">Pontos em Dobro</option>
+                            <label>Tipo de Benefício *</label>
+                            <select id="loteTipoBeneficio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione o tipo</option>
+                                <option value="desconto">Desconto</option>
+                                <option value="cashback">Cashback</option>
+                                <option value="pontos_dobro">Pontos em Dobro</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor *</label>
+                            <input type="number" id="loteValorDesconto" required placeholder="Ex: 10" min="0" step="0.01" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Para Desconto/Cashback: valor em %. Para Pontos em Dobro: deixe 0</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1441,21 +1441,6 @@
                         <div class="form-group">
                             <label>Validade (dias) *</label>
                             <input type="number" id="loteValidade" required placeholder="30" min="1" max="365" value="30" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo de Desconto *</label>
-                            <select id="loteTipoDesconto" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
-                                <option value="percent">Percentual (%)</option>
-                                <option value="fixed">Valor Fixo (R$)</option>
-                                <option value="freebie">Gratuito</option>
-                                <option value="points">Pontos em Dobro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Valor do Desconto *</label>
-                            <input type="number" id="loteValorDesconto" required placeholder="Ex: 10" min="0" step="0.01" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
                     </div>
                     <div class="form-group">
@@ -3342,14 +3327,14 @@ function exportReport(type, format) {
 
 // ===== CUPONS - SISTEMA COMPLETO =====
 var cuponsData = [
-    { id:1, code:'AV-7X2K-9M4P', parceiro:'Posto Shell Centro', beneficio:'Desconto 5% Combustível', tipo:'percent', valor:5, emitido:'10/01/2025', validade:'10/02/2025', status:'Válido', associado:'João Carlos Silva', email:'joao@email.com', obs:'' },
-    { id:2, code:'AV-3F8N-1L5Q', parceiro:'Lava-Jato Express', beneficio:'Lavagem Premium Grátis', tipo:'freebie', valor:0, emitido:'08/01/2025', validade:'08/02/2025', status:'Válido', associado:'Maria Fernanda', email:'maria@email.com', obs:'' },
-    { id:3, code:'AV-9D4R-6H2W', parceiro:'Mecânica do João', beneficio:'Cashback 10%', tipo:'percent', valor:10, emitido:'05/01/2025', validade:'05/02/2025', status:'Usado', associado:'Pedro Henrique', email:'pedro@email.com', obs:'Usado em 20/01/2025' },
-    { id:4, code:'AV-2B7T-8K3J', parceiro:'Pneu Forte', beneficio:'Pontos em Dobro', tipo:'points', valor:0, emitido:'01/01/2025', validade:'15/01/2025', status:'Expirado', associado:'Ana Beatriz', email:'ana@email.com', obs:'' },
-    { id:5, code:'AV-5G1M-4N8V', parceiro:'Estética Premium', beneficio:'Desconto 15% Polimento', tipo:'percent', valor:15, emitido:'12/01/2025', validade:'12/03/2025', status:'Válido', associado:'Lucas Oliveira', email:'lucas@email.com', obs:'' },
-    { id:6, code:'AV-6C9P-2R7X', parceiro:'Auto Elétrica Raio', beneficio:'Revisão com Desconto', tipo:'percent', valor:20, emitido:'14/01/2025', validade:'14/04/2025', status:'Válido', associado:'Fernanda Costa', email:'fernanda@email.com', obs:'' },
-    { id:7, code:'AV-8H3M-5T9R', parceiro:'Borracharia 24h', beneficio:'Desconto 10% Serviços', tipo:'percent', valor:10, emitido:'20/01/2025', validade:'20/02/2025', status:'Válido', associado:'Ricardo Alves', email:'ricardo@email.com', obs:'' },
-    { id:8, code:'AV-1K7P-4W2N', parceiro:'Guincho Express', beneficio:'Desconto 20% Revisão', tipo:'percent', valor:20, emitido:'22/01/2025', validade:'22/03/2025', status:'Cancelado', associado:'Camila Santos', email:'camila@email.com', obs:'Cancelado a pedido do cliente' }
+    { id:1, code:'AV-7X2K-9M4P', nome:'Desconto Combustível', parceiro:'Posto Shell Centro', beneficio:'Desconto Combustível (Desconto 5%)', tipo:'desconto', valor:5, emitido:'10/01/2025', validade:'10/02/2025', status:'Válido', associado:'João Carlos Silva', email:'joao@email.com', obs:'' },
+    { id:2, code:'AV-3F8N-1L5Q', nome:'Lavagem Premium', parceiro:'Lava-Jato Express', beneficio:'Lavagem Premium (Desconto 15%)', tipo:'desconto', valor:15, emitido:'08/01/2025', validade:'08/02/2025', status:'Válido', associado:'Maria Fernanda', email:'maria@email.com', obs:'' },
+    { id:3, code:'AV-9D4R-6H2W', nome:'Cashback Mecânica', parceiro:'Mecânica do João', beneficio:'Cashback Mecânica (Cashback 10%)', tipo:'cashback', valor:10, emitido:'05/01/2025', validade:'05/02/2025', status:'Usado', associado:'Pedro Henrique', email:'pedro@email.com', obs:'Usado em 20/01/2025' },
+    { id:4, code:'AV-2B7T-8K3J', nome:'Pontos Dobrados', parceiro:'Pneu Forte', beneficio:'Pontos Dobrados (Pontos em Dobro)', tipo:'pontos_dobro', valor:0, emitido:'01/01/2025', validade:'15/01/2025', status:'Expirado', associado:'Ana Beatriz', email:'ana@email.com', obs:'' },
+    { id:5, code:'AV-5G1M-4N8V', nome:'Desconto Polimento', parceiro:'Estética Premium', beneficio:'Desconto Polimento (Desconto 15%)', tipo:'desconto', valor:15, emitido:'12/01/2025', validade:'12/03/2025', status:'Válido', associado:'Lucas Oliveira', email:'lucas@email.com', obs:'' },
+    { id:6, code:'AV-6C9P-2R7X', nome:'Revisão com Desconto', parceiro:'Auto Elétrica Raio', beneficio:'Revisão com Desconto (Desconto 20%)', tipo:'desconto', valor:20, emitido:'14/01/2025', validade:'14/04/2025', status:'Válido', associado:'Fernanda Costa', email:'fernanda@email.com', obs:'' },
+    { id:7, code:'AV-8H3M-5T9R', nome:'Desconto Borracharia', parceiro:'Borracharia 24h', beneficio:'Desconto Borracharia (Desconto 10%)', tipo:'desconto', valor:10, emitido:'20/01/2025', validade:'20/02/2025', status:'Válido', associado:'Ricardo Alves', email:'ricardo@email.com', obs:'' },
+    { id:8, code:'AV-1K7P-4W2N', nome:'Cashback Guincho', parceiro:'Guincho Express', beneficio:'Cashback Guincho (Cashback 20%)', tipo:'cashback', valor:20, emitido:'22/01/2025', validade:'22/03/2025', status:'Cancelado', associado:'Camila Santos', email:'camila@email.com', obs:'Cancelado a pedido do cliente' }
 ];
 var cuponsPage = 1;
 var cuponsPerPage = 6;
@@ -3375,7 +3360,7 @@ function getFilteredCupons() {
     var search = (document.getElementById('cuponsSearchInput').value || '').toLowerCase();
     var statusFilter = document.getElementById('cuponsFilterStatus').value;
     return cuponsData.filter(function(c) {
-        var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1;
+        var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1 || (c.nome && c.nome.toLowerCase().indexOf(search) > -1);
         var matchStatus = statusFilter === 'all' || c.status === statusFilter;
         return matchSearch && matchStatus;
     });
@@ -3391,13 +3376,15 @@ function renderCuponsTable() {
     if (!tbody) return;
 
     if (page.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
     } else {
         tbody.innerHTML = page.map(function(c) {
+            var tipoLabel = c.tipo === 'desconto' ? '<span style="color:var(--green)">Desconto</span>' : c.tipo === 'cashback' ? '<span style="color:#eab308">Cashback</span>' : '<span style="color:var(--primary-blue)">Pontos em Dobro</span>';
             return '<tr>' +
                 '<td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">' + c.code + '</code></td>' +
                 '<td>' + c.parceiro + '</td>' +
-                '<td>' + c.beneficio + '</td>' +
+                '<td style="font-weight:600">' + (c.nome || c.beneficio) + '</td>' +
+                '<td>' + tipoLabel + (c.tipo !== 'pontos_dobro' ? ' ' + c.valor + '%' : '') + '</td>' +
                 '<td>' + c.emitido + '</td>' +
                 '<td>' + c.validade + '</td>' +
                 '<td>' + getStatusBadge(c.status) + '</td>' +
@@ -3426,8 +3413,8 @@ function verDetalhesCupom(id) {
     if (!c) return;
     window._currentCupomId = id;
     var content = document.getElementById('detalhesCupomContent');
-    var tipoLabel = c.tipo === 'percent' ? 'Percentual' : c.tipo === 'fixed' ? 'Valor Fixo' : c.tipo === 'freebie' ? 'Gratuito' : 'Pontos em Dobro';
-    var valorLabel = c.tipo === 'percent' ? c.valor + '%' : c.tipo === 'fixed' ? 'R$ ' + c.valor.toFixed(2) : c.tipo === 'freebie' ? 'Grátis' : '2x Pontos';
+    var tipoLabel = c.tipo === 'desconto' ? 'Desconto' : c.tipo === 'cashback' ? 'Cashback' : 'Pontos em Dobro';
+    var valorLabel = c.tipo === 'pontos_dobro' ? '2x Pontos' : c.valor + '%';
 
     content.innerHTML =
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
@@ -3439,16 +3426,16 @@ function verDetalhesCupom(id) {
                 '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Status</div>' +
                 '<div>' + getStatusBadge(c.status) + '</div>' +
             '</div>' +
+            '<div style="grid-column:1/-1;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Nome do Cupom</div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--text-primary);">' + (c.nome || c.beneficio) + '</div>' +
+            '</div>' +
             '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
                 '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parceiro</div>' +
                 '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.parceiro + '</div>' +
             '</div>' +
             '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
-                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Benefício</div>' +
-                '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + c.beneficio + '</div>' +
-            '</div>' +
-            '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
-                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Tipo / Valor</div>' +
+                '<div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Tipo de Benefício</div>' +
                 '<div style="font-size:14px;font-weight:600;color:var(--green);">' + tipoLabel + ' - ' + valorLabel + '</div>' +
             '</div>' +
             '<div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:16px;">' +
@@ -3485,14 +3472,17 @@ function cancelarCupom() {
 
 function salvarCupom(event) {
     event.preventDefault();
+    var nome = document.getElementById('cupomNome').value;
     var parceiro = document.getElementById('cupomParceiro').value;
-    var beneficio = document.getElementById('cupomBeneficio').value;
-    var tipo = document.getElementById('cupomTipoDesconto').value;
+    var tipoBeneficio = document.getElementById('cupomTipoBeneficio').value;
     var valor = parseFloat(document.getElementById('cupomValorDesconto').value) || 0;
     var validade = parseInt(document.getElementById('cupomValidade').value) || 30;
     var associado = document.getElementById('cupomAssociado').value || 'Sem associado';
     var obs = document.getElementById('cupomObs').value || '';
     var fb = document.getElementById('gerarCupomFeedback');
+
+    var tipoLabel = tipoBeneficio === 'desconto' ? 'Desconto' : tipoBeneficio === 'cashback' ? 'Cashback' : 'Pontos em Dobro';
+    var beneficioNome = tipoBeneficio === 'pontos_dobro' ? nome + ' (Pontos em Dobro)' : nome + ' (' + tipoLabel + ' ' + valor + '%)';
 
     var hoje = new Date();
     var vencimento = new Date(hoje.getTime() + validade * 24 * 60 * 60 * 1000);
@@ -3502,9 +3492,10 @@ function salvarCupom(event) {
     var novoCupom = {
         id: cuponsData.length + 1,
         code: generateCupomCode(),
+        nome: nome,
         parceiro: parceiro,
-        beneficio: beneficio,
-        tipo: tipo,
+        beneficio: beneficioNome,
+        tipo: tipoBeneficio,
         valor: valor,
         emitido: emitidoStr,
         validade: validadeStr,
@@ -3519,7 +3510,7 @@ function salvarCupom(event) {
     fb.style.background = 'rgba(0,166,81,0.1)';
     fb.style.border = '1px solid rgba(0,166,81,0.3)';
     fb.style.color = '#00A651';
-    fb.textContent = 'Cupom ' + novoCupom.code + ' gerado com sucesso!';
+    fb.textContent = 'Cupom "' + nome + '" (' + novoCupom.code + ') gerado com sucesso!';
 
     setTimeout(function() {
         fb.style.display = 'none';
@@ -3532,13 +3523,16 @@ function salvarCupom(event) {
 
 function salvarCupomLote(event) {
     event.preventDefault();
+    var nome = document.getElementById('loteNome').value;
     var parceiro = document.getElementById('loteParceiro').value;
-    var beneficio = document.getElementById('loteBeneficio').value;
+    var tipoBeneficio = document.getElementById('loteTipoBeneficio').value;
+    var valor = parseFloat(document.getElementById('loteValorDesconto').value) || 0;
     var quantidade = parseInt(document.getElementById('loteQuantidade').value) || 10;
     var validade = parseInt(document.getElementById('loteValidade').value) || 30;
-    var tipo = document.getElementById('loteTipoDesconto').value;
-    var valor = parseFloat(document.getElementById('loteValorDesconto').value) || 0;
     var fb = document.getElementById('gerarLoteFeedback');
+
+    var tipoLabel = tipoBeneficio === 'desconto' ? 'Desconto' : tipoBeneficio === 'cashback' ? 'Cashback' : 'Pontos em Dobro';
+    var beneficioNome = tipoBeneficio === 'pontos_dobro' ? nome + ' (Pontos em Dobro)' : nome + ' (' + tipoLabel + ' ' + valor + '%)';
 
     var btn = document.getElementById('btnSalvarLote');
     btn.disabled = true;
@@ -3554,9 +3548,10 @@ function salvarCupomLote(event) {
             cuponsData.unshift({
                 id: cuponsData.length + 1 + i,
                 code: generateCupomCode(),
+                nome: nome,
                 parceiro: parceiro,
-                beneficio: beneficio,
-                tipo: tipo,
+                beneficio: beneficioNome,
+                tipo: tipoBeneficio,
                 valor: valor,
                 emitido: emitidoStr,
                 validade: validadeStr,
@@ -3572,7 +3567,7 @@ function salvarCupomLote(event) {
         fb.style.background = 'rgba(0,166,81,0.1)';
         fb.style.border = '1px solid rgba(0,166,81,0.3)';
         fb.style.color = '#00A651';
-        fb.textContent = quantidade + ' cupons gerados com sucesso para ' + parceiro + '!';
+        fb.textContent = quantidade + ' cupons "' + nome + '" gerados com sucesso para ' + parceiro + '!';
         setTimeout(function() {
             fb.style.display = 'none';
             closeModal('modalGerarLote');

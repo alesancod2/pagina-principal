@@ -229,11 +229,13 @@ CREATE TABLE IF NOT EXISTS campaigns (
 CREATE TABLE IF NOT EXISTS coupons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(20) UNIQUE NOT NULL,
+    name VARCHAR(255),
     partner_id UUID REFERENCES partners(id),
     benefit_id UUID REFERENCES partner_benefits(id),
     campaign_id UUID REFERENCES campaigns(id),
     user_id UUID REFERENCES users(id),
     status coupon_status DEFAULT 'active',
+    benefit_type VARCHAR(30) DEFAULT 'desconto',
     max_uses INTEGER DEFAULT 1,
     current_uses INTEGER DEFAULT 0,
     discount_value DECIMAL(10,2),
