@@ -530,6 +530,46 @@ CREATE TRIGGER trg_benefit_usage_count
     AFTER INSERT ON benefit_usages
     FOR EACH ROW EXECUTE FUNCTION increment_benefit_usage();
 
+-- ============================================
+-- MIGRAÇÕES (seguro para bancos já existentes)
+-- Deve rodar ANTES das funções que referenciam colunas novas
+-- ============================================
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'name') THEN
+        ALTER TABLE coupons ADD COLUMN name VARCHAR(255);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'benefit_type') THEN
+        ALTER TABLE coupons ADD COLUMN benefit_type VARCHAR(30) DEFAULT 'desconto';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'discount_type') THEN
+        ALTER TABLE coupons ADD COLUMN discount_type VARCHAR(20) DEFAULT 'percentual';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'batch_id') THEN
+        ALTER TABLE coupons ADD COLUMN batch_id UUID;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'notes') THEN
+        ALTER TABLE coupons ADD COLUMN notes TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_by') THEN
+        ALTER TABLE coupons ADD COLUMN created_by UUID;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'cancelled_at') THEN
+        ALTER TABLE coupons ADD COLUMN cancelled_at TIMESTAMP;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_at') THEN
+        ALTER TABLE coupons ADD COLUMN created_at TIMESTAMP DEFAULT NOW();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'updated_at') THEN
+        ALTER TABLE coupons ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
+    END IF;
+END $$;
+
+-- Atualizar discount_type legado
+UPDATE coupons SET discount_type = 'percentual' WHERE discount_type = 'percent';
+UPDATE coupons SET discount_type = 'valor_fixo' WHERE discount_type = 'fixed';
+
 -- Trigger: Atualizar updated_at na tabela coupons
 DROP TRIGGER IF EXISTS trg_coupons_updated ON coupons;
 CREATE TRIGGER trg_coupons_updated
@@ -831,78 +871,6 @@ CREATE POLICY "allow_public_read_coupons" ON coupons FOR SELECT USING (true);
 ALTER TABLE benefit_usages ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_public_read_benefit_usages" ON benefit_usages;
 CREATE POLICY "allow_public_read_benefit_usages" ON benefit_usages FOR SELECT USING (true);
-
--- ============================================
--- MIGRAÇÕES (seguro para bancos já existentes)
--- ============================================
-
--- Adicionar coluna 'name' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'name') THEN
-        ALTER TABLE coupons ADD COLUMN name VARCHAR(255);
-    END IF;
-END $$;
-
--- Adicionar coluna 'benefit_type' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'benefit_type') THEN
-        ALTER TABLE coupons ADD COLUMN benefit_type VARCHAR(30) DEFAULT 'desconto';
-    END IF;
-END $$;
-
--- Adicionar coluna 'batch_id' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'batch_id') THEN
-        ALTER TABLE coupons ADD COLUMN batch_id UUID;
-    END IF;
-END $$;
-
--- Adicionar coluna 'notes' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'notes') THEN
-        ALTER TABLE coupons ADD COLUMN notes TEXT;
-    END IF;
-END $$;
-
--- Adicionar coluna 'created_by' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_by') THEN
-        ALTER TABLE coupons ADD COLUMN created_by UUID REFERENCES users(id);
-    END IF;
-END $$;
-
--- Adicionar coluna 'cancelled_at' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'cancelled_at') THEN
-        ALTER TABLE coupons ADD COLUMN cancelled_at TIMESTAMP;
-    END IF;
-END $$;
-
--- Adicionar coluna 'created_at' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'created_at') THEN
-        ALTER TABLE coupons ADD COLUMN created_at TIMESTAMP DEFAULT NOW();
-    END IF;
-END $$;
-
--- Adicionar coluna 'updated_at' na tabela coupons (se não existir)
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'updated_at') THEN
-        ALTER TABLE coupons ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();
-    END IF;
-END $$;
-
--- Atualizar discount_type existente: 'percent' -> 'percentual' para consistência
-UPDATE coupons SET discount_type = 'percentual' WHERE discount_type = 'percent';
-UPDATE coupons SET discount_type = 'valor_fixo' WHERE discount_type = 'fixed';
 
 -- RLS policy para INSERT/UPDATE em coupons (admin pode tudo)
 DROP POLICY IF EXISTS "allow_admin_insert_coupons" ON coupons;
