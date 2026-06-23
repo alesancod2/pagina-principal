@@ -1528,6 +1528,19 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group" style="margin-top:4px;">
+                        <label>Imagem do Banner (opcional)</label>
+                        <div id="campBannerPreview" style="display:none;margin-bottom:12px;border-radius:10px;overflow:hidden;height:120px;background:var(--dark-bg);border:1px solid var(--dark-border);position:relative;">
+                            <img id="campBannerImg" style="width:100%;height:100%;object-fit:cover;" alt="Preview">
+                            <button type="button" onclick="removeCampBanner()" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">&times;</button>
+                        </div>
+                        <label for="campBannerFile" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:2px dashed var(--dark-border);border-radius:10px;cursor:pointer;color:var(--text-secondary);font-size:13px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--dark-border)';this.style.color='var(--text-secondary)'">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span id="campBannerLabel">Clique para enviar imagem (PNG, JPG, max 2MB)</span>
+                        </label>
+                        <input type="file" id="campBannerFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewCampBanner(this)">
+                        <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Se não enviar imagem, será usado o gradiente de cor selecionado acima.</span>
+                    </div>
                     <div id="novaCampanhaFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
                     <div style="margin-top:24px;display:flex;gap:12px;">
                         <button type="submit" class="btn btn-green" id="btnSalvarCampanha">
@@ -4046,12 +4059,12 @@ function salvarCupomLote(event) {
 
 // ===== CAMPANHAS - SISTEMA COMPLETO =====
 var campanhasData = [
-    { id:1, titulo:'Verão Premiado 2025', tipo:'double_points', descricao:'Pontos em dobro em todos os postos parceiros durante o verão.', inicio:'2025-01-01', fim:'2025-02-28', parceiro:'Posto Shell Centro', multiplicador:2, cor:'orange', status:'ativa', publico:'todos', icon:'sun' },
-    { id:2, titulo:'Semana do Carro Limpo', tipo:'special_cashback', descricao:'Lavagem completa com 50% de desconto usando pontos.', inicio:'2025-01-15', fim:'2025-01-22', parceiro:'Lava-Jato Express', multiplicador:1, cor:'blue', status:'ativa', publico:'todos', icon:'car' },
-    { id:3, titulo:'Maratona de Pontos', tipo:'double_points', descricao:'Acumule 1000 pontos e ganhe uma troca de óleo grátis.', inicio:'2025-03-01', fim:'2025-03-31', parceiro:'Mecânica do João', multiplicador:2, cor:'green', status:'agendada', publico:'premium', icon:'trophy' },
-    { id:4, titulo:'Natal Premiado 2024', tipo:'custom', descricao:'Sorteio de prêmios para quem acumulou mais de 500 pontos.', inicio:'2024-12-01', fim:'2024-12-25', parceiro:'Todos os parceiros', multiplicador:1, cor:'gray', status:'encerrada', publico:'todos', icon:'gift' },
-    { id:5, titulo:'Cashback de Aniversário', tipo:'special_cashback', descricao:'10% de cashback em todos os serviços durante o mês de aniversário do associado.', inicio:'2025-04-01', fim:'2025-04-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'red', status:'agendada', publico:'todos', icon:'percent' },
-    { id:6, titulo:'Indique e Ganhe', tipo:'member_month', descricao:'Indique um amigo e ambos ganham 200 pontos bônus na primeira utilização.', inicio:'2025-02-01', fim:'2025-06-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'green', status:'ativa', publico:'todos', icon:'users' }
+    { id:1, titulo:'Verão Premiado 2025', tipo:'double_points', descricao:'Pontos em dobro em todos os postos parceiros durante o verão.', inicio:'2025-01-01', fim:'2025-02-28', parceiro:'Posto Shell Centro', multiplicador:2, cor:'orange', status:'ativa', publico:'todos', icon:'sun', bannerUrl:null },
+    { id:2, titulo:'Semana do Carro Limpo', tipo:'special_cashback', descricao:'Lavagem completa com 50% de desconto usando pontos.', inicio:'2025-01-15', fim:'2025-01-22', parceiro:'Lava-Jato Express', multiplicador:1, cor:'blue', status:'ativa', publico:'todos', icon:'car', bannerUrl:null },
+    { id:3, titulo:'Maratona de Pontos', tipo:'double_points', descricao:'Acumule 1000 pontos e ganhe uma troca de óleo grátis.', inicio:'2025-03-01', fim:'2025-03-31', parceiro:'Mecânica do João', multiplicador:2, cor:'green', status:'agendada', publico:'premium', icon:'trophy', bannerUrl:null },
+    { id:4, titulo:'Natal Premiado 2024', tipo:'custom', descricao:'Sorteio de prêmios para quem acumulou mais de 500 pontos.', inicio:'2024-12-01', fim:'2024-12-25', parceiro:'Todos os parceiros', multiplicador:1, cor:'gray', status:'encerrada', publico:'todos', icon:'gift', bannerUrl:null },
+    { id:5, titulo:'Cashback de Aniversário', tipo:'special_cashback', descricao:'10% de cashback em todos os serviços durante o mês de aniversário do associado.', inicio:'2025-04-01', fim:'2025-04-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'red', status:'agendada', publico:'todos', icon:'percent', bannerUrl:null },
+    { id:6, titulo:'Indique e Ganhe', tipo:'member_month', descricao:'Indique um amigo e ambos ganham 200 pontos bônus na primeira utilização.', inicio:'2025-02-01', fim:'2025-06-30', parceiro:'Todos os parceiros', multiplicador:1, cor:'green', status:'ativa', publico:'todos', icon:'users', bannerUrl:null }
 ];
 
 var campanhaGradients = {
@@ -4070,6 +4083,55 @@ var campanhaIcons = {
     percent: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
     users: '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
 };
+
+// Banner preview/upload helpers
+var campBannerFileData = null; // stores base64 for preview
+
+function previewCampBanner(input) {
+    var file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Imagem deve ter no máximo 2MB.');
+        input.value = '';
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        campBannerFileData = e.target.result;
+        document.getElementById('campBannerImg').src = e.target.result;
+        document.getElementById('campBannerPreview').style.display = 'block';
+        document.getElementById('campBannerLabel').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+}
+
+function removeCampBanner() {
+    campBannerFileData = null;
+    document.getElementById('campBannerFile').value = '';
+    document.getElementById('campBannerPreview').style.display = 'none';
+    document.getElementById('campBannerLabel').textContent = 'Clique para enviar imagem (PNG, JPG, max 2MB)';
+}
+
+// Upload banner to Supabase Storage (if available)
+async function uploadCampBanner(file, campanhaId) {
+    if (!supabaseClient || !file) return null;
+    try {
+        var ext = file.name.split('.').pop().toLowerCase();
+        var fileName = 'campaign-' + campanhaId + '-' + Date.now() + '.' + ext;
+        var { data, error } = await supabaseClient.storage
+            .from('campaign-banners')
+            .upload(fileName, file, { cacheControl: '3600', upsert: true });
+        if (error) {
+            console.warn('[Supabase Storage] Upload error:', error.message);
+            return null;
+        }
+        var { data: urlData } = supabaseClient.storage.from('campaign-banners').getPublicUrl(fileName);
+        return urlData ? urlData.publicUrl : null;
+    } catch(e) {
+        console.warn('[Supabase Storage] Error:', e.message);
+        return null;
+    }
+}
 
 function formatDateBRShort(dateStr) {
     if (!dateStr) return '';
@@ -4103,9 +4165,13 @@ function renderCampanhas() {
     grid.innerHTML = filtered.map(function(c) {
         var gradient = campanhaGradients[c.cor] || campanhaGradients.blue;
         var icon = campanhaIcons[c.icon] || campanhaIcons.sun;
+        var bannerStyle = c.bannerUrl
+            ? 'background:url(' + c.bannerUrl + ') center/cover no-repeat'
+            : 'background:' + gradient;
+        var bannerContent = c.bannerUrl ? '' : icon;
         var calIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
         return '<div class="campaign-card" onclick="verDetalhesCampanha(' + c.id + ')">' +
-            '<div class="campaign-banner" style="background:' + gradient + '">' + icon + '</div>' +
+            '<div class="campaign-banner" style="' + bannerStyle + '">' + bannerContent + '</div>' +
             '<div class="campaign-body">' +
                 '<div style="margin-bottom:8px">' + getCampanhaStatusBadge(c.status) + '</div>' +
                 '<h4>' + c.titulo + '</h4>' +
@@ -4130,8 +4196,8 @@ function verDetalhesCampanha(id) {
     var gradient = campanhaGradients[c.cor] || campanhaGradients.blue;
     var icon = campanhaIcons[c.icon] || campanhaIcons.sun;
 
-    banner.style.background = gradient;
-    banner.innerHTML = icon;
+    banner.style.background = c.bannerUrl ? 'url(' + c.bannerUrl + ') center/cover no-repeat' : gradient;
+    banner.innerHTML = c.bannerUrl ? '' : icon;
 
     var tipoLabel = { double_points:'Pontos em Dobro', partner_month:'Parceiro do Mês', special_cashback:'Cashback Especial', member_month:'Membro do Mês', custom:'Personalizada' };
     var publicoLabel = { todos:'Todos os associados', premium:'Apenas Premium', novos:'Novos associados', inativos:'Associados inativos' };
@@ -4202,6 +4268,7 @@ function salvarCampanha(event) {
     var multiplicador = parseFloat(document.getElementById('campMultiplicador').value) || 1;
     var cor = document.getElementById('campCor').value;
     var publico = document.getElementById('campPublico').value;
+    var bannerFile = document.getElementById('campBannerFile').files[0] || null;
     var fb = document.getElementById('novaCampanhaFeedback');
 
     // Determinar status baseado nas datas
@@ -4211,6 +4278,11 @@ function salvarCampanha(event) {
     // Determinar ícone baseado no tipo
     var iconMap = { double_points:'trophy', partner_month:'sun', special_cashback:'percent', member_month:'users', custom:'gift' };
 
+    var btn = document.getElementById('btnSalvarCampanha');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Salvando...';
+
+    // Processar (com ou sem upload de imagem)
     var novaCampanha = {
         id: campanhasData.length + 1,
         titulo: titulo,
@@ -4223,9 +4295,28 @@ function salvarCampanha(event) {
         cor: cor,
         status: status,
         publico: publico,
-        icon: iconMap[tipo] || 'sun'
+        icon: iconMap[tipo] || 'sun',
+        bannerUrl: campBannerFileData || null
     };
+
+    // Tentar upload no Supabase Storage (assíncrono, não bloqueia)
+    if (bannerFile && supabaseClient) {
+        uploadCampBanner(bannerFile, novaCampanha.id).then(function(url) {
+            if (url) novaCampanha.bannerUrl = url;
+            finalizarSalvarCampanha(novaCampanha, btn, fb, titulo, status);
+        });
+    } else {
+        setTimeout(function() {
+            finalizarSalvarCampanha(novaCampanha, btn, fb, titulo, status);
+        }, 500);
+    }
+}
+
+function finalizarSalvarCampanha(novaCampanha, btn, fb, titulo, status) {
     campanhasData.unshift(novaCampanha);
+
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Campanha';
 
     fb.style.display = 'block';
     fb.style.background = 'rgba(0,166,81,0.1)';
@@ -4237,6 +4328,7 @@ function salvarCampanha(event) {
         fb.style.display = 'none';
         closeModal('modalNovaCampanha');
         document.getElementById('formNovaCampanha').reset();
+        removeCampBanner();
         renderCampanhas();
     }, 1500);
 }

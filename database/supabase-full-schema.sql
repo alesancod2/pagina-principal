@@ -387,6 +387,11 @@ END $$;
 UPDATE coupons SET discount_type = 'percentual' WHERE discount_type = 'percent';
 UPDATE coupons SET discount_type = 'valor_fixo' WHERE discount_type = 'fixed';
 
+-- Criar bucket de storage para banners de campanhas (se não existir)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('campaign-banners', 'campaign-banners', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- ============================================
 -- ÍNDICES DE PERFORMANCE
 -- ============================================
@@ -881,6 +886,15 @@ CREATE POLICY "allow_admin_update_coupons" ON coupons FOR UPDATE USING (true);
 
 DROP POLICY IF EXISTS "allow_admin_delete_coupons" ON coupons;
 CREATE POLICY "allow_admin_delete_coupons" ON coupons FOR DELETE USING (true);
+
+-- Storage policies para campaign-banners (público pode ler, anon pode inserir)
+DROP POLICY IF EXISTS "allow_public_read_campaign_banners" ON storage.objects;
+CREATE POLICY "allow_public_read_campaign_banners" ON storage.objects
+    FOR SELECT USING (bucket_id = 'campaign-banners');
+
+DROP POLICY IF EXISTS "allow_upload_campaign_banners" ON storage.objects;
+CREATE POLICY "allow_upload_campaign_banners" ON storage.objects
+    FOR INSERT WITH CHECK (bucket_id = 'campaign-banners');
 
 -- ============================================
 -- VERIFICAÇÃO FINAL
