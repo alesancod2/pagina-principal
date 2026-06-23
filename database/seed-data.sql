@@ -174,13 +174,13 @@ BEGIN
         ON CONFLICT (code) DO NOTHING;
     END IF;
 
-    -- Cupom 3: Cashback Mecânica (usado)
+    -- Cupom 3: Desconto Mecânica (usado)
     SELECT p.id, pb.id INTO v_partner_id, v_benefit_id
     FROM partners p LEFT JOIN partner_benefits pb ON pb.partner_id = p.id
     WHERE p.trade_name = 'Mecânica Central' LIMIT 1;
     IF v_partner_id IS NOT NULL THEN
         INSERT INTO coupons (code, name, partner_id, benefit_id, created_by, benefit_type, discount_type, discount_value, status, used_at, expires_at)
-        VALUES ('AV-9D4R-6H2W', 'Cashback Mecânica', v_partner_id, v_benefit_id, v_admin_id, 'cashback', 'percentual', 10, 'used', NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days')
+        VALUES ('AV-9D4R-6H2W', 'Desconto Mecânica', v_partner_id, v_benefit_id, v_admin_id, 'desconto', 'percentual', 10, 'used', NOW() - INTERVAL '5 days', NOW() + INTERVAL '30 days')
         ON CONFLICT (code) DO NOTHING;
     END IF;
 
@@ -233,7 +233,7 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Semana do Carro Limpo') THEN
         INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, target_categories, created_by)
-        VALUES ('Semana do Carro Limpo', 'Lavagem completa com 50% de desconto usando pontos.', 'special_cashback', 1.0, '2025-01-15', '2025-01-22', true, ARRAY['lava-jato'], v_admin_id);
+        VALUES ('Semana do Carro Limpo', 'Lavagem completa com 50% de desconto usando pontos.', 'partner_month', 1.0, '2025-01-15', '2025-01-22', true, ARRAY['lava-jato'], v_admin_id);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Maratona de Pontos') THEN
@@ -246,9 +246,9 @@ BEGIN
         VALUES ('Natal Premiado 2024', 'Sorteio de prêmios para quem acumulou mais de 500 pontos.', 'custom', 1.0, '2024-12-01', '2024-12-25', false, v_admin_id);
     END IF;
 
-    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Cashback de Aniversário') THEN
+    IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Desconto de Aniversário') THEN
         INSERT INTO campaigns (title, description, type, points_multiplier, start_date, end_date, is_active, created_by)
-        VALUES ('Cashback de Aniversário', '10% de cashback em todos os serviços durante o mês de aniversário do associado.', 'special_cashback', 1.0, '2025-04-01', '2025-04-30', true, v_admin_id);
+        VALUES ('Desconto de Aniversário', '10% de desconto em todos os serviços durante o mês de aniversário do associado.', 'custom', 1.0, '2025-04-01', '2025-04-30', true, v_admin_id);
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM campaigns WHERE title = 'Indique e Ganhe') THEN

@@ -36,6 +36,7 @@ END $$;
 
 DO $$ BEGIN
     CREATE TYPE benefit_type AS ENUM ('discount_percent', 'discount_fixed', 'cashback', 'points', 'freebie');
+    -- Nota: 'cashback' mantido no ENUM por compatibilidade, mas NÃO é usado na aplicação
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
@@ -51,6 +52,7 @@ END $$;
 
 DO $$ BEGIN
     CREATE TYPE campaign_type AS ENUM ('double_points', 'partner_month', 'special_cashback', 'member_month', 'custom');
+    -- Nota: 'special_cashback' mantido no ENUM por compatibilidade, mas NÃO é usado na aplicação
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
@@ -151,7 +153,7 @@ CREATE TABLE IF NOT EXISTS partner_benefits (
     benefit_type benefit_type NOT NULL,
     discount_percent DECIMAL(5,2),
     discount_fixed DECIMAL(10,2),
-    cashback_percent DECIMAL(5,2),
+    cashback_percent DECIMAL(5,2), -- NÃO UTILIZADO (cashback removido da aplicação)
     points_generated INTEGER DEFAULT 0,
     points_required INTEGER DEFAULT 0,
     start_date DATE,
