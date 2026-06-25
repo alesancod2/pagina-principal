@@ -1105,143 +1105,42 @@
         <div class="section" id="sec-parceiros">
             <h1 class="section-title">Parceiros</h1>
             <p class="section-subtitle">Gerencie os parceiros da plataforma</p>
-
             <div class="table-container">
                 <div class="table-header">
-                    <input type="text" class="table-search" placeholder="Buscar parceiro..." onkeyup="searchTable(this, 'parceiros-table')">
-                    <button class="btn btn-green">+ Novo Parceiro</button>
+                    <input type="text" class="table-search" id="parceirosSearchInput" placeholder="Buscar parceiro..." onkeyup="renderParceirosTable()">
+                    <button class="btn btn-green" onclick="openModal('modalNovoParceiro')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Parceiro</button>
                 </div>
                 <div style="overflow-x:auto">
-                <table id="parceiros-table">
-                    <thead>
-                        <tr>
-                            <th>Logo</th>
-                            <th>Nome</th>
-                            <th>Categoria</th>
-                            <th>Cidade</th>
-                            <th>Telefone</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/><path d="M3 14h18"/></svg></td>
-                            <td><strong>Posto Shell Centro</strong></td>
-                            <td>Postos</td>
-                            <td>São Paulo</td>
-                            <td>(11) 3456-7890</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></td>
-                            <td><strong>Lava-Jato Express</strong></td>
-                            <td>Lava-Jato</td>
-                            <td>Campinas</td>
-                            <td>(19) 2345-6789</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></td>
-                            <td><strong>Mecânica do João</strong></td>
-                            <td>Mecânica</td>
-                            <td>Santos</td>
-                            <td>(13) 9876-5432</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
+                <table><thead><tr><th>Nome</th><th>Categoria</th><th>Cidade</th><th>Telefone</th><th>Status</th><th>Ações</th></tr></thead><tbody id="parceirosTableBody"></tbody></table>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-top:1px solid var(--dark-border);margin-top:8px;"><span style="font-size:13px;color:var(--text-secondary)" id="parceirosPageInfo"></span><div id="parceirosPagination" style="display:flex;gap:4px"></div></div>
+            </div>
+        </div>
 
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></td>
-                            <td><strong>Estética Premium</strong></td>
-                            <td>Estética</td>
-                            <td>São Paulo</td>
-                            <td>(11) 4567-8901</td>
-                            <td><span class="badge badge-yellow">Pendente</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></td>
-                            <td><strong>Pneu Forte</strong></td>
-                            <td>Pneus</td>
-                            <td>Guarulhos</td>
-                            <td>(11) 5678-9012</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg></td>
-                            <td><strong>Auto Elétrica Raio</strong></td>
-                            <td>Auto Elétrica</td>
-                            <td>Osasco</td>
-                            <td>(11) 6789-0123</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/><path d="M3 14h18"/></svg></td>
-                            <td><strong>Posto Ipiranga BR</strong></td>
-                            <td>Postos</td>
-                            <td>Ribeirão Preto</td>
-                            <td>(16) 7890-1234</td>
-                            <td><span class="badge badge-red">Inativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></td>
-                            <td><strong>Guincho SOS 24h</strong></td>
-                            <td>Guincho</td>
-                            <td>Sorocaba</td>
-                            <td>(15) 8901-2345</td>
-                            <td><span class="badge badge-green">Ativo</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline">Visualizar</button>
-                                <button class="btn btn-sm btn-primary">Editar</button>
-                                <button class="btn btn-sm btn-danger">Excluir</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
-                <div class="pagination">
-                    <button class="page-btn">‹</button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <button class="page-btn">...</button>
-                    <button class="page-btn">5</button>
-                    <button class="page-btn">›</button>
-                </div>
+        <!-- MODAL: Ver Parceiro -->
+        <div id="modalVerParceiro" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalVerParceiro')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;">Detalhes do Parceiro</h2>
+                <div id="verParceiroContent"></div>
+                <div style="margin-top:24px;display:flex;gap:12px;"><button class="btn btn-primary" onclick="closeModal('modalVerParceiro');editarParceiro(window._viewParceiroId)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar</button><button class="btn btn-outline" onclick="closeModal('modalVerParceiro')">Fechar</button></div>
+            </div>
+        </div>
+
+        <!-- MODAL: Novo/Editar Parceiro -->
+        <div id="modalNovoParceiro" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:650px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalNovoParceiro')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;" id="modalParceiroTitle">Novo Parceiro</h2>
+                <form id="formParceiro" onsubmit="salvarParceiro(event)">
+                    <div class="form-row"><div class="form-group"><label>Nome Fantasia *</label><input type="text" id="parcNome" required placeholder="Ex: Auto Posto São Jorge" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>Razão Social</label><input type="text" id="parcRazao" placeholder="Ex: Auto Posto São Jorge Ltda" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div></div>
+                    <div class="form-row"><div class="form-group"><label>CNPJ *</label><input type="text" id="parcCnpj" required placeholder="00.000.000/0001-00" maxlength="18" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>Categoria *</label><select id="parcCategoria" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"><option value="">Selecione</option><option value="postos">Postos</option><option value="lava-jato">Lava-Jato</option><option value="mecanica">Mecânica</option><option value="estetica">Estética</option><option value="pneus">Pneus</option><option value="eletrica">Auto Elétrica</option><option value="borracharia">Borracharia</option><option value="guincho">Guincho</option><option value="alimentacao">Alimentação</option><option value="saude">Saúde</option><option value="educacao">Educação</option></select></div></div>
+                    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="parcTelefone" placeholder="(27) 3264-0000" maxlength="15" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>WhatsApp</label><input type="text" id="parcWhatsapp" placeholder="(27) 99999-0000" maxlength="15" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div></div>
+                    <div class="form-group"><label>Endereço</label><input type="text" id="parcEndereco" placeholder="Rua, nº - Bairro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div>
+                    <div class="form-row"><div class="form-group"><label>Cidade *</label><input type="text" id="parcCidade" required placeholder="Linhares" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>Status</label><select id="parcStatus" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"><option value="active">Ativo</option><option value="pending">Pendente</option><option value="inactive">Inativo</option></select></div></div>
+                    <div id="parcFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;"><button type="submit" class="btn btn-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar</button><button type="button" class="btn btn-outline" onclick="closeModal('modalNovoParceiro')">Cancelar</button></div>
+                </form>
             </div>
         </div>
 
@@ -4130,6 +4029,81 @@ function salvarCupomLote(event) {
         }, 2000);
     }, 1000);
 }
+
+// ===== PARCEIROS - CRUD COMPLETO =====
+var parceirosData = [
+    { id:1, nome:'Auto Posto São Jorge', razao:'Auto Posto São Jorge Ltda', cnpj:'12.345.678/0001-01', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-1234', whatsapp:'(27) 99812-3456', endereco:'Av. Augusto Pestana, 1250 - Centro', status:'active' },
+    { id:2, nome:'Lava Jato Premium', razao:'Lava Jato Premium Ltda', cnpj:'12.345.678/0001-02', categoria:'lava-jato', cidade:'Linhares', telefone:'(27) 3264-5678', whatsapp:'(27) 99834-5678', endereco:'Rua Gov. Santos Neves, 450', status:'active' },
+    { id:3, nome:'Mecânica Central', razao:'Mecânica Central Ltda', cnpj:'12.345.678/0001-03', categoria:'mecanica', cidade:'Linhares', telefone:'(27) 3264-9012', whatsapp:'(27) 99856-7890', endereco:'Rua Rufino de Carvalho, 320', status:'active' },
+    { id:4, nome:'Estética Car Pro', razao:'Estética Car Pro ME', cnpj:'12.345.678/0001-04', categoria:'estetica', cidade:'Linhares', telefone:'(27) 3264-3456', whatsapp:'(27) 99878-1234', endereco:'Av. João Felipe Calmon, 890', status:'pending' },
+    { id:5, nome:'Pneus & Cia', razao:'Pneus & Cia Comércio Ltda', cnpj:'12.345.678/0001-05', categoria:'pneus', cidade:'Linhares', telefone:'(27) 3264-7890', whatsapp:'(27) 99890-2345', endereco:'Rod. ES-010, Km 3', status:'active' },
+    { id:6, nome:'Auto Elétrica Rápida', razao:'Auto Elétrica Rápida ME', cnpj:'12.345.678/0001-06', categoria:'eletrica', cidade:'Linhares', telefone:'(27) 3264-2345', whatsapp:'(27) 99812-6789', endereco:'Rua Augusto Luciano, 156', status:'active' },
+    { id:7, nome:'Borracharia 24h', razao:'Borracharia 24h ME', cnpj:'12.345.678/0001-07', categoria:'borracharia', cidade:'Linhares', telefone:'(27) 3264-6789', whatsapp:'(27) 99834-0123', endereco:'Rua Principal, 45', status:'active' },
+    { id:8, nome:'Guincho Express', razao:'Guincho Express Serviços Ltda', cnpj:'12.345.678/0001-08', categoria:'guincho', cidade:'Linhares', telefone:'(27) 3264-0123', whatsapp:'(27) 99856-4567', endereco:'Av. Industrial, 2200', status:'active' },
+    { id:9, nome:'Restaurante Sabor Mineiro', razao:'Restaurante Sabor Mineiro Ltda', cnpj:'12.345.678/0001-09', categoria:'alimentacao', cidade:'Linhares', telefone:'(27) 3264-4567', whatsapp:'(27) 99878-5678', endereco:'Rua Dr. Abelardo, 78', status:'active' },
+    { id:10, nome:'Farmácia Saúde+', razao:'Farmácia Saúde+ Ltda', cnpj:'12.345.678/0001-10', categoria:'saude', cidade:'Linhares', telefone:'(27) 3264-8901', whatsapp:'(27) 99890-6789', endereco:'Av. Beira Rio, 320', status:'active' },
+    { id:11, nome:'Auto Escola Dirigir Bem', razao:'Auto Escola Dirigir Bem Ltda', cnpj:'12.345.678/0001-11', categoria:'educacao', cidade:'Linhares', telefone:'(27) 3264-5432', whatsapp:'(27) 99812-8901', endereco:'Rua Castelo Branco, 560', status:'active' },
+    { id:12, nome:'Posto Shell Av. Brasil', razao:'Posto Shell Av. Brasil Ltda', cnpj:'12.345.678/0001-12', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-6543', whatsapp:'(27) 99834-2345', endereco:'Av. Brasil, 1800', status:'active' }
+];
+var parceirosPage = 1; var parceirosPerPage = 8;
+
+function getParcStatusBadge(s) { return s==='active'?'<span class="badge badge-green">Ativo</span>':s==='pending'?'<span class="badge badge-yellow">Pendente</span>':'<span class="badge badge-red">Inativo</span>'; }
+
+function renderParceirosTable() {
+    var search = (document.getElementById('parceirosSearchInput').value||'').toLowerCase();
+    var filtered = parceirosData.filter(function(p) { return !search||p.nome.toLowerCase().indexOf(search)>-1||p.categoria.toLowerCase().indexOf(search)>-1||p.cidade.toLowerCase().indexOf(search)>-1; });
+    var total=filtered.length, start=(parceirosPage-1)*parceirosPerPage, end=Math.min(start+parceirosPerPage,total), page=filtered.slice(start,end);
+    var tbody=document.getElementById('parceirosTableBody'); if(!tbody) return;
+    if(page.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum parceiro encontrado</td></tr>'; } else {
+        tbody.innerHTML=page.map(function(p){ return '<tr><td><strong>'+p.nome+'</strong></td><td>'+p.categoria+'</td><td>'+p.cidade+'</td><td>'+p.telefone+'</td><td>'+getParcStatusBadge(p.status)+'</td><td style="white-space:nowrap"><button onclick="verParceiro('+p.id+')" title="Visualizar" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;" onmouseover="this.style.color=\'var(--green)\'" onmouseout="this.style.color=\'var(--text-secondary)\'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button onclick="editarParceiro('+p.id+')" title="Editar" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;" onmouseover="this.style.color=\'var(--primary-blue)\'" onmouseout="this.style.color=\'var(--text-secondary)\'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button onclick="excluirParceiro('+p.id+')" title="Excluir" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--text-secondary)\'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td></tr>'; }).join('');
+    }
+    document.getElementById('parceirosPageInfo').textContent='Mostrando '+(total>0?start+1:0)+'-'+end+' de '+total;
+    var pages=Math.ceil(total/parceirosPerPage), pag=document.getElementById('parceirosPagination'), html='';
+    for(var i=1;i<=pages;i++){var a=i===parceirosPage?'background:var(--primary-blue);color:#fff;':'background:var(--dark-bg);color:var(--text-secondary);';html+='<button onclick="parceirosPage='+i+';renderParceirosTable()" style="'+a+'border:1px solid var(--dark-border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;">'+i+'</button>';}
+    pag.innerHTML=html;
+}
+
+function verParceiro(id) {
+    var p=parceirosData.find(function(x){return x.id===id;}); if(!p) return;
+    window._viewParceiroId=id;
+    document.getElementById('verParceiroContent').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Nome Fantasia</div><div style="font-weight:600;">'+p.nome+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Razão Social</div><div style="font-weight:600;">'+p.razao+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">CNPJ</div><div style="font-weight:600;">'+p.cnpj+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Categoria</div><div style="font-weight:600;">'+p.categoria+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Telefone</div><div style="font-weight:600;">'+p.telefone+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">WhatsApp</div><div style="font-weight:600;">'+p.whatsapp+'</div></div><div style="grid-column:1/-1;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Endereço</div><div style="font-weight:600;">'+p.endereco+' - '+p.cidade+'</div></div><div style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:10px;padding:14px;"><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:4px;">Status</div><div>'+getParcStatusBadge(p.status)+'</div></div></div>';
+    openModal('modalVerParceiro');
+}
+
+function editarParceiro(id) {
+    var p=parceirosData.find(function(x){return x.id===id;}); if(!p) return;
+    window._editParceiroId=id;
+    document.getElementById('modalParceiroTitle').textContent='Editar Parceiro';
+    document.getElementById('parcNome').value=p.nome;
+    document.getElementById('parcRazao').value=p.razao;
+    document.getElementById('parcCnpj').value=p.cnpj;
+    document.getElementById('parcCategoria').value=p.categoria;
+    document.getElementById('parcTelefone').value=p.telefone;
+    document.getElementById('parcWhatsapp').value=p.whatsapp;
+    document.getElementById('parcEndereco').value=p.endereco;
+    document.getElementById('parcCidade').value=p.cidade;
+    document.getElementById('parcStatus').value=p.status;
+    openModal('modalNovoParceiro');
+}
+
+function salvarParceiro(event) {
+    event.preventDefault();
+    var data={nome:document.getElementById('parcNome').value,razao:document.getElementById('parcRazao').value,cnpj:document.getElementById('parcCnpj').value,categoria:document.getElementById('parcCategoria').value,telefone:document.getElementById('parcTelefone').value,whatsapp:document.getElementById('parcWhatsapp').value,endereco:document.getElementById('parcEndereco').value,cidade:document.getElementById('parcCidade').value,status:document.getElementById('parcStatus').value};
+    var fb=document.getElementById('parcFeedback');
+    if(window._editParceiroId){var p=parceirosData.find(function(x){return x.id===window._editParceiroId;});if(p)Object.assign(p,data);fb.textContent='Parceiro atualizado!';}
+    else{data.id=parceirosData.length+1;parceirosData.push(data);fb.textContent='Parceiro "'+data.nome+'" criado!';}
+    fb.style.display='block';fb.style.background='rgba(0,166,81,0.1)';fb.style.border='1px solid rgba(0,166,81,0.3)';fb.style.color='#00A651';
+    setTimeout(function(){fb.style.display='none';closeModal('modalNovoParceiro');document.getElementById('formParceiro').reset();window._editParceiroId=null;document.getElementById('modalParceiroTitle').textContent='Novo Parceiro';renderParceirosTable();},1200);
+}
+
+function excluirParceiro(id) {
+    var p=parceirosData.find(function(x){return x.id===id;});if(!p) return;
+    if(!confirm('Excluir parceiro "'+p.nome+'"?')) return;
+    parceirosData=parceirosData.filter(function(x){return x.id!==id;});
+    renderParceirosTable();
+}
+
+document.addEventListener('DOMContentLoaded',function(){renderParceirosTable();});
 
 // ===== CATEGORIAS - DINÂMICO =====
 var categoriasData = [
