@@ -1488,41 +1488,52 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Parceiros / Categorias</label>
-                            <select id="campParceiro" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
-                                <optgroup label="Todos">
-                                    <option value="todos" selected>Todos os parceiros</option>
-                                </optgroup>
-                                <optgroup label="Por Categoria">
-                                    <option value="cat:postos">Postos de Combustível</option>
-                                    <option value="cat:lava-jato">Lava-Jatos</option>
-                                    <option value="cat:mecanica">Mecânicas</option>
-                                    <option value="cat:estetica">Estética Automotiva</option>
-                                    <option value="cat:pneus">Pneus e Rodas</option>
-                                    <option value="cat:eletrica">Auto Elétricas</option>
-                                    <option value="cat:borracharia">Borracharias</option>
-                                    <option value="cat:guincho">Guincho e Reboque</option>
-                                    <option value="cat:alimentacao">Alimentação</option>
-                                    <option value="cat:saude">Saúde e Bem-estar</option>
-                                    <option value="cat:educacao">Educação</option>
-                                </optgroup>
-                                <optgroup label="Parceiro Específico">
-                                    <option value="Posto Shell Centro">Posto Shell Centro</option>
-                                    <option value="Lava-Jato Express">Lava-Jato Express</option>
-                                    <option value="Mecânica do João">Mecânica do João</option>
-                                    <option value="Pneu Forte">Pneu Forte</option>
-                                    <option value="Estética Premium">Estética Premium</option>
-                                    <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
-                                    <option value="Borracharia 24h">Borracharia 24h</option>
-                                    <option value="Guincho Express">Guincho Express</option>
-                                </optgroup>
+                            <label>Alcance da Campanha</label>
+                            <select id="campAlcance" onchange="toggleCampParceiroFields('camp')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="todos">Todos os parceiros</option>
+                                <option value="categoria">Por Categoria</option>
+                                <option value="especifico">Parceiro Específico</option>
                             </select>
-                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para selecionar múltiplos. Selecione "Todos" para aplicar a todos.</span>
                         </div>
                         <div class="form-group">
                             <label>Multiplicador de Pontos</label>
                             <input type="number" id="campMultiplicador" placeholder="2.0" min="1" max="5" step="0.5" value="2.0" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
+                    </div>
+                    <div id="campCategoriaField" style="display:none;" class="form-group">
+                        <label>Selecione as Categorias</label>
+                        <select id="campCategorias" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                            <option value="postos">Postos de Combustível</option>
+                            <option value="lava-jato">Lava-Jatos</option>
+                            <option value="mecanica">Mecânicas</option>
+                            <option value="estetica">Estética Automotiva</option>
+                            <option value="pneus">Pneus e Rodas</option>
+                            <option value="eletrica">Auto Elétricas</option>
+                            <option value="borracharia">Borracharias</option>
+                            <option value="guincho">Guincho e Reboque</option>
+                            <option value="alimentacao">Alimentação</option>
+                            <option value="saude">Saúde e Bem-estar</option>
+                            <option value="educacao">Educação</option>
+                        </select>
+                        <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplas categorias.</span>
+                    </div>
+                    <div id="campEspecificoField" style="display:none;" class="form-group">
+                        <label>Selecione os Parceiros</label>
+                        <select id="campParceiros" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                            <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
+                            <option value="Lava Jato Premium">Lava Jato Premium</option>
+                            <option value="Mecânica Central">Mecânica Central</option>
+                            <option value="Estética Car Pro">Estética Car Pro</option>
+                            <option value="Pneus & Cia">Pneus &amp; Cia</option>
+                            <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
+                            <option value="Borracharia 24h">Borracharia 24h</option>
+                            <option value="Guincho Express">Guincho Express</option>
+                            <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
+                            <option value="Farmácia Saúde+">Farmácia Saúde+</option>
+                            <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
+                            <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
+                        </select>
+                        <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplos parceiros.</span>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -1628,41 +1639,52 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Parceiros / Categorias</label>
-                            <select id="editCampParceiro" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
-                                <optgroup label="Todos">
-                                    <option value="todos">Todos os parceiros</option>
-                                </optgroup>
-                                <optgroup label="Por Categoria">
-                                    <option value="cat:postos">Postos de Combustível</option>
-                                    <option value="cat:lava-jato">Lava-Jatos</option>
-                                    <option value="cat:mecanica">Mecânicas</option>
-                                    <option value="cat:estetica">Estética Automotiva</option>
-                                    <option value="cat:pneus">Pneus e Rodas</option>
-                                    <option value="cat:eletrica">Auto Elétricas</option>
-                                    <option value="cat:borracharia">Borracharias</option>
-                                    <option value="cat:guincho">Guincho e Reboque</option>
-                                    <option value="cat:alimentacao">Alimentação</option>
-                                    <option value="cat:saude">Saúde e Bem-estar</option>
-                                    <option value="cat:educacao">Educação</option>
-                                </optgroup>
-                                <optgroup label="Parceiro Específico">
-                                    <option value="Posto Shell Centro">Posto Shell Centro</option>
-                                    <option value="Lava-Jato Express">Lava-Jato Express</option>
-                                    <option value="Mecânica do João">Mecânica do João</option>
-                                    <option value="Pneu Forte">Pneu Forte</option>
-                                    <option value="Estética Premium">Estética Premium</option>
-                                    <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
-                                    <option value="Borracharia 24h">Borracharia 24h</option>
-                                    <option value="Guincho Express">Guincho Express</option>
-                                </optgroup>
+                            <label>Alcance da Campanha</label>
+                            <select id="editCampAlcance" onchange="toggleCampParceiroFields('editCamp')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="todos">Todos os parceiros</option>
+                                <option value="categoria">Por Categoria</option>
+                                <option value="especifico">Parceiro Específico</option>
                             </select>
-                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplos.</span>
                         </div>
                         <div class="form-group">
                             <label>Multiplicador de Pontos</label>
                             <input type="number" id="editCampMultiplicador" min="1" max="5" step="0.5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
+                    </div>
+                    <div id="editCampCategoriaField" style="display:none;" class="form-group">
+                        <label>Selecione as Categorias</label>
+                        <select id="editCampCategorias" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                            <option value="postos">Postos de Combustível</option>
+                            <option value="lava-jato">Lava-Jatos</option>
+                            <option value="mecanica">Mecânicas</option>
+                            <option value="estetica">Estética Automotiva</option>
+                            <option value="pneus">Pneus e Rodas</option>
+                            <option value="eletrica">Auto Elétricas</option>
+                            <option value="borracharia">Borracharias</option>
+                            <option value="guincho">Guincho e Reboque</option>
+                            <option value="alimentacao">Alimentação</option>
+                            <option value="saude">Saúde e Bem-estar</option>
+                            <option value="educacao">Educação</option>
+                        </select>
+                        <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplas categorias.</span>
+                    </div>
+                    <div id="editCampEspecificoField" style="display:none;" class="form-group">
+                        <label>Selecione os Parceiros</label>
+                        <select id="editCampParceiros" multiple size="5" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:13px;outline:none;">
+                            <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
+                            <option value="Lava Jato Premium">Lava Jato Premium</option>
+                            <option value="Mecânica Central">Mecânica Central</option>
+                            <option value="Estética Car Pro">Estética Car Pro</option>
+                            <option value="Pneus & Cia">Pneus &amp; Cia</option>
+                            <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
+                            <option value="Borracharia 24h">Borracharia 24h</option>
+                            <option value="Guincho Express">Guincho Express</option>
+                            <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
+                            <option value="Farmácia Saúde+">Farmácia Saúde+</option>
+                            <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
+                            <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
+                        </select>
+                        <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Ctrl+Click para múltiplos parceiros.</span>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -4402,7 +4424,7 @@ function salvarCampanha(event) {
     var descricao = document.getElementById('campDescricao').value;
     var inicio = document.getElementById('campInicio').value;
     var fim = document.getElementById('campFim').value;
-    var parceiro = getSelectedParceiros('campParceiro');
+    var parceiro = getSelectedParceiros('camp');
     var multiplicador = parseFloat(document.getElementById('campMultiplicador').value) || 1;
     var cor = document.getElementById('campCor').value;
     var publico = document.getElementById('campPublico').value;
@@ -4514,14 +4536,28 @@ function editarCampanha(id) {
     document.getElementById('editCampCor').value = c.cor;
     document.getElementById('editCampPublico').value = c.publico;
 
-    // Selecionar parceiros no multi-select
-    var selectEl = document.getElementById('editCampParceiro');
-    for (var i = 0; i < selectEl.options.length; i++) {
-        selectEl.options[i].selected = false;
-        if (c.parceiro === 'Todos os parceiros' && selectEl.options[i].value === 'todos') {
-            selectEl.options[i].selected = true;
-        } else if (selectEl.options[i].value === c.parceiro) {
-            selectEl.options[i].selected = true;
+    // Selecionar alcance no editar
+    if (c.parceiro === 'Todos os parceiros') {
+        document.getElementById('editCampAlcance').value = 'todos';
+    } else {
+        // Check if parceiro matches a category or specific partner
+        var categorias = ['postos','lava-jato','mecanica','estetica','pneus','eletrica','borracharia','guincho','alimentacao','saude','educacao'];
+        var parceiroLower = c.parceiro.toLowerCase();
+        var isCategory = categorias.some(function(cat) { return parceiroLower.indexOf(cat) > -1; });
+        if (isCategory) {
+            document.getElementById('editCampAlcance').value = 'categoria';
+        } else {
+            document.getElementById('editCampAlcance').value = 'especifico';
+        }
+    }
+    toggleCampParceiroFields('editCamp');
+
+    // Pre-select parceiros/categorias if applicable
+    if (document.getElementById('editCampAlcance').value === 'especifico') {
+        var parceirosArr = c.parceiro.split(', ');
+        var selectParceiros = document.getElementById('editCampParceiros');
+        for (var i = 0; i < selectParceiros.options.length; i++) {
+            selectParceiros.options[i].selected = parceirosArr.indexOf(selectParceiros.options[i].value) > -1;
         }
     }
 
@@ -4555,16 +4591,7 @@ function salvarEdicaoCampanha(event) {
     c.publico = document.getElementById('editCampPublico').value;
 
     // Parceiro(s) selecionado(s)
-    var selectEl = document.getElementById('editCampParceiro');
-    var selected = [];
-    for (var i = 0; i < selectEl.options.length; i++) {
-        if (selectEl.options[i].selected) selected.push(selectEl.options[i].value);
-    }
-    if (selected.indexOf('todos') > -1) {
-        c.parceiro = 'Todos os parceiros';
-    } else {
-        c.parceiro = selected.map(function(v) { return v.replace('cat:', ''); }).join(', ');
-    }
+    c.parceiro = getSelectedParceiros('editCamp');
 
     // Banner
     if (editCampBannerFileData === 'removed') {
@@ -4597,14 +4624,34 @@ function salvarEdicaoCampanha(event) {
     }, 1200);
 }
 
-function getSelectedParceiros(selectId) {
-    var el = document.getElementById(selectId);
-    var selected = [];
-    for (var i = 0; i < el.options.length; i++) {
-        if (el.options[i].selected) selected.push(el.options[i].value);
+function getSelectedParceiros(prefix) {
+    var alcance = document.getElementById(prefix + 'Alcance').value;
+    if (alcance === 'todos') return 'Todos os parceiros';
+    if (alcance === 'categoria') {
+        var el = document.getElementById(prefix + 'Categorias');
+        var selected = [];
+        for (var i = 0; i < el.options.length; i++) {
+            if (el.options[i].selected) selected.push(el.options[i].text);
+        }
+        return selected.length > 0 ? selected.join(', ') : 'Todos os parceiros';
     }
-    if (selected.indexOf('todos') > -1) return 'Todos os parceiros';
-    return selected.map(function(v) { return v.replace('cat:', ''); }).join(', ') || 'Todos os parceiros';
+    if (alcance === 'especifico') {
+        var el = document.getElementById(prefix + 'Parceiros');
+        var selected = [];
+        for (var i = 0; i < el.options.length; i++) {
+            if (el.options[i].selected) selected.push(el.options[i].value);
+        }
+        return selected.length > 0 ? selected.join(', ') : 'Todos os parceiros';
+    }
+    return 'Todos os parceiros';
+}
+
+function toggleCampParceiroFields(prefix) {
+    var alcance = document.getElementById(prefix + 'Alcance').value;
+    var catField = document.getElementById(prefix + 'CategoriaField');
+    var espField = document.getElementById(prefix + 'EspecificoField');
+    if (catField) catField.style.display = alcance === 'categoria' ? 'block' : 'none';
+    if (espField) espField.style.display = alcance === 'especifico' ? 'block' : 'none';
 }
 
 // Init cupons table on load
