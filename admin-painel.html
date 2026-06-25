@@ -4143,16 +4143,90 @@ function salvarParceiro(event) {
     event.preventDefault();
     var data={nome:document.getElementById('parcNome').value,razao:document.getElementById('parcRazao').value,cnpj:document.getElementById('parcCnpj').value,categoria:document.getElementById('parcCategoria').value,telefone:document.getElementById('parcTelefone').value,whatsapp:document.getElementById('parcWhatsapp').value,endereco:document.getElementById('parcEndereco').value,cidade:document.getElementById('parcCidade').value,status:document.getElementById('parcStatus').value};
     var fb=document.getElementById('parcFeedback');
-    // Handle images
-    if(parcLogoData && parcLogoData!=='removed') data.logo_url=parcLogoData;
-    else if(parcLogoData==='removed') data.logo_url=null;
-    if(parcBannerData && parcBannerData!=='removed') data.cover_url=parcBannerData;
-    else if(parcBannerData==='removed') data.cover_url=null;
+    var btn=event.target.querySelector('button[type="submit"]');
+    btn.disabled=true; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Salvando...';
 
-    if(window._editParceiroId){var p=parceirosData.find(function(x){return x.id===window._editParceiroId;});if(p){if(!data.logo_url&&parcLogoData!=='removed')data.logo_url=p.logo_url;if(!data.cover_url&&parcBannerData!=='removed')data.cover_url=p.cover_url;Object.assign(p,data);}fb.textContent='Parceiro atualizado!';}
-    else{data.id=parceirosData.length+1;data.logo_url=data.logo_url||null;data.cover_url=data.cover_url||null;parceirosData.push(data);fb.textContent='Parceiro "'+data.nome+'" criado!';}
-    fb.style.display='block';fb.style.background='rgba(0,166,81,0.1)';fb.style.border='1px solid rgba(0,166,81,0.3)';fb.style.color='#00A651';
-    setTimeout(function(){fb.style.display='none';closeModal('modalNovoParceiro');document.getElementById('formParceiro').reset();resetParcImgs();window._editParceiroId=null;document.getElementById('modalParceiroTitle').textContent='Novo Parceiro';renderParceirosTable();},1200);
+    // Upload images to Supabase Storage
+    var logoFile = document.getElementById('parcLogoFile').files[0];
+    var bannerFile = document.getElementById('parcBannerFile').files[0];
+
+    async function processUpload() {
+        var logoUrl = null, coverUrl = null;
+
+        if (supabaseClient) {
+            // Upload logo
+            if (logoFile) {
+                var ext = logoFile.name.split('.').pop().toLowerCase();
+                var fileName = 'logo-' + data.cnpj.replace(/\D/g,'') + '-' + Date.now() + '.' + ext;
+                var { data: uploadData, error } = await supabaseClient.storage.from('partner-images').upload(fileName, logoFile, { cacheControl:'3600', upsert:true });
+                if (!error) {
+                    var { data: urlData } = supabaseClient.storage.from('partner-images').getPublicUrl(fileName);
+                    if (urlData) logoUrl = urlData.publicUrl;
+                }
+            } else if (parcLogoData && parcLogoData !== 'removed') {
+                logoUrl = parcLogoData; // keep base64 for local display
+            }
+
+            // Upload banner
+            if (bannerFile) {
+                var ext2 = bannerFile.name.split('.').pop().toLowerCase();
+                var fileName2 = 'cover-' + data.cnpj.replace(/\D/g,'') + '-' + Date.now() + '.' + ext2;
+                var { data: uploadData2, error: error2 } = await supabaseClient.storage.from('partner-images').upload(fileName2, bannerFile, { cacheControl:'3600', upsert:true });
+                if (!error2) {
+                    var { data: urlData2 } = supabaseClient.storage.from('partner-images').getPublicUrl(fileName2);
+                    if (urlData2) coverUrl = urlData2.publicUrl;
+                }
+            } else if (parcBannerData && parcBannerData !== 'removed') {
+                coverUrl = parcBannerData;
+            }
+
+            // Update database
+            if (window._editParceiroId) {
+                var p = parceirosData.find(function(x){return x.id===window._editParceiroId;});
+                if (p) {
+                    // Update Supabase table
+                    var updateData = { trade_name: data.nome, company_name: data.razao || data.nome, category: data.categoria, phone: data.telefone, whatsapp: data.whatsapp, address: data.endereco, city: data.cidade, status: data.status };
+                    if (logoUrl && logoUrl.startsWith('http')) updateData.logo_url = logoUrl;
+                    else if (parcLogoData === 'removed') updateData.logo_url = null;
+                    if (coverUrl && coverUrl.startsWith('http')) updateData.cover_url = coverUrl;
+                    else if (parcBannerData === 'removed') updateData.cover_url = null;
+                    await supabaseClient.from('partners').update(updateData).eq('cnpj', data.cnpj);
+                    // Update local
+                    data.logo_url = logoUrl || (parcLogoData==='removed'?null:p.logo_url);
+                    data.cover_url = coverUrl || (parcBannerData==='removed'?null:p.cover_url);
+                    Object.assign(p, data);
+                }
+                fb.textContent='Parceiro atualizado e salvo no banco!';
+            } else {
+                // Insert new partner in Supabase
+                var insertData = { trade_name: data.nome, company_name: data.razao || data.nome, cnpj: data.cnpj, category: data.categoria, phone: data.telefone, whatsapp: data.whatsapp, address: data.endereco, city: data.cidade, state:'ES', status: data.status };
+                if (logoUrl && logoUrl.startsWith('http')) insertData.logo_url = logoUrl;
+                if (coverUrl && coverUrl.startsWith('http')) insertData.cover_url = coverUrl;
+                await supabaseClient.from('partners').insert(insertData);
+                data.id = parceirosData.length+1;
+                data.logo_url = logoUrl || null;
+                data.cover_url = coverUrl || null;
+                parceirosData.push(data);
+                fb.textContent='Parceiro "'+data.nome+'" criado e salvo no banco!';
+            }
+        } else {
+            // Fallback sem Supabase (local only)
+            if (parcLogoData && parcLogoData!=='removed') data.logo_url=parcLogoData; else if(parcLogoData==='removed') data.logo_url=null;
+            if (parcBannerData && parcBannerData!=='removed') data.cover_url=parcBannerData; else if(parcBannerData==='removed') data.cover_url=null;
+            if(window._editParceiroId){var p=parceirosData.find(function(x){return x.id===window._editParceiroId;});if(p){if(!data.logo_url&&parcLogoData!=='removed')data.logo_url=p.logo_url;if(!data.cover_url&&parcBannerData!=='removed')data.cover_url=p.cover_url;Object.assign(p,data);}fb.textContent='Parceiro atualizado!';}
+            else{data.id=parceirosData.length+1;data.logo_url=data.logo_url||null;data.cover_url=data.cover_url||null;parceirosData.push(data);fb.textContent='Parceiro "'+data.nome+'" criado!';}
+        }
+
+        btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar';
+        fb.style.display='block';fb.style.background='rgba(0,166,81,0.1)';fb.style.border='1px solid rgba(0,166,81,0.3)';fb.style.color='#00A651';
+        setTimeout(function(){fb.style.display='none';closeModal('modalNovoParceiro');document.getElementById('formParceiro').reset();resetParcImgs();window._editParceiroId=null;document.getElementById('modalParceiroTitle').textContent='Novo Parceiro';renderParceirosTable();},1500);
+    }
+
+    processUpload().catch(function(err) {
+        console.error('[Parceiro] Erro ao salvar:', err);
+        btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar';
+        fb.style.display='block';fb.style.background='rgba(239,68,68,0.1)';fb.style.border='1px solid rgba(239,68,68,0.3)';fb.style.color='#ef4444';fb.textContent='Erro ao salvar. Verifique a conexão.';
+    });
 }
 
 function excluirParceiro(id) {
