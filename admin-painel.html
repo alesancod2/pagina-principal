@@ -1250,81 +1250,34 @@
             <h1 class="section-title">Categorias</h1>
             <p class="section-subtitle">Organize os parceiros por segmento</p>
             <div style="margin-bottom:20px;text-align:right">
-                <button class="btn btn-green">+ Nova Categoria</button>
+                <button class="btn btn-green" onclick="openModal('modalNovaCategoria')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nova Categoria</button>
             </div>
-            <div class="categories-grid">
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/><path d="M3 14h18"/></svg></div>
-                    <h4>Postos</h4>
-                    <p>Postos de combustíveis</p>
-                    <div class="count">12 parceiros</div>
+            <!-- Grid dinâmico -->
+            <div class="categories-grid" id="categoriasGrid"></div>
+            <!-- Lista de parceiros da categoria (hidden by default) -->
+            <div id="categoriaParceirosPanel" style="display:none;margin-top:24px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                    <button onclick="fecharParceirosCategoria()" class="btn btn-outline" style="padding:6px 12px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg> Voltar</button>
+                    <h3 id="categoriaParceirosTitle" style="font-size:18px;font-weight:700;"></h3>
                 </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
-                    <h4>Lava-Jato</h4>
-                    <p>Lavagem automotiva</p>
-                    <div class="count">8 parceiros</div>
+                <div class="table-container">
+                    <table><thead><tr><th>Parceiro</th><th>Endereço</th><th>Telefone</th><th>Status</th></tr></thead><tbody id="categoriaParceirosBody"></tbody></table>
                 </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-                    <h4>Mecânica</h4>
-                    <p>Manutenção e reparos</p>
-                    <div class="count">6 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></div>
-                    <h4>Estética</h4>
-                    <p>Polimento e estética</p>
-                    <div class="count">5 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-                    <h4>Pneus</h4>
-                    <p>Venda e troca de pneus</p>
-                    <div class="count">4 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg></div>
-                    <h4>Auto Elétrica</h4>
-                    <p>Serviços elétricos</p>
-                    <div class="count">3 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-                    <h4>Borracharia</h4>
-                    <p>Conserto de pneus</p>
-                    <div class="count">3 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
-                    <h4>Guincho</h4>
-                    <p>Reboque e socorro</p>
-                    <div class="count">2 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-                    <h4>Alimentação</h4>
-                    <p>Restaurantes e lanchonetes</p>
-                    <div class="count">2 parceiros</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-                    <h4>Saúde</h4>
-                    <p>Clínicas e farmácias</p>
-                    <div class="count">1 parceiro</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-                    <h4>Educação</h4>
-                    <p>Cursos e autoescolas</p>
-                    <div class="count">1 parceiro</div>
-                </div>
-                <div class="category-card">
-                    <div class="cat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-                    <h4>Conveniência</h4>
-                    <p>Lojas de conveniência</p>
-                    <div class="count">1 parceiro</div>
-                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Nova Categoria -->
+        <div id="modalNovaCategoria" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;padding:20px;">
+            <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:16px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;position:relative;">
+                <button onclick="closeModal('modalNovaCategoria')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="2" y="9" width="6" height="6" rx="1"/></svg> Nova Categoria</h2>
+                <form id="formNovaCategoria" onsubmit="salvarCategoria(event)">
+                    <div class="form-group"><label>Nome da Categoria *</label><input type="text" id="catNome" required placeholder="Ex: Oficinas" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div>
+                    <div class="form-group"><label>Descrição</label><input type="text" id="catDescricao" placeholder="Ex: Oficinas mecânicas especializadas" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div>
+                    <div class="form-group"><label>Slug (identificador único) *</label><input type="text" id="catSlug" required placeholder="Ex: oficinas" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"><span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Usado internamente. Apenas letras minúsculas e hífens.</span></div>
+                    <div id="novaCatFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
+                    <div style="margin-top:24px;display:flex;gap:12px;"><button type="submit" class="btn btn-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar</button><button type="button" class="btn btn-outline" onclick="closeModal('modalNovaCategoria')">Cancelar</button></div>
+                </form>
             </div>
         </div>
 
@@ -4177,6 +4130,83 @@ function salvarCupomLote(event) {
         }, 2000);
     }, 1000);
 }
+
+// ===== CATEGORIAS - DINÂMICO =====
+var categoriasData = [
+    { slug:'postos', nome:'Postos', descricao:'Postos de combustíveis', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v17"/><path d="M13 10h4a2 2 0 0 1 2 2v10"/><path d="M21 7l-2-2"/><circle cx="20" cy="5" r="1"/></svg>', parceiros:['Auto Posto São Jorge','Posto Shell Av. Brasil'] },
+    { slug:'lava-jato', nome:'Lava-Jato', descricao:'Lavagem automotiva', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>', parceiros:['Lava Jato Premium'] },
+    { slug:'mecanica', nome:'Mecânica', descricao:'Manutenção e reparos', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>', parceiros:['Mecânica Central'] },
+    { slug:'estetica', nome:'Estética', descricao:'Polimento e estética', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>', parceiros:['Estética Car Pro'] },
+    { slug:'pneus', nome:'Pneus', descricao:'Venda e troca de pneus', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>', parceiros:['Pneus & Cia'] },
+    { slug:'eletrica', nome:'Auto Elétrica', descricao:'Serviços elétricos', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>', parceiros:['Auto Elétrica Rápida'] },
+    { slug:'borracharia', nome:'Borracharia', descricao:'Conserto de pneus', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>', parceiros:['Borracharia 24h'] },
+    { slug:'guincho', nome:'Guincho', descricao:'Reboque e socorro', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>', parceiros:['Guincho Express'] },
+    { slug:'alimentacao', nome:'Alimentação', descricao:'Restaurantes e lanchonetes', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>', parceiros:['Restaurante Sabor Mineiro'] },
+    { slug:'saude', nome:'Saúde', descricao:'Clínicas e farmácias', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>', parceiros:['Farmácia Saúde+'] },
+    { slug:'educacao', nome:'Educação', descricao:'Cursos e autoescolas', icon:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>', parceiros:['Auto Escola Dirigir Bem'] }
+];
+
+function renderCategoriasGrid() {
+    var grid = document.getElementById('categoriasGrid');
+    if (!grid) return;
+    grid.innerHTML = categoriasData.map(function(c, idx) {
+        var count = c.parceiros.length;
+        return '<div class="category-card" onclick="verParceirosCategoria(\'' + c.slug + '\')" style="cursor:pointer">' +
+            '<div class="cat-icon">' + c.icon + '</div>' +
+            '<h4>' + c.nome + '</h4>' +
+            '<p>' + c.descricao + '</p>' +
+            '<div class="count">' + count + ' parceiro' + (count !== 1 ? 's' : '') + '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function verParceirosCategoria(slug) {
+    var cat = categoriasData.find(function(c) { return c.slug === slug; });
+    if (!cat) return;
+    document.getElementById('categoriasGrid').style.display = 'none';
+    var panel = document.getElementById('categoriaParceirosPanel');
+    panel.style.display = 'block';
+    document.getElementById('categoriaParceirosTitle').textContent = 'Parceiros: ' + cat.nome + ' (' + cat.parceiros.length + ')';
+    var tbody = document.getElementById('categoriaParceirosBody');
+    if (cat.parceiros.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-secondary);">Nenhum parceiro nesta categoria</td></tr>';
+        return;
+    }
+    // Match with beneficiosData parceiros for address/phone/status
+    tbody.innerHTML = cat.parceiros.map(function(nome) {
+        var b = beneficiosData.find(function(x) { return x.parceiro === nome; });
+        return '<tr><td><strong>' + nome + '</strong></td><td style="color:var(--text-secondary)">Linhares - ES</td><td style="color:var(--text-secondary)">(27) 3264-XXXX</td><td><span class="badge badge-green">Ativo</span></td></tr>';
+    }).join('');
+}
+
+function fecharParceirosCategoria() {
+    document.getElementById('categoriaParceirosPanel').style.display = 'none';
+    document.getElementById('categoriasGrid').style.display = 'grid';
+}
+
+function salvarCategoria(event) {
+    event.preventDefault();
+    var nome = document.getElementById('catNome').value;
+    var descricao = document.getElementById('catDescricao').value || nome;
+    var slug = document.getElementById('catSlug').value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    var fb = document.getElementById('novaCatFeedback');
+    if (categoriasData.find(function(c) { return c.slug === slug; })) {
+        fb.style.display = 'block'; fb.style.background = 'rgba(239,68,68,0.1)'; fb.style.border = '1px solid rgba(239,68,68,0.3)'; fb.style.color = '#ef4444'; fb.textContent = 'Slug "' + slug + '" já existe!';
+        return;
+    }
+    categoriasData.push({ slug: slug, nome: nome, descricao: descricao, icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>', parceiros: [] });
+    fb.style.display = 'block'; fb.style.background = 'rgba(0,166,81,0.1)'; fb.style.border = '1px solid rgba(0,166,81,0.3)'; fb.style.color = '#00A651'; fb.textContent = 'Categoria "' + nome + '" criada!';
+    setTimeout(function() { fb.style.display = 'none'; closeModal('modalNovaCategoria'); document.getElementById('formNovaCategoria').reset(); renderCategoriasGrid(); }, 1200);
+}
+
+// Auto-fill slug from name
+document.addEventListener('DOMContentLoaded', function() {
+    var catNome = document.getElementById('catNome');
+    if (catNome) catNome.addEventListener('input', function() {
+        document.getElementById('catSlug').value = this.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    });
+    renderCategoriasGrid();
+});
 
 // ===== BENEFÍCIOS - CRUD COMPLETO =====
 var beneficiosData = [
