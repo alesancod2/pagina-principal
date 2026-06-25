@@ -854,6 +854,16 @@ ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_public_read_partners" ON partners;
 CREATE POLICY "allow_public_read_partners" ON partners FOR SELECT USING (true);
 
+-- Permitir inserção e atualização de parceiros (admin via anon key)
+DROP POLICY IF EXISTS "allow_insert_partners" ON partners;
+CREATE POLICY "allow_insert_partners" ON partners FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_update_partners" ON partners;
+CREATE POLICY "allow_update_partners" ON partners FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "allow_delete_partners" ON partners;
+CREATE POLICY "allow_delete_partners" ON partners FOR DELETE USING (true);
+
 -- Permitir leitura de benefícios (público)
 ALTER TABLE partner_benefits ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_public_read_benefits" ON partner_benefits;
