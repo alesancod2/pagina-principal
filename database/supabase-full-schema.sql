@@ -394,6 +394,11 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('campaign-banners', 'campaign-banners', true)
 ON CONFLICT (id) DO NOTHING;
 
+-- Criar bucket de storage para imagens de parceiros (logo + banner)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('partner-images', 'partner-images', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- ============================================
 -- ÍNDICES DE PERFORMANCE
 -- ============================================
@@ -897,6 +902,15 @@ CREATE POLICY "allow_public_read_campaign_banners" ON storage.objects
 DROP POLICY IF EXISTS "allow_upload_campaign_banners" ON storage.objects;
 CREATE POLICY "allow_upload_campaign_banners" ON storage.objects
     FOR INSERT WITH CHECK (bucket_id = 'campaign-banners');
+
+-- Storage policies para partner-images (logo e banner de parceiros)
+DROP POLICY IF EXISTS "allow_public_read_partner_images" ON storage.objects;
+CREATE POLICY "allow_public_read_partner_images" ON storage.objects
+    FOR SELECT USING (bucket_id = 'partner-images');
+
+DROP POLICY IF EXISTS "allow_upload_partner_images" ON storage.objects;
+CREATE POLICY "allow_upload_partner_images" ON storage.objects
+    FOR INSERT WITH CHECK (bucket_id = 'partner-images');
 
 -- ============================================
 -- VERIFICAÇÃO FINAL

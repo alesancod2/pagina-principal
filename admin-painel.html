@@ -1138,6 +1138,32 @@
                     <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="parcTelefone" placeholder="(27) 3264-0000" maxlength="15" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>WhatsApp</label><input type="text" id="parcWhatsapp" placeholder="(27) 99999-0000" maxlength="15" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div></div>
                     <div class="form-group"><label>Endereço</label><input type="text" id="parcEndereco" placeholder="Rua, nº - Bairro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div>
                     <div class="form-row"><div class="form-group"><label>Cidade *</label><input type="text" id="parcCidade" required placeholder="Linhares" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"></div><div class="form-group"><label>Status</label><select id="parcStatus" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;"><option value="active">Ativo</option><option value="pending">Pendente</option><option value="inactive">Inativo</option></select></div></div>
+                    <div class="form-row" style="margin-top:8px;">
+                        <div class="form-group">
+                            <label>Logomarca</label>
+                            <div id="parcLogoPreview" style="display:none;margin-bottom:8px;width:64px;height:64px;border-radius:12px;overflow:hidden;border:1px solid var(--dark-border);position:relative;">
+                                <img id="parcLogoImg" style="width:100%;height:100%;object-fit:cover;" alt="">
+                                <button type="button" onclick="removeParcImg('Logo')" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:#fff;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">&times;</button>
+                            </div>
+                            <label for="parcLogoFile" style="display:flex;align-items:center;gap:6px;padding:10px;border:2px dashed var(--dark-border);border-radius:8px;cursor:pointer;color:var(--text-secondary);font-size:12px;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--dark-border)'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span id="parcLogoLabel">Upload logo (PNG/JPG)</span>
+                            </label>
+                            <input type="file" id="parcLogoFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewParcImg(this,'Logo')">
+                        </div>
+                        <div class="form-group">
+                            <label>Banner (capa)</label>
+                            <div id="parcBannerPreview" style="display:none;margin-bottom:8px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--dark-border);position:relative;">
+                                <img id="parcBannerImg" style="width:100%;height:100%;object-fit:cover;" alt="">
+                                <button type="button" onclick="removeParcImg('Banner')" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:#fff;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">&times;</button>
+                            </div>
+                            <label for="parcBannerFile" style="display:flex;align-items:center;gap:6px;padding:10px;border:2px dashed var(--dark-border);border-radius:8px;cursor:pointer;color:var(--text-secondary);font-size:12px;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--dark-border)'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span id="parcBannerLabel">Upload banner (PNG/JPG)</span>
+                            </label>
+                            <input type="file" id="parcBannerFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewParcImg(this,'Banner')">
+                        </div>
+                    </div>
                     <div id="parcFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
                     <div style="margin-top:24px;display:flex;gap:12px;"><button type="submit" class="btn btn-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar</button><button type="button" class="btn btn-outline" onclick="closeModal('modalNovoParceiro')">Cancelar</button></div>
                 </form>
@@ -4031,19 +4057,42 @@ function salvarCupomLote(event) {
 }
 
 // ===== PARCEIROS - CRUD COMPLETO =====
+var parcLogoData = null, parcBannerData = null;
+
+function previewParcImg(input, type) {
+    var file = input.files[0]; if (!file) return;
+    if (file.size > 2*1024*1024) { alert('Imagem deve ter no máximo 2MB.'); input.value=''; return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        if (type==='Logo') { parcLogoData=e.target.result; document.getElementById('parcLogoImg').src=e.target.result; document.getElementById('parcLogoPreview').style.display='block'; document.getElementById('parcLogoLabel').textContent=file.name; }
+        else { parcBannerData=e.target.result; document.getElementById('parcBannerImg').src=e.target.result; document.getElementById('parcBannerPreview').style.display='block'; document.getElementById('parcBannerLabel').textContent=file.name; }
+    };
+    reader.readAsDataURL(file);
+}
+function removeParcImg(type) {
+    if (type==='Logo') { parcLogoData='removed'; document.getElementById('parcLogoFile').value=''; document.getElementById('parcLogoPreview').style.display='none'; document.getElementById('parcLogoLabel').textContent='Upload logo (PNG/JPG)'; }
+    else { parcBannerData='removed'; document.getElementById('parcBannerFile').value=''; document.getElementById('parcBannerPreview').style.display='none'; document.getElementById('parcBannerLabel').textContent='Upload banner (PNG/JPG)'; }
+}
+function resetParcImgs() {
+    parcLogoData=null; parcBannerData=null;
+    document.getElementById('parcLogoFile').value=''; document.getElementById('parcBannerFile').value='';
+    document.getElementById('parcLogoPreview').style.display='none'; document.getElementById('parcBannerPreview').style.display='none';
+    document.getElementById('parcLogoLabel').textContent='Upload logo (PNG/JPG)'; document.getElementById('parcBannerLabel').textContent='Upload banner (PNG/JPG)';
+}
+
 var parceirosData = [
-    { id:1, nome:'Auto Posto São Jorge', razao:'Auto Posto São Jorge Ltda', cnpj:'12.345.678/0001-01', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-1234', whatsapp:'(27) 99812-3456', endereco:'Av. Augusto Pestana, 1250 - Centro', status:'active' },
-    { id:2, nome:'Lava Jato Premium', razao:'Lava Jato Premium Ltda', cnpj:'12.345.678/0001-02', categoria:'lava-jato', cidade:'Linhares', telefone:'(27) 3264-5678', whatsapp:'(27) 99834-5678', endereco:'Rua Gov. Santos Neves, 450', status:'active' },
-    { id:3, nome:'Mecânica Central', razao:'Mecânica Central Ltda', cnpj:'12.345.678/0001-03', categoria:'mecanica', cidade:'Linhares', telefone:'(27) 3264-9012', whatsapp:'(27) 99856-7890', endereco:'Rua Rufino de Carvalho, 320', status:'active' },
-    { id:4, nome:'Estética Car Pro', razao:'Estética Car Pro ME', cnpj:'12.345.678/0001-04', categoria:'estetica', cidade:'Linhares', telefone:'(27) 3264-3456', whatsapp:'(27) 99878-1234', endereco:'Av. João Felipe Calmon, 890', status:'pending' },
-    { id:5, nome:'Pneus & Cia', razao:'Pneus & Cia Comércio Ltda', cnpj:'12.345.678/0001-05', categoria:'pneus', cidade:'Linhares', telefone:'(27) 3264-7890', whatsapp:'(27) 99890-2345', endereco:'Rod. ES-010, Km 3', status:'active' },
-    { id:6, nome:'Auto Elétrica Rápida', razao:'Auto Elétrica Rápida ME', cnpj:'12.345.678/0001-06', categoria:'eletrica', cidade:'Linhares', telefone:'(27) 3264-2345', whatsapp:'(27) 99812-6789', endereco:'Rua Augusto Luciano, 156', status:'active' },
-    { id:7, nome:'Borracharia 24h', razao:'Borracharia 24h ME', cnpj:'12.345.678/0001-07', categoria:'borracharia', cidade:'Linhares', telefone:'(27) 3264-6789', whatsapp:'(27) 99834-0123', endereco:'Rua Principal, 45', status:'active' },
-    { id:8, nome:'Guincho Express', razao:'Guincho Express Serviços Ltda', cnpj:'12.345.678/0001-08', categoria:'guincho', cidade:'Linhares', telefone:'(27) 3264-0123', whatsapp:'(27) 99856-4567', endereco:'Av. Industrial, 2200', status:'active' },
-    { id:9, nome:'Restaurante Sabor Mineiro', razao:'Restaurante Sabor Mineiro Ltda', cnpj:'12.345.678/0001-09', categoria:'alimentacao', cidade:'Linhares', telefone:'(27) 3264-4567', whatsapp:'(27) 99878-5678', endereco:'Rua Dr. Abelardo, 78', status:'active' },
-    { id:10, nome:'Farmácia Saúde+', razao:'Farmácia Saúde+ Ltda', cnpj:'12.345.678/0001-10', categoria:'saude', cidade:'Linhares', telefone:'(27) 3264-8901', whatsapp:'(27) 99890-6789', endereco:'Av. Beira Rio, 320', status:'active' },
-    { id:11, nome:'Auto Escola Dirigir Bem', razao:'Auto Escola Dirigir Bem Ltda', cnpj:'12.345.678/0001-11', categoria:'educacao', cidade:'Linhares', telefone:'(27) 3264-5432', whatsapp:'(27) 99812-8901', endereco:'Rua Castelo Branco, 560', status:'active' },
-    { id:12, nome:'Posto Shell Av. Brasil', razao:'Posto Shell Av. Brasil Ltda', cnpj:'12.345.678/0001-12', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-6543', whatsapp:'(27) 99834-2345', endereco:'Av. Brasil, 1800', status:'active' }
+    { id:1, nome:'Auto Posto São Jorge', razao:'Auto Posto São Jorge Ltda', cnpj:'12.345.678/0001-01', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-1234', whatsapp:'(27) 99812-3456', endereco:'Av. Augusto Pestana, 1250 - Centro', status:'active', logo_url:null, cover_url:null },
+    { id:2, nome:'Lava Jato Premium', razao:'Lava Jato Premium Ltda', cnpj:'12.345.678/0001-02', categoria:'lava-jato', cidade:'Linhares', telefone:'(27) 3264-5678', whatsapp:'(27) 99834-5678', endereco:'Rua Gov. Santos Neves, 450', status:'active', logo_url:null, cover_url:null },
+    { id:3, nome:'Mecânica Central', razao:'Mecânica Central Ltda', cnpj:'12.345.678/0001-03', categoria:'mecanica', cidade:'Linhares', telefone:'(27) 3264-9012', whatsapp:'(27) 99856-7890', endereco:'Rua Rufino de Carvalho, 320', status:'active', logo_url:null, cover_url:null },
+    { id:4, nome:'Estética Car Pro', razao:'Estética Car Pro ME', cnpj:'12.345.678/0001-04', categoria:'estetica', cidade:'Linhares', telefone:'(27) 3264-3456', whatsapp:'(27) 99878-1234', endereco:'Av. João Felipe Calmon, 890', status:'pending', logo_url:null, cover_url:null },
+    { id:5, nome:'Pneus & Cia', razao:'Pneus & Cia Comércio Ltda', cnpj:'12.345.678/0001-05', categoria:'pneus', cidade:'Linhares', telefone:'(27) 3264-7890', whatsapp:'(27) 99890-2345', endereco:'Rod. ES-010, Km 3', status:'active', logo_url:null, cover_url:null },
+    { id:6, nome:'Auto Elétrica Rápida', razao:'Auto Elétrica Rápida ME', cnpj:'12.345.678/0001-06', categoria:'eletrica', cidade:'Linhares', telefone:'(27) 3264-2345', whatsapp:'(27) 99812-6789', endereco:'Rua Augusto Luciano, 156', status:'active', logo_url:null, cover_url:null },
+    { id:7, nome:'Borracharia 24h', razao:'Borracharia 24h ME', cnpj:'12.345.678/0001-07', categoria:'borracharia', cidade:'Linhares', telefone:'(27) 3264-6789', whatsapp:'(27) 99834-0123', endereco:'Rua Principal, 45', status:'active', logo_url:null, cover_url:null },
+    { id:8, nome:'Guincho Express', razao:'Guincho Express Serviços Ltda', cnpj:'12.345.678/0001-08', categoria:'guincho', cidade:'Linhares', telefone:'(27) 3264-0123', whatsapp:'(27) 99856-4567', endereco:'Av. Industrial, 2200', status:'active', logo_url:null, cover_url:null },
+    { id:9, nome:'Restaurante Sabor Mineiro', razao:'Restaurante Sabor Mineiro Ltda', cnpj:'12.345.678/0001-09', categoria:'alimentacao', cidade:'Linhares', telefone:'(27) 3264-4567', whatsapp:'(27) 99878-5678', endereco:'Rua Dr. Abelardo, 78', status:'active', logo_url:null, cover_url:null },
+    { id:10, nome:'Farmácia Saúde+', razao:'Farmácia Saúde+ Ltda', cnpj:'12.345.678/0001-10', categoria:'saude', cidade:'Linhares', telefone:'(27) 3264-8901', whatsapp:'(27) 99890-6789', endereco:'Av. Beira Rio, 320', status:'active', logo_url:null, cover_url:null },
+    { id:11, nome:'Auto Escola Dirigir Bem', razao:'Auto Escola Dirigir Bem Ltda', cnpj:'12.345.678/0001-11', categoria:'educacao', cidade:'Linhares', telefone:'(27) 3264-5432', whatsapp:'(27) 99812-8901', endereco:'Rua Castelo Branco, 560', status:'active', logo_url:null, cover_url:null },
+    { id:12, nome:'Posto Shell Av. Brasil', razao:'Posto Shell Av. Brasil Ltda', cnpj:'12.345.678/0001-12', categoria:'postos', cidade:'Linhares', telefone:'(27) 3264-6543', whatsapp:'(27) 99834-2345', endereco:'Av. Brasil, 1800', status:'active', logo_url:null, cover_url:null }
 ];
 var parceirosPage = 1; var parceirosPerPage = 8;
 
@@ -4083,6 +4132,10 @@ function editarParceiro(id) {
     document.getElementById('parcEndereco').value=p.endereco;
     document.getElementById('parcCidade').value=p.cidade;
     document.getElementById('parcStatus').value=p.status;
+    // Images
+    resetParcImgs();
+    if(p.logo_url){parcLogoData=null;document.getElementById('parcLogoImg').src=p.logo_url;document.getElementById('parcLogoPreview').style.display='block';document.getElementById('parcLogoLabel').textContent='Alterar logo';}
+    if(p.cover_url){parcBannerData=null;document.getElementById('parcBannerImg').src=p.cover_url;document.getElementById('parcBannerPreview').style.display='block';document.getElementById('parcBannerLabel').textContent='Alterar banner';}
     openModal('modalNovoParceiro');
 }
 
@@ -4090,10 +4143,16 @@ function salvarParceiro(event) {
     event.preventDefault();
     var data={nome:document.getElementById('parcNome').value,razao:document.getElementById('parcRazao').value,cnpj:document.getElementById('parcCnpj').value,categoria:document.getElementById('parcCategoria').value,telefone:document.getElementById('parcTelefone').value,whatsapp:document.getElementById('parcWhatsapp').value,endereco:document.getElementById('parcEndereco').value,cidade:document.getElementById('parcCidade').value,status:document.getElementById('parcStatus').value};
     var fb=document.getElementById('parcFeedback');
-    if(window._editParceiroId){var p=parceirosData.find(function(x){return x.id===window._editParceiroId;});if(p)Object.assign(p,data);fb.textContent='Parceiro atualizado!';}
-    else{data.id=parceirosData.length+1;parceirosData.push(data);fb.textContent='Parceiro "'+data.nome+'" criado!';}
+    // Handle images
+    if(parcLogoData && parcLogoData!=='removed') data.logo_url=parcLogoData;
+    else if(parcLogoData==='removed') data.logo_url=null;
+    if(parcBannerData && parcBannerData!=='removed') data.cover_url=parcBannerData;
+    else if(parcBannerData==='removed') data.cover_url=null;
+
+    if(window._editParceiroId){var p=parceirosData.find(function(x){return x.id===window._editParceiroId;});if(p){if(!data.logo_url&&parcLogoData!=='removed')data.logo_url=p.logo_url;if(!data.cover_url&&parcBannerData!=='removed')data.cover_url=p.cover_url;Object.assign(p,data);}fb.textContent='Parceiro atualizado!';}
+    else{data.id=parceirosData.length+1;data.logo_url=data.logo_url||null;data.cover_url=data.cover_url||null;parceirosData.push(data);fb.textContent='Parceiro "'+data.nome+'" criado!';}
     fb.style.display='block';fb.style.background='rgba(0,166,81,0.1)';fb.style.border='1px solid rgba(0,166,81,0.3)';fb.style.color='#00A651';
-    setTimeout(function(){fb.style.display='none';closeModal('modalNovoParceiro');document.getElementById('formParceiro').reset();window._editParceiroId=null;document.getElementById('modalParceiroTitle').textContent='Novo Parceiro';renderParceirosTable();},1200);
+    setTimeout(function(){fb.style.display='none';closeModal('modalNovoParceiro');document.getElementById('formParceiro').reset();resetParcImgs();window._editParceiroId=null;document.getElementById('modalParceiroTitle').textContent='Novo Parceiro';renderParceirosTable();},1200);
 }
 
 function excluirParceiro(id) {
