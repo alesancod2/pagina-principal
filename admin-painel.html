@@ -1605,22 +1605,37 @@
             <h1 class="section-title">Cupons</h1>
             <p class="section-subtitle">Gerencie cupons de desconto</p>
 
-            <!-- Filtro por status -->
-            <div style="margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <label style="font-size:13px;color:var(--text-secondary)">Status:</label>
-                <select id="cuponsFilterStatus" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
-                    <option value="all">Todos</option>
-                    <option value="Válido">Válido</option>
-                    <option value="Usado">Usado</option>
-                    <option value="Expirado">Expirado</option>
-                    <option value="Cancelado">Cancelado</option>
-                </select>
-            </div>
-
             <div class="table-container">
-                <div class="table-header">
+                <div class="table-header" style="flex-wrap:wrap;">
                     <input type="text" class="table-search" id="cuponsSearchInput" placeholder="Buscar por código, parceiro..." onkeyup="filterCuponsTable()">
-                    <div style="display:flex;gap:8px">
+                    <select id="cuponsFilterParceiro" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todos Parceiros</option>
+                        <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
+                        <option value="Lava Jato Premium">Lava Jato Premium</option>
+                        <option value="Mecânica Central">Mecânica Central</option>
+                        <option value="Estética Car Pro">Estética Car Pro</option>
+                        <option value="Pneus & Cia">Pneus &amp; Cia</option>
+                        <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
+                        <option value="Borracharia 24h">Borracharia 24h</option>
+                        <option value="Guincho Express">Guincho Express</option>
+                        <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
+                        <option value="Farmácia Saúde+">Farmácia Saúde+</option>
+                        <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
+                        <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
+                    </select>
+                    <select id="cuponsFilterTipo" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todos Tipos</option>
+                        <option value="desconto">Desconto</option>
+                        <option value="pontos_dobro">Pontos em Dobro</option>
+                    </select>
+                    <select id="cuponsFilterStatus" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="all">Todos Status</option>
+                        <option value="Válido">Válido</option>
+                        <option value="Usado">Usado</option>
+                        <option value="Expirado">Expirado</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                    <div style="display:flex;gap:8px;margin-left:auto;">
                         <button class="btn btn-primary" onclick="openModal('modalGerarCupom')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> Gerar Cupom</button>
                         <button class="btn btn-green" onclick="openModal('modalGerarLote')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Gerar em Lote</button>
                     </div>
@@ -3859,10 +3874,14 @@ function filterCuponsTable() {
 function getFilteredCupons() {
     var search = (document.getElementById('cuponsSearchInput').value || '').toLowerCase();
     var statusFilter = document.getElementById('cuponsFilterStatus').value;
+    var parceiroFilter = document.getElementById('cuponsFilterParceiro') ? document.getElementById('cuponsFilterParceiro').value : '';
+    var tipoFilter = document.getElementById('cuponsFilterTipo') ? document.getElementById('cuponsFilterTipo').value : '';
     return cuponsData.filter(function(c) {
         var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1 || (c.nome && c.nome.toLowerCase().indexOf(search) > -1);
         var matchStatus = statusFilter === 'all' || c.status === statusFilter;
-        return matchSearch && matchStatus;
+        var matchParceiro = !parceiroFilter || c.parceiro === parceiroFilter;
+        var matchTipo = !tipoFilter || c.tipo === tipoFilter;
+        return matchSearch && matchStatus && matchParceiro && matchTipo;
     });
 }
 
