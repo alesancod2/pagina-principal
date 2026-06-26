@@ -82,10 +82,26 @@ img{max-width:100%;display:block}
 .search-input::placeholder{color:var(--text-muted)}
 .search-btn{padding:12px 24px;background:var(--gradient-brand);color:#fff;border-radius:var(--radius-sm);font-weight:600;font-size:0.875rem;transition:var(--transition)}
 .search-btn:hover{opacity:.9;transform:translateY(-1px)}
-.hero-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap}
-.stat-item{display:flex;flex-direction:column;align-items:center}
-.stat-value{font-size:1.5rem;font-weight:800;color:var(--text-primary)}
-.stat-label{font-size:0.75rem;color:var(--text-muted);font-weight:500}
+.hero-stats{display:none}
+.stat-item{display:none}
+.stat-value{display:none}
+.stat-label{display:none}
+/* Banner Carousel */
+.banner-carousel{position:relative;width:100%;max-width:900px;margin:24px auto 0;border-radius:12px;overflow:hidden;height:160px}
+.banner-track{display:flex;transition:transform 0.5s ease;height:100%}
+.banner-slide{min-width:100%;height:100%;position:relative;cursor:pointer;border-radius:12px;overflow:hidden}
+.banner-slide img{width:100%;height:100%;object-fit:cover}
+.banner-slide-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.1) 60%);display:flex;flex-direction:column;justify-content:center;padding:24px 32px}
+.banner-slide-name{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:4px}
+.banner-slide-desc{font-size:0.8rem;color:rgba(255,255,255,0.8)}
+.banner-slide-badge{position:absolute;top:12px;right:16px;background:var(--secondary);color:#fff;font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:20px}
+.banner-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:background 0.2s}
+.banner-arrow:hover{background:rgba(255,255,255,0.3)}
+.banner-arrow-left{left:12px}
+.banner-arrow-right{right:12px}
+.banner-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
+.banner-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.4);cursor:pointer;transition:all 0.2s}
+.banner-dot.active{background:#fff;width:20px;border-radius:4px}
 
 /* ===== Categories ===== */
 .categories-section{padding:0 24px 24px}
@@ -234,7 +250,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 /* ===== Responsive ===== */
 @media(max-width:1024px){
     .hero-title{font-size:1.75rem}
-    .hero-stats{gap:24px}
+    .banner-carousel{height:120px}
+    .banner-slide-name{font-size:0.95rem}
     .navbar-menu{display:none}
 }
 @media(max-width:768px){
@@ -246,8 +263,9 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     .categories-section{padding:0 16px 16px}
     .marketplace-section{padding:0 16px 32px}
     .partners-grid{grid-template-columns:1fr}
-    .hero-stats{gap:16px}
-    .stat-value{font-size:1.2rem}
+    .banner-carousel{height:100px}
+    .banner-slide-overlay{padding:16px 20px}
+    .banner-slide-name{font-size:0.85rem}
     .user-info{display:none}
     .partner-modal-overlay{padding:0;align-items:flex-end}
     .partner-modal{max-width:100%;max-height:95vh;border-radius:var(--radius) var(--radius) 0 0}
@@ -337,24 +355,16 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     <input type="text" class="search-input" placeholder="Buscar parceiros, categorias ou benefícios...">
                     <button class="search-btn">Buscar</button>
                 </div>
-                <!-- Stats -->
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">127</span>
-                        <span class="stat-label">Parceiros</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">18</span>
-                        <span class="stat-label">Categorias</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">2.4k</span>
-                        <span class="stat-label">Associados</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">R$85k</span>
-                        <span class="stat-label">Economia gerada</span>
-                    </div>
+                <!-- Banner Carousel de Parceiros -->
+                <div class="banner-carousel" id="bannerCarousel" onmouseenter="pauseBannerScroll()" onmouseleave="resumeBannerScroll()">
+                    <button class="banner-arrow banner-arrow-left" onclick="prevBanner()">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <div class="banner-track" id="bannerTrack"></div>
+                    <button class="banner-arrow banner-arrow-right" onclick="nextBanner()">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                    <div class="banner-dots" id="bannerDots"></div>
                 </div>
             </div>
         </section>
@@ -917,8 +927,77 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         });
     });
 
+    // ===== BANNER CAROUSEL DE PARCEIROS =====
+    var bannerIndex = 0;
+    var bannerInterval = null;
+    var bannerPaused = false;
+
+    function initBannerCarousel() {
+        var track = document.getElementById('bannerTrack');
+        var dotsContainer = document.getElementById('bannerDots');
+        if (!track) return;
+
+        // Usar parceiros que tenham cover_url ou gerar slide com gradiente
+        var bannerPartners = partners.filter(function(p) { return p.cover_url || true; });
+        var gradients = [
+            'linear-gradient(135deg,#2F3EBF 0%,#6b7fff 100%)',
+            'linear-gradient(135deg,#00A651 0%,#00d68f 100%)',
+            'linear-gradient(135deg,#ff6b35 0%,#f7c948 100%)',
+            'linear-gradient(135deg,#8b5cf6 0%,#a78bfa 100%)',
+            'linear-gradient(135deg,#06b6d4 0%,#22d3ee 100%)',
+            'linear-gradient(135deg,#ef4444 0%,#f97316 100%)'
+        ];
+
+        track.innerHTML = bannerPartners.map(function(p, idx) {
+            var bg = p.cover_url
+                ? '<img src="' + p.cover_url + '" alt="' + p.name + '">'
+                : '<div style="width:100%;height:100%;background:' + gradients[idx % gradients.length] + ';"></div>';
+            return '<div class="banner-slide" onclick="showPartnerDetail(' + p.id + ')">' +
+                bg +
+                '<div class="banner-slide-overlay">' +
+                    '<span class="banner-slide-name">' + p.name + '</span>' +
+                    '<span class="banner-slide-desc">' + p.description + ' - ' + p.city + '</span>' +
+                '</div>' +
+                '<span class="banner-slide-badge">' + p.discount + '% OFF</span>' +
+            '</div>';
+        }).join('');
+
+        // Dots
+        dotsContainer.innerHTML = bannerPartners.map(function(_, idx) {
+            return '<span class="banner-dot' + (idx === 0 ? ' active' : '') + '" onclick="goToBanner(' + idx + ')"></span>';
+        }).join('');
+
+        startBannerScroll();
+    }
+
+    function goToBanner(idx) {
+        var track = document.getElementById('bannerTrack');
+        var dots = document.querySelectorAll('.banner-dot');
+        var total = dots.length;
+        if (idx < 0) idx = total - 1;
+        if (idx >= total) idx = 0;
+        bannerIndex = idx;
+        track.style.transform = 'translateX(-' + (bannerIndex * 100) + '%)';
+        dots.forEach(function(d, i) { d.classList.toggle('active', i === bannerIndex); });
+    }
+
+    window.nextBanner = function() { goToBanner(bannerIndex + 1); };
+    window.prevBanner = function() { goToBanner(bannerIndex - 1); };
+    window.goToBanner = goToBanner;
+
+    function startBannerScroll() {
+        if (bannerInterval) clearInterval(bannerInterval);
+        bannerInterval = setInterval(function() {
+            if (!bannerPaused) goToBanner(bannerIndex + 1);
+        }, 4000);
+    }
+
+    window.pauseBannerScroll = function() { bannerPaused = true; };
+    window.resumeBannerScroll = function() { bannerPaused = false; };
+
     // Render inicial
     renderPartners('all');
+    initBannerCarousel();
 
     // Expose para Supabase carregar imagens
     window.partners = partners;
