@@ -1100,8 +1100,34 @@
             <h1 class="section-title">Parceiros</h1>
             <p class="section-subtitle">Gerencie os parceiros da plataforma</p>
             <div class="table-container">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+                    <select id="parcFilterCategoria" onchange="parceirosPage=1;renderParceirosTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todas Categorias</option>
+                        <option value="postos">Postos</option>
+                        <option value="lava-jato">Lava-Jato</option>
+                        <option value="mecanica">Mecânica</option>
+                        <option value="estetica">Estética</option>
+                        <option value="pneus">Pneus</option>
+                        <option value="eletrica">Auto Elétrica</option>
+                        <option value="borracharia">Borracharia</option>
+                        <option value="guincho">Guincho</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="saude">Saúde</option>
+                        <option value="educacao">Educação</option>
+                    </select>
+                    <select id="parcFilterCidade" onchange="parceirosPage=1;renderParceirosTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todas Cidades</option>
+                        <option value="Linhares">Linhares</option>
+                    </select>
+                    <select id="parcFilterStatus" onchange="parceirosPage=1;renderParceirosTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todos Status</option>
+                        <option value="active">Ativo</option>
+                        <option value="pending">Pendente</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
                 <div class="table-header">
-                    <input type="text" class="table-search" id="parceirosSearchInput" placeholder="Buscar parceiro..." onkeyup="renderParceirosTable()">
+                    <input type="text" class="table-search" id="parceirosSearchInput" placeholder="Buscar parceiro..." onkeyup="parceirosPage=1;renderParceirosTable()">
                     <button class="btn btn-green" onclick="openModal('modalNovoParceiro')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Parceiro</button>
                 </div>
                 <div style="overflow-x:auto">
@@ -4162,7 +4188,16 @@ function getParcStatusBadge(s) { return s==='active'?'<span class="badge badge-g
 
 function renderParceirosTable() {
     var search = (document.getElementById('parceirosSearchInput').value||'').toLowerCase();
-    var filtered = parceirosData.filter(function(p) { return !search||p.nome.toLowerCase().indexOf(search)>-1||p.categoria.toLowerCase().indexOf(search)>-1||p.cidade.toLowerCase().indexOf(search)>-1; });
+    var filterCat = document.getElementById('parcFilterCategoria').value;
+    var filterCidade = document.getElementById('parcFilterCidade').value;
+    var filterStatus = document.getElementById('parcFilterStatus').value;
+    var filtered = parceirosData.filter(function(p) {
+        var matchSearch = !search||p.nome.toLowerCase().indexOf(search)>-1||p.categoria.toLowerCase().indexOf(search)>-1||p.cidade.toLowerCase().indexOf(search)>-1;
+        var matchCat = !filterCat || p.categoria === filterCat;
+        var matchCidade = !filterCidade || p.cidade === filterCidade;
+        var matchStatus = !filterStatus || p.status === filterStatus;
+        return matchSearch && matchCat && matchCidade && matchStatus;
+    });
     var total=filtered.length, start=(parceirosPage-1)*parceirosPerPage, end=Math.min(start+parceirosPerPage,total), page=filtered.slice(start,end);
     var tbody=document.getElementById('parceirosTableBody'); if(!tbody) return;
     if(page.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum parceiro encontrado</td></tr>'; } else {
