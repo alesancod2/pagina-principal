@@ -4231,7 +4231,7 @@ function salvarParceiro(event) {
                     else if (parcLogoData === 'removed') updateData.logo_url = null;
                     if (coverUrl && coverUrl.startsWith('http')) updateData.cover_url = coverUrl;
                     else if (parcBannerData === 'removed') updateData.cover_url = null;
-                    await supabaseClient.from('partners').update(updateData).eq('cnpj', data.cnpj);
+                    await supabaseClient.from('partners').update(updateData).eq('trade_name', p.nome);
                     // Update local
                     data.logo_url = logoUrl || (parcLogoData==='removed'?null:p.logo_url);
                     data.cover_url = coverUrl || (parcBannerData==='removed'?null:p.cover_url);
