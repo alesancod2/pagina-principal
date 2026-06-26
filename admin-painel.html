@@ -621,6 +621,10 @@
         .category-card .count { font-size: 12px; color: var(--green); font-weight: 600; }
 
         /* CAMPAIGN CARDS */
+        .dash-filter { background:var(--dark-card);border:1px solid var(--dark-border);color:var(--text-secondary);border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;transition:all 0.2s; }
+        .dash-filter:hover { border-color:var(--primary-blue);color:var(--text-primary); }
+        .dash-filter.active { background:var(--primary-blue);color:#fff;border-color:var(--primary-blue); }
+        .dash-bar-h { height:24px;border-radius:4px;background:linear-gradient(90deg,var(--primary-blue),var(--green));transition:width 0.5s ease;min-width:4px; }
         .campaigns-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1026,48 +1030,38 @@
                     <div class="stat-value">28.540</div>
                     <div class="stat-label">Pontos Distribuídos</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(47,62,191,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-                    <div class="stat-value">R$ 45.2K</div>
-                    <div class="stat-label">Economia Gerada</div>
-                </div>
             </div>
 
-            <!-- MÉTRICAS DE UTILIZAÇÕES -->
+            <!-- FILTRO DE PERÍODO -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                <button class="btn btn-sm dash-filter active" onclick="setDashFilter('dia')">Dia</button>
+                <button class="btn btn-sm dash-filter" onclick="setDashFilter('semana')">Semana</button>
+                <button class="btn btn-sm dash-filter" onclick="setDashFilter('mes')">Mês</button>
+                <button class="btn btn-sm dash-filter" onclick="setDashFilter('total')">Total</button>
+                <span style="color:var(--text-secondary);font-size:13px;margin-left:8px;">|</span>
+                <input type="date" id="dashDateStart" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:12px;outline:none;">
+                <span style="color:var(--text-secondary);font-size:12px;">até</span>
+                <input type="date" id="dashDateEnd" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:12px;outline:none;">
+                <button class="btn btn-sm btn-primary" onclick="setDashFilter('custom')" style="padding:6px 12px;">Filtrar</button>
+            </div>
+
+            <!-- UTILIZAÇÕES POR STATUS -->
             <h3 style="margin-bottom:16px;font-size:18px;font-weight:600;color:var(--text-primary);">Utilizações por Status</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(234,179,8,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-                    <div class="stat-value">127</div>
-                    <div class="stat-label">Utilizações Pendentes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(0,166,81,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                    <div class="stat-value">3.542</div>
-                    <div class="stat-label">Utilizações Confirmadas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(239,68,68,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
-                    <div class="stat-value">173</div>
-                    <div class="stat-label">Utilizações Canceladas</div>
+            <div class="stats-grid" id="dashUtilizacoesGrid">
+                <!-- Rendered by renderDashboard() -->
+            </div>
+
+            <div class="chart-container" style="margin-bottom:24px;">
+                <h3>Utilizações ao Longo do Tempo</h3>
+                <div id="dashLineChart" style="height:200px;display:flex;align-items:flex-end;gap:2px;padding:20px 0 30px;position:relative;">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
 
-            <div class="chart-container">
-                <h3>Crescimento Mensal</h3>
-                <div class="chart-bars">
-                    <div class="chart-bar" style="height:40%"><span>Jan</span></div>
-                    <div class="chart-bar" style="height:55%"><span>Fev</span></div>
-                    <div class="chart-bar" style="height:45%"><span>Mar</span></div>
-                    <div class="chart-bar" style="height:65%"><span>Abr</span></div>
-                    <div class="chart-bar" style="height:75%"><span>Mai</span></div>
-                    <div class="chart-bar" style="height:60%"><span>Jun</span></div>
-                    <div class="chart-bar" style="height:85%"><span>Jul</span></div>
-                    <div class="chart-bar" style="height:90%"><span>Ago</span></div>
-                    <div class="chart-bar" style="height:80%"><span>Set</span></div>
-                    <div class="chart-bar" style="height:95%"><span>Out</span></div>
-                    <div class="chart-bar" style="height:88%"><span>Nov</span></div>
-                    <div class="chart-bar" style="height:100%"><span>Dez</span></div>
+            <div class="chart-container" style="margin-bottom:24px;">
+                <h3>Parceiros Mais Utilizados</h3>
+                <div id="dashParceirosChart" style="padding:16px 0;">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
 
@@ -4055,6 +4049,53 @@ function salvarCupomLote(event) {
         }, 2000);
     }, 1000);
 }
+
+// ===== DASHBOARD - FILTROS E GRÁFICOS =====
+var dashFilterActive = 'total';
+var dashUtilData = { dia:{pend:12,conf:245,canc:8}, semana:{pend:45,conf:890,canc:32}, mes:{pend:127,conf:3542,canc:173}, total:{pend:127,conf:3542,canc:173} };
+var dashLineData = { dia:[18,22,15,28,32,24,19], semana:[120,145,132,168,155,140,178], mes:[450,520,480,610,580,550,620,690,720,680,750,800], total:[320,380,420,490,560,610,680,720,790,850,920,980] };
+var dashLineLabels = { dia:['06h','09h','12h','15h','18h','21h','00h'], semana:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'], mes:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'], total:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'] };
+var dashParcData = { dia:[{n:'Auto Posto São Jorge',v:8},{n:'Lava Jato Premium',v:5},{n:'Mecânica Central',v:4},{n:'Estética Car Pro',v:3},{n:'Pneus & Cia',v:2}], semana:[{n:'Auto Posto São Jorge',v:45},{n:'Lava Jato Premium',v:38},{n:'Mecânica Central',v:28},{n:'Estética Car Pro',v:22},{n:'Pneus & Cia',v:15}], mes:[{n:'Auto Posto São Jorge',v:156},{n:'Lava Jato Premium',v:134},{n:'Mecânica Central',v:98},{n:'Estética Car Pro',v:67},{n:'Pneus & Cia',v:45},{n:'Auto Elétrica Rápida',v:32}], total:[{n:'Auto Posto São Jorge',v:856},{n:'Lava Jato Premium',v:734},{n:'Mecânica Central',v:498},{n:'Estética Car Pro',v:367},{n:'Pneus & Cia',v:245},{n:'Auto Elétrica Rápida',v:182}] };
+
+function setDashFilter(filter) {
+    dashFilterActive = filter;
+    document.querySelectorAll('.dash-filter').forEach(function(b){b.classList.remove('active');});
+    if(filter!=='custom') document.querySelectorAll('.dash-filter').forEach(function(b){if(b.textContent.toLowerCase()===filter||b.textContent==='Total'&&filter==='total'||b.textContent==='Dia'&&filter==='dia'||b.textContent==='Semana'&&filter==='semana'||b.textContent==='Mês'&&filter==='mes')b.classList.add('active');});
+    renderDashboard();
+}
+
+function renderDashboard() {
+    var f = dashFilterActive === 'custom' ? 'mes' : dashFilterActive;
+    // Utilizações por status
+    var u = dashUtilData[f] || dashUtilData.total;
+    var grid = document.getElementById('dashUtilizacoesGrid');
+    if(grid) grid.innerHTML = '<div class="stat-card"><div class="stat-icon" style="background:rgba(234,179,8,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-value">'+u.pend+'</div><div class="stat-label">Pendentes</div></div><div class="stat-card"><div class="stat-icon" style="background:rgba(0,166,81,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-value">'+u.conf.toLocaleString('pt-BR')+'</div><div class="stat-label">Confirmadas</div></div><div class="stat-card"><div class="stat-icon" style="background:rgba(239,68,68,0.15)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div><div class="stat-value">'+u.canc+'</div><div class="stat-label">Canceladas</div></div>';
+
+    // Line chart
+    var lineData = dashLineData[f] || dashLineData.total;
+    var lineLabels = dashLineLabels[f] || dashLineLabels.total;
+    var maxVal = Math.max.apply(null, lineData);
+    var chart = document.getElementById('dashLineChart');
+    if(chart) {
+        var svgW = chart.offsetWidth || 700;
+        var svgH = 180;
+        var points = lineData.map(function(v,i){ return ((i/(lineData.length-1))*svgW)+','+((1-v/maxVal)*svgH); }).join(' ');
+        chart.innerHTML = '<svg width="100%" height="'+svgH+'" viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="none" style="overflow:visible;"><polyline points="'+points+'" fill="none" stroke="url(#dashGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2F3EBF"/><stop offset="100%" stop-color="#00A651"/></linearGradient></defs></svg><div style="display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;font-size:11px;color:var(--text-secondary);">'+lineLabels.map(function(l){return '<span>'+l+'</span>';}).join('')+'</div>';
+    }
+
+    // Parceiros chart (horizontal bars)
+    var parcData = dashParcData[f] || dashParcData.total;
+    var maxParc = parcData.length > 0 ? parcData[0].v : 1;
+    var parcChart = document.getElementById('dashParceirosChart');
+    if(parcChart) {
+        parcChart.innerHTML = parcData.map(function(p){
+            var pct = Math.round((p.v/maxParc)*100);
+            return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><span style="font-size:13px;min-width:180px;color:var(--text-primary);font-weight:500;">'+p.n+'</span><div style="flex:1;background:var(--dark-bg);border-radius:4px;height:24px;overflow:hidden;"><div class="dash-bar-h" style="width:'+pct+'%"></div></div><span style="font-size:13px;font-weight:700;color:var(--green);min-width:40px;text-align:right;">'+p.v+'</span></div>';
+        }).join('');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function(){ renderDashboard(); });
 
 // ===== PARCEIROS - CRUD COMPLETO =====
 var parcLogoData = null, parcBannerData = null;
