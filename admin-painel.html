@@ -4245,6 +4245,7 @@ function salvarParceiro(event) {
                     if (coverUrl && coverUrl.startsWith('http')) updateData.cover_url = coverUrl;
                     else if (parcBannerData === 'removed') updateData.cover_url = null;
                     await supabaseClient.from('partners').update(updateData).eq('trade_name', p.nome);
+                    avpCache.invalidate('avp_cache_partners');
                     // Update local
                     data.logo_url = logoUrl || (parcLogoData==='removed'?null:p.logo_url);
                     data.cover_url = coverUrl || (parcBannerData==='removed'?null:p.cover_url);
@@ -4257,6 +4258,7 @@ function salvarParceiro(event) {
                 if (logoUrl && logoUrl.startsWith('http')) insertData.logo_url = logoUrl;
                 if (coverUrl && coverUrl.startsWith('http')) insertData.cover_url = coverUrl;
                 await supabaseClient.from('partners').insert(insertData);
+                avpCache.invalidate('avp_cache_partners');
                 data.id = parceirosData.length+1;
                 data.logo_url = logoUrl || null;
                 data.cover_url = coverUrl || null;
@@ -4905,9 +4907,49 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
         var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+        // ===== CACHE SYSTEM (localStorage + TTL) =====
+        var avpCache = {
+            TTL: 5 * 60 * 1000, // 5 minutos padrão
+            get: function(key) {
+                try {
+                    var item = localStorage.getItem(key);
+                    if (!item) return null;
+                    var parsed = JSON.parse(item);
+                    if (Date.now() > parsed.expires) { localStorage.removeItem(key); return null; }
+                    return parsed.data;
+                } catch(e) { return null; }
+            },
+            set: function(key, data, ttl) {
+                try {
+                    localStorage.setItem(key, JSON.stringify({ data: data, expires: Date.now() + (ttl || this.TTL) }));
+                } catch(e) { /* Storage full - clear old caches */ this.clearExpired(); }
+            },
+            invalidate: function(pattern) {
+                var keys = Object.keys(localStorage);
+                for (var i = 0; i < keys.length; i++) {
+                    if (keys[i].indexOf(pattern || 'avp_cache_') === 0) localStorage.removeItem(keys[i]);
+                }
+            },
+            clearExpired: function() {
+                var keys = Object.keys(localStorage);
+                for (var i = 0; i < keys.length; i++) {
+                    if (keys[i].indexOf('avp_cache_') === 0) {
+                        try { var p = JSON.parse(localStorage.getItem(keys[i])); if (Date.now() > p.expires) localStorage.removeItem(keys[i]); } catch(e) { localStorage.removeItem(keys[i]); }
+                    }
+                }
+            }
+        };
+        // Clean expired on load
+        avpCache.clearExpired();
+
         // Helper: Query Supabase tables (admin tem acesso a todas as tabelas)
         async function supabaseQuery(table, options) {
             if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            // Check cache first
+            var cacheKey = 'avp_cache_' + table + '_' + JSON.stringify(options || {});
+            var cached = avpCache.get(cacheKey);
+            if (cached) return { data: cached, error: null };
+
             var query = supabaseClient.from(table).select(options && options.select || '*');
             if (options && options.filter) {
                 for (var key in options.filter) {
@@ -4916,24 +4958,30 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             }
             if (options && options.order) query = query.order(options.order, { ascending: options.ascending || false });
             if (options && options.limit) query = query.limit(options.limit);
-            return await query;
+            var result = await query;
+            // Cache successful results
+            if (!result.error && result.data) avpCache.set(cacheKey, result.data);
+            return result;
         }
 
         // Helper: Insert into Supabase
         async function supabaseInsert(table, data) {
             if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            avpCache.invalidate('avp_cache_' + table);
             return await supabaseClient.from(table).insert(data).select();
         }
 
         // Helper: Update in Supabase
         async function supabaseUpdate(table, id, data) {
             if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            avpCache.invalidate('avp_cache_' + table);
             return await supabaseClient.from(table).update(data).eq('id', id).select();
         }
 
         // Helper: Delete from Supabase
         async function supabaseDelete(table, id) {
             if (!supabaseClient) return { data: null, error: 'Supabase não inicializado' };
+            avpCache.invalidate('avp_cache_' + table);
             return await supabaseClient.from(table).delete().eq('id', id);
         }
 

@@ -858,6 +858,13 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         if (supabaseClient) console.log('[Supabase] Conectado - Marketplace page');
 
+        // ===== CACHE SYSTEM =====
+        var avpCache = {
+            TTL: 5 * 60 * 1000,
+            get: function(key) { try { var i=localStorage.getItem(key); if(!i)return null; var p=JSON.parse(i); if(Date.now()>p.expires){localStorage.removeItem(key);return null;} return p.data; } catch(e){return null;} },
+            set: function(key, data, ttl) { try { localStorage.setItem(key, JSON.stringify({data:data,expires:Date.now()+(ttl||this.TTL)})); } catch(e){} }
+        };
+
         // Get current user from localStorage
         function getCurrentUser() {
             try {
@@ -866,11 +873,15 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
             } catch(e) { return null; }
         }
 
-        // Query user data filtered by user_id
+        // Query user data filtered by user_id (with cache)
         async function getUserData(table, userId) {
             if (!supabaseClient) return null;
+            var cacheKey = 'avp_cache_' + table + '_' + userId;
+            var cached = avpCache.get(cacheKey);
+            if (cached) return cached;
             var { data, error } = await supabaseClient.from(table).select('*').eq('user_id', userId);
             if (error) { console.error('[Supabase] Erro em getUserData:', error); return null; }
+            if (data) avpCache.set(cacheKey, data, 3 * 60 * 1000); // 3 min
             return data;
         }
 
@@ -993,12 +1004,23 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         window.avpGetUserHistory = getUserHistory;
         window.avpGetUserProfile = getUserProfile;
 
-        // Load partner images from Supabase (logo_url, cover_url)
+        // Load partner images from Supabase (logo_url, cover_url) with cache
         async function loadPartnerImages() {
             if (!supabaseClient) return;
             try {
-                var { data, error } = await supabaseClient.from('partners').select('trade_name, logo_url, cover_url').eq('status', 'active');
-                if (error || !data) return;
+                // Check cache first
+                var cacheKey = 'avp_cache_partners_images';
+                var cached = avpCache.get(cacheKey);
+                var data;
+
+                if (cached) {
+                    data = cached;
+                } else {
+                    var result = await supabaseClient.from('partners').select('trade_name, logo_url, cover_url').eq('status', 'active');
+                    if (result.error || !result.data) return;
+                    data = result.data;
+                    avpCache.set(cacheKey, data, 5 * 60 * 1000); // 5 min cache
+                }
                 // Update partners array with real images
                 if (window.partners) {
                     data.forEach(function(dbPartner) {
