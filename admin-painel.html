@@ -4085,19 +4085,30 @@ function renderDashboard() {
         chart.innerHTML = '<svg width="100%" height="'+(svgH+10)+'" viewBox="0 0 '+svgW+' '+(svgH+10)+'" style="overflow:visible;"><defs><linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2F3EBF"/><stop offset="100%" stop-color="#00A651"/></linearGradient></defs><polyline points="'+points+'" fill="none" stroke="url(#dashGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+circles+'</svg><div style="display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;font-size:11px;color:var(--text-secondary);">'+lineLabels.map(function(l){return '<span>'+l+'</span>';}).join('')+'</div>';
     }
 
-    // Parceiros chart (horizontal bars)
+    // Parceiros chart (horizontal bars - cores diferentes + clicável)
     var parcData = dashParcData[f] || dashParcData.total;
     var maxParc = parcData.length > 0 ? parcData[0].v : 1;
+    var dashColors = ['#2F3EBF','#00A651','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#14b8a6','#f97316','#6366f1'];
     var parcChart = document.getElementById('dashParceirosChart');
     if(parcChart) {
-        parcChart.innerHTML = parcData.map(function(p){
+        parcChart.innerHTML = parcData.map(function(p,idx){
             var pct = Math.round((p.v/maxParc)*100);
-            return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><span style="font-size:13px;min-width:180px;color:var(--text-primary);font-weight:500;">'+p.n+'</span><div style="flex:1;background:var(--dark-bg);border-radius:4px;height:24px;overflow:hidden;"><div class="dash-bar-h" style="width:'+pct+'%"></div></div><span style="font-size:13px;font-weight:700;color:var(--green);min-width:40px;text-align:right;">'+p.v+'</span></div>';
+            var color = dashColors[idx % dashColors.length];
+            return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;cursor:pointer;" onclick="navegarParaParceiro(\''+p.n.replace(/'/g,"\\'")+'\')" title="Clique para ver detalhes"><span style="font-size:13px;min-width:180px;color:var(--text-primary);font-weight:500;">'+p.n+'</span><div style="flex:1;background:var(--dark-bg);border-radius:4px;height:24px;overflow:hidden;"><div style="height:24px;border-radius:4px;background:'+color+';width:'+pct+'%;transition:width 0.5s ease;min-width:4px;"></div></div><span style="font-size:13px;font-weight:700;color:'+color+';min-width:40px;text-align:right;">'+p.v+'</span></div>';
         }).join('');
     }
 }
 
 document.addEventListener('DOMContentLoaded', function(){ renderDashboard(); });
+
+function navegarParaParceiro(nome) {
+    // Navegar para aba Parceiros e abrir modal de visualização
+    navigateTo('parceiros');
+    setTimeout(function() {
+        var p = parceirosData.find(function(x) { return x.nome === nome; });
+        if (p) verParceiro(p.id);
+    }, 300);
+}
 
 // ===== PARCEIROS - CRUD COMPLETO =====
 var parcLogoData = null, parcBannerData = null;
