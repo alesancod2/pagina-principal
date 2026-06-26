@@ -620,12 +620,14 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
             filtered.sort(function(a, b) { return b.points - a.points; });
         } else if (sortVal === 'avaliacao') {
             filtered.sort(function(a, b) { return b.rating - a.rating; });
-        } else if (sortVal === 'proximos' && _userLat && _userLng) {
+        } else if (sortVal === 'proximos') {
             filtered.sort(function(a, b) {
-                var distA = parseFloat(a.distance) || 99;
-                var distB = parseFloat(b.distance) || 99;
+                var distA = a._distNum || parseFloat(a.distance) || 99;
+                var distB = b._distNum || parseFloat(b.distance) || 99;
                 return distA - distB;
             });
+            // Solicitar localização se não tem ainda
+            if (!_userLat && !_userLng) requestUserLocation();
         }
         
         grid.innerHTML = filtered.map(function(p) {
