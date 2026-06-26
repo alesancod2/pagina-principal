@@ -3853,7 +3853,7 @@ function renderCuponsTable() {
                 '<td>' + c.emitido + '</td>' +
                 '<td>' + c.validade + '</td>' +
                 '<td>' + getStatusBadge(c.status) + '</td>' +
-                '<td><button class="btn btn-sm btn-outline" onclick="verDetalhesCupom(' + c.id + ')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Detalhes</button></td>' +
+                '<td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="verDetalhesCupom(' + c.id + ')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:2px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Detalhes</button> <button onclick="excluirCupom(' + c.id + ')" title="Excluir" style="background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;vertical-align:middle;" onmouseover="this.style.color=\'#ef4444\'" onmouseout="this.style.color=\'var(--text-secondary)\'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></td>' +
             '</tr>';
         }).join('');
     }
@@ -3933,6 +3933,14 @@ function cancelarCupom() {
     c.status = 'Cancelado';
     c.obs = 'Cancelado manualmente em ' + new Date().toLocaleDateString('pt-BR');
     closeModal('modalDetalhesCupom');
+    renderCuponsTable();
+}
+
+function excluirCupom(id) {
+    var c = cuponsData.find(function(x) { return x.id === id; });
+    if (!c) return;
+    if (!confirm('Excluir cupom ' + c.code + ' (' + (c.nome || c.beneficio) + ')? Esta ação não pode ser desfeita.')) return;
+    cuponsData = cuponsData.filter(function(x) { return x.id !== id; });
     renderCuponsTable();
 }
 
