@@ -4078,9 +4078,11 @@ function renderDashboard() {
     var chart = document.getElementById('dashLineChart');
     if(chart) {
         var svgW = chart.offsetWidth || 700;
-        var svgH = 180;
-        var points = lineData.map(function(v,i){ return ((i/(lineData.length-1))*svgW)+','+((1-v/maxVal)*svgH); }).join(' ');
-        chart.innerHTML = '<svg width="100%" height="'+svgH+'" viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="none" style="overflow:visible;"><polyline points="'+points+'" fill="none" stroke="url(#dashGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2F3EBF"/><stop offset="100%" stop-color="#00A651"/></linearGradient></defs></svg><div style="display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;font-size:11px;color:var(--text-secondary);">'+lineLabels.map(function(l){return '<span>'+l+'</span>';}).join('')+'</div>';
+        var svgH = 160;
+        var padTop = 25;
+        var points = lineData.map(function(v,i){ return ((i/(lineData.length-1))*svgW)+','+((1-v/maxVal)*(svgH-padTop)+padTop); }).join(' ');
+        var circles = lineData.map(function(v,i){ var x=(i/(lineData.length-1))*svgW; var y=(1-v/maxVal)*(svgH-padTop)+padTop; return '<circle cx="'+x+'" cy="'+y+'" r="4" fill="var(--dark-card)" stroke="url(#dashGrad)" stroke-width="2"/><text x="'+x+'" y="'+(y-10)+'" text-anchor="middle" fill="var(--text-primary)" font-size="11" font-weight="600">'+v+'</text>'; }).join('');
+        chart.innerHTML = '<svg width="100%" height="'+(svgH+10)+'" viewBox="0 0 '+svgW+' '+(svgH+10)+'" style="overflow:visible;"><defs><linearGradient id="dashGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2F3EBF"/><stop offset="100%" stop-color="#00A651"/></linearGradient></defs><polyline points="'+points+'" fill="none" stroke="url(#dashGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+circles+'</svg><div style="display:flex;justify-content:space-between;position:absolute;bottom:0;left:0;right:0;font-size:11px;color:var(--text-secondary);">'+lineLabels.map(function(l){return '<span>'+l+'</span>';}).join('')+'</div>';
     }
 
     // Parceiros chart (horizontal bars)
