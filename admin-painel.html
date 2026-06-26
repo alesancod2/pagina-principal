@@ -974,7 +974,23 @@
         </div>
         <div class="topbar-right">
             <div class="topbar-icon" id="themeToggle" title="Alternar tema"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
-            <div class="topbar-icon" title="Notificações"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div style="position:relative;">
+                <div class="topbar-icon" id="notifBellBtn" title="Notificações" onclick="toggleNotifPanel()" style="cursor:pointer;position:relative;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--dark-bg);"></span>
+                </div>
+                <div id="notifPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:380px;max-height:480px;background:var(--dark-card);border:1px solid var(--dark-border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:2000;overflow:hidden;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--dark-border);">
+                        <h3 style="font-size:15px;font-weight:600;margin:0;">Notificações</h3>
+                        <button onclick="markAllNotifRead()" style="background:none;border:none;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit;">Marcar todas como lidas</button>
+                    </div>
+                    <div id="notifList" style="max-height:380px;overflow-y:auto;padding:8px 0;"></div>
+                    <div id="notifEmpty" style="display:none;padding:40px 20px;text-align:center;color:var(--text-secondary);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;opacity:0.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <p style="font-size:13px;margin:0;">Nenhuma notificação</p>
+                    </div>
+                </div>
+            </div>
             <div style="position:relative;">
                 <div class="user-avatar" id="adminAvatarToggle" style="cursor:pointer;" onclick="document.getElementById('adminDropdown').style.display=document.getElementById('adminDropdown').style.display==='none'?'block':'none'">AV</div>
                 <div id="adminDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:200px;background:var(--dark-card);border:1px solid var(--dark-border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.3);z-index:2000;padding:8px 0;">
@@ -5199,6 +5215,208 @@ function toggleCampParceiroFields(prefix) {
     if (catField) catField.style.display = alcance === 'categoria' ? 'block' : 'none';
     if (espField) espField.style.display = alcance === 'especifico' ? 'block' : 'none';
 }
+
+// ===== SISTEMA DE NOTIFICAÇÕES =====
+var notificationsData = [];
+var notifUnreadCount = 0;
+
+function toggleNotifPanel() {
+    var panel = document.getElementById('notifPanel');
+    var isOpen = panel.style.display !== 'none';
+    panel.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) generateNotifications();
+    // Close on click outside
+    if (!isOpen) {
+        setTimeout(function() {
+            document.addEventListener('click', closeNotifOnClickOutside);
+        }, 10);
+    }
+}
+
+function closeNotifOnClickOutside(e) {
+    var panel = document.getElementById('notifPanel');
+    var btn = document.getElementById('notifBellBtn');
+    if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+        panel.style.display = 'none';
+        document.removeEventListener('click', closeNotifOnClickOutside);
+    }
+}
+
+function getNotifIcon(type) {
+    var icons = {
+        novo_parceiro: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>',
+        cupom_expirado: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+        campanha_encerrada: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+        novo_associado: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+        beneficio_popular: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+        erro_conexao: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+    };
+    return icons[type] || icons.novo_parceiro;
+}
+
+function getNotifColor(type) {
+    var colors = {
+        novo_parceiro: '#2F3EBF',
+        cupom_expirado: '#f59e0b',
+        campanha_encerrada: '#8b5cf6',
+        novo_associado: '#00A651',
+        beneficio_popular: '#06b6d4',
+        erro_conexao: '#ef4444'
+    };
+    return colors[type] || '#2F3EBF';
+}
+
+function generateNotifications() {
+    notificationsData = [];
+    var now = new Date();
+
+    // 1. Novo parceiro pendente
+    var pendentes = parceirosData.filter(function(p) { return p.status === 'pending'; });
+    pendentes.forEach(function(p) {
+        notificationsData.push({
+            id: 'parc_' + p.id,
+            type: 'novo_parceiro',
+            title: 'Novo parceiro pendente',
+            message: p.nome + ' aguarda aprovação',
+            time: 'Aguardando',
+            read: false
+        });
+    });
+
+    // 2. Cupons expirados recentemente
+    var expirados = cuponsData.filter(function(c) { return c.status === 'Expirado'; });
+    expirados.slice(0, 3).forEach(function(c) {
+        notificationsData.push({
+            id: 'cup_' + c.id,
+            type: 'cupom_expirado',
+            title: 'Cupom expirado',
+            message: (c.nome || c.code) + ' - ' + c.parceiro,
+            time: c.validade || 'Recente',
+            read: false
+        });
+    });
+
+    // 4. Campanhas encerradas
+    var encerradas = campanhasData.filter(function(c) { return c.status === 'encerrada'; });
+    encerradas.slice(0, 2).forEach(function(c) {
+        notificationsData.push({
+            id: 'camp_' + c.id,
+            type: 'campanha_encerrada',
+            title: 'Campanha encerrada',
+            message: '"' + c.titulo + '" finalizou em ' + (c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : ''),
+            time: c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : '',
+            read: false
+        });
+    });
+
+    // 5. Novos associados (simulado - baseado em dados do banco se disponível)
+    notificationsData.push({
+        id: 'assoc_new_1',
+        type: 'novo_associado',
+        title: 'Novo associado',
+        message: 'João Carlos Silva se cadastrou na plataforma',
+        time: 'Hoje',
+        read: false
+    });
+
+    // 7. Benefício popular
+    var topBenef = beneficiosData.filter(function(b) { return b.status === 'Ativo'; }).slice(0, 1);
+    topBenef.forEach(function(b) {
+        notificationsData.push({
+            id: 'benef_pop_' + b.id,
+            type: 'beneficio_popular',
+            title: 'Benefício em alta',
+            message: '"' + b.titulo + '" de ' + b.parceiro + ' com alta demanda',
+            time: 'Semana atual',
+            read: true
+        });
+    });
+
+    // 8. Erro de conexão (apenas se supabaseClient falhou)
+    if (!window.supabaseClient && typeof supabaseClient === 'undefined') {
+        notificationsData.push({
+            id: 'err_conn_1',
+            type: 'erro_conexao',
+            title: 'Erro de conexão',
+            message: 'Não foi possível conectar ao banco de dados Supabase',
+            time: 'Agora',
+            read: false
+        });
+    }
+
+    // Check localStorage for read state
+    var readIds = JSON.parse(localStorage.getItem('avp_notif_read') || '[]');
+    notificationsData.forEach(function(n) {
+        if (readIds.indexOf(n.id) > -1) n.read = true;
+    });
+
+    notifUnreadCount = notificationsData.filter(function(n) { return !n.read; }).length;
+    updateNotifBadge();
+    renderNotifList();
+}
+
+function updateNotifBadge() {
+    var badge = document.getElementById('notifBadge');
+    if (badge) {
+        badge.style.display = notifUnreadCount > 0 ? 'block' : 'none';
+    }
+}
+
+function renderNotifList() {
+    var list = document.getElementById('notifList');
+    var empty = document.getElementById('notifEmpty');
+    if (!list) return;
+
+    if (notificationsData.length === 0) {
+        list.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        return;
+    }
+    list.style.display = 'block';
+    if (empty) empty.style.display = 'none';
+
+    list.innerHTML = notificationsData.map(function(n) {
+        var color = getNotifColor(n.type);
+        var opacity = n.read ? '0.6' : '1';
+        var bg = n.read ? 'transparent' : 'rgba(47,62,191,0.04)';
+        var dot = n.read ? '' : '<span style="width:6px;height:6px;background:' + color + ';border-radius:50%;flex-shrink:0;"></span>';
+        return '<div onclick="markNotifRead(\'' + n.id + '\')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;cursor:pointer;opacity:' + opacity + ';background:' + bg + ';transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'' + bg + '\'">' +
+            '<div style="width:36px;height:36px;border-radius:10px;background:' + color + '15;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + color + ';">' + getNotifIcon(n.type) + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+                '<div style="display:flex;align-items:center;gap:6px;">' +
+                    '<span style="font-size:13px;font-weight:600;color:var(--text-primary);">' + n.title + '</span>' + dot +
+                '</div>' +
+                '<p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.message + '</p>' +
+                '<span style="font-size:11px;color:var(--text-secondary);opacity:0.7;">' + n.time + '</span>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function markNotifRead(id) {
+    var readIds = JSON.parse(localStorage.getItem('avp_notif_read') || '[]');
+    if (readIds.indexOf(id) === -1) readIds.push(id);
+    localStorage.setItem('avp_notif_read', JSON.stringify(readIds));
+    var n = notificationsData.find(function(x) { return x.id === id; });
+    if (n) n.read = true;
+    notifUnreadCount = notificationsData.filter(function(x) { return !x.read; }).length;
+    updateNotifBadge();
+    renderNotifList();
+}
+
+function markAllNotifRead() {
+    var readIds = notificationsData.map(function(n) { return n.id; });
+    localStorage.setItem('avp_notif_read', JSON.stringify(readIds));
+    notificationsData.forEach(function(n) { n.read = true; });
+    notifUnreadCount = 0;
+    updateNotifBadge();
+    renderNotifList();
+}
+
+// Gerar notificações ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(generateNotifications, 1000);
+});
 
 // Init cupons table on load
 document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); });
