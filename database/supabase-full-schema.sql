@@ -869,10 +869,44 @@ ALTER TABLE partner_benefits ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_public_read_benefits" ON partner_benefits;
 CREATE POLICY "allow_public_read_benefits" ON partner_benefits FOR SELECT USING (true);
 
+-- Permitir INSERT/UPDATE/DELETE em benefícios (admin via anon key)
+DROP POLICY IF EXISTS "allow_insert_benefits" ON partner_benefits;
+CREATE POLICY "allow_insert_benefits" ON partner_benefits FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_update_benefits" ON partner_benefits;
+CREATE POLICY "allow_update_benefits" ON partner_benefits FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "allow_delete_benefits" ON partner_benefits;
+CREATE POLICY "allow_delete_benefits" ON partner_benefits FOR DELETE USING (true);
+
+-- Campanhas: habilitar RLS + full CRUD
+ALTER TABLE campaigns ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_campaigns" ON campaigns;
+CREATE POLICY "allow_public_read_campaigns" ON campaigns FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_insert_campaigns" ON campaigns;
+CREATE POLICY "allow_insert_campaigns" ON campaigns FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_update_campaigns" ON campaigns;
+CREATE POLICY "allow_update_campaigns" ON campaigns FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "allow_delete_campaigns" ON campaigns;
+CREATE POLICY "allow_delete_campaigns" ON campaigns FOR DELETE USING (true);
+
 -- Permitir leitura de configs (público)
 ALTER TABLE system_config ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "allow_public_read_config" ON system_config;
 CREATE POLICY "allow_public_read_config" ON system_config FOR SELECT USING (true);
+
+-- Permitir INSERT/UPDATE/DELETE em configs (admin via anon key)
+DROP POLICY IF EXISTS "allow_insert_config" ON system_config;
+CREATE POLICY "allow_insert_config" ON system_config FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_update_config" ON system_config;
+CREATE POLICY "allow_update_config" ON system_config FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "allow_delete_config" ON system_config;
+CREATE POLICY "allow_delete_config" ON system_config FOR DELETE USING (true);
 
 -- Permitir leitura de pontos do próprio usuário
 ALTER TABLE user_points ENABLE ROW LEVEL SECURITY;
@@ -904,7 +938,7 @@ CREATE POLICY "allow_admin_update_coupons" ON coupons FOR UPDATE USING (true);
 DROP POLICY IF EXISTS "allow_admin_delete_coupons" ON coupons;
 CREATE POLICY "allow_admin_delete_coupons" ON coupons FOR DELETE USING (true);
 
--- Storage policies para campaign-banners (público pode ler, anon pode inserir)
+-- Storage policies para campaign-banners (público pode ler, anon pode inserir/atualizar/excluir)
 DROP POLICY IF EXISTS "allow_public_read_campaign_banners" ON storage.objects;
 CREATE POLICY "allow_public_read_campaign_banners" ON storage.objects
     FOR SELECT USING (bucket_id = 'campaign-banners');
@@ -912,6 +946,14 @@ CREATE POLICY "allow_public_read_campaign_banners" ON storage.objects
 DROP POLICY IF EXISTS "allow_upload_campaign_banners" ON storage.objects;
 CREATE POLICY "allow_upload_campaign_banners" ON storage.objects
     FOR INSERT WITH CHECK (bucket_id = 'campaign-banners');
+
+DROP POLICY IF EXISTS "allow_update_campaign_banners" ON storage.objects;
+CREATE POLICY "allow_update_campaign_banners" ON storage.objects
+    FOR UPDATE USING (bucket_id = 'campaign-banners');
+
+DROP POLICY IF EXISTS "allow_delete_campaign_banners" ON storage.objects;
+CREATE POLICY "allow_delete_campaign_banners" ON storage.objects
+    FOR DELETE USING (bucket_id = 'campaign-banners');
 
 -- Storage policies para partner-images (logo e banner de parceiros)
 DROP POLICY IF EXISTS "allow_public_read_partner_images" ON storage.objects;
@@ -921,6 +963,14 @@ CREATE POLICY "allow_public_read_partner_images" ON storage.objects
 DROP POLICY IF EXISTS "allow_upload_partner_images" ON storage.objects;
 CREATE POLICY "allow_upload_partner_images" ON storage.objects
     FOR INSERT WITH CHECK (bucket_id = 'partner-images');
+
+DROP POLICY IF EXISTS "allow_update_partner_images" ON storage.objects;
+CREATE POLICY "allow_update_partner_images" ON storage.objects
+    FOR UPDATE USING (bucket_id = 'partner-images');
+
+DROP POLICY IF EXISTS "allow_delete_partner_images" ON storage.objects;
+CREATE POLICY "allow_delete_partner_images" ON storage.objects
+    FOR DELETE USING (bucket_id = 'partner-images');
 
 -- ============================================
 -- VERIFICAÇÃO FINAL

@@ -3960,6 +3960,15 @@ function cancelarCupom() {
     c.obs = 'Cancelado manualmente em ' + new Date().toLocaleDateString('pt-BR');
     closeModal('modalDetalhesCupom');
     renderCuponsTable();
+    if (supabaseClient) {
+        var cancelQuery = c.db_id
+            ? supabaseClient.from('coupons').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('id', c.db_id)
+            : supabaseClient.from('coupons').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('code', c.code);
+        cancelQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error cancelling coupon:', result.error.message);
+            else avpCache.invalidate('avp_cache_coupons');
+        });
+    }
 }
 
 function excluirCupom(id) {
@@ -3968,6 +3977,15 @@ function excluirCupom(id) {
     if (!confirm('Excluir cupom ' + c.code + ' (' + (c.nome || c.beneficio) + ')? Esta ação não pode ser desfeita.')) return;
     cuponsData = cuponsData.filter(function(x) { return x.id !== id; });
     renderCuponsTable();
+    if (supabaseClient) {
+        var deleteQuery = c.db_id
+            ? supabaseClient.from('coupons').delete().eq('id', c.db_id)
+            : supabaseClient.from('coupons').delete().eq('code', c.code);
+        deleteQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error deleting coupon:', result.error.message);
+            else avpCache.invalidate('avp_cache_coupons');
+        });
+    }
 }
 
 function salvarCupom(event) {
@@ -4009,6 +4027,25 @@ function salvarCupom(event) {
     };
     cuponsData.unshift(novoCupom);
 
+    if (supabaseClient) {
+        supabaseClient.from('partners').select('id').eq('trade_name', parceiro).limit(1).then(function(partnerRes) {
+            var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+            supabaseClient.from('coupons').insert({
+                code: novoCupom.code,
+                name: nome,
+                partner_id: partnerId,
+                benefit_type: tipoBeneficio,
+                discount_type: tipoDesconto,
+                discount_value: valor,
+                status: 'active',
+                expires_at: vencimento.toISOString()
+            }).then(function(result) {
+                if (result.error) console.warn('[DB] Error inserting coupon:', result.error.message);
+                else avpCache.invalidate('avp_cache_coupons');
+            });
+        });
+    }
+
     fb.style.display = 'block';
     fb.style.background = 'rgba(0,166,81,0.1)';
     fb.style.border = '1px solid rgba(0,166,81,0.3)';
@@ -4049,8 +4086,9 @@ function salvarCupomLote(event) {
     var validadeStr = vencimento.toLocaleDateString('pt-BR');
 
     setTimeout(function() {
+        var loteCupons = [];
         for (var i = 0; i < quantidade; i++) {
-            cuponsData.unshift({
+            var cupom = {
                 id: cuponsData.length + 1 + i,
                 code: generateCupomCode(),
                 nome: nome,
@@ -4065,6 +4103,29 @@ function salvarCupomLote(event) {
                 associado: 'Lote #' + (i + 1),
                 email: '',
                 obs: 'Gerado em lote (' + quantidade + ' cupons)'
+            };
+            cuponsData.unshift(cupom);
+            loteCupons.push(cupom);
+        }
+        if (supabaseClient) {
+            supabaseClient.from('partners').select('id').eq('trade_name', parceiro).limit(1).then(function(partnerRes) {
+                var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+                var dbRows = loteCupons.map(function(c) {
+                    return {
+                        code: c.code,
+                        name: nome,
+                        partner_id: partnerId,
+                        benefit_type: tipoBeneficio,
+                        discount_type: tipoDesconto,
+                        discount_value: valor,
+                        status: 'active',
+                        expires_at: vencimento.toISOString()
+                    };
+                });
+                supabaseClient.from('coupons').insert(dbRows).then(function(result) {
+                    if (result.error) console.warn('[DB] Error inserting lote coupons:', result.error.message);
+                    else avpCache.invalidate('avp_cache_coupons');
+                });
             });
         }
         btn.disabled = false;
@@ -4287,7 +4348,10 @@ function salvarParceiro(event) {
                     else if (parcLogoData === 'removed') updateData.logo_url = null;
                     if (coverUrl && coverUrl.startsWith('http')) updateData.cover_url = coverUrl;
                     else if (parcBannerData === 'removed') updateData.cover_url = null;
-                    await supabaseClient.from('partners').update(updateData).eq('trade_name', p.nome);
+                    var parcUpdateQuery = p.db_id
+                        ? supabaseClient.from('partners').update(updateData).eq('id', p.db_id)
+                        : supabaseClient.from('partners').update(updateData).eq('trade_name', p.nome);
+                    await parcUpdateQuery;
                     avpCache.invalidate('avp_cache_partners');
                     // Update local
                     data.logo_url = logoUrl || (parcLogoData==='removed'?null:p.logo_url);
@@ -4333,6 +4397,15 @@ function excluirParceiro(id) {
     if(!confirm('Excluir parceiro "'+p.nome+'"?')) return;
     parceirosData=parceirosData.filter(function(x){return x.id!==id;});
     renderParceirosTable();
+    if (supabaseClient) {
+        var deleteQuery = p.db_id 
+            ? supabaseClient.from('partners').delete().eq('id', p.db_id)
+            : supabaseClient.from('partners').delete().eq('trade_name', p.nome);
+        deleteQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error deleting partner:', result.error.message);
+            else avpCache.invalidate('avp_cache_partners');
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded',function(){renderParceirosTable();});
@@ -4401,6 +4474,15 @@ function salvarCategoria(event) {
         return;
     }
     categoriasData.push({ slug: slug, nome: nome, descricao: descricao, icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>', parceiros: [] });
+    if (supabaseClient) {
+        supabaseClient.from('system_config').insert({
+            key: 'category_' + slug,
+            value: JSON.stringify({ slug: slug, nome: nome, descricao: descricao })
+        }).then(function(result) {
+            if (result.error) console.warn('[DB] Error inserting category:', result.error.message);
+            else avpCache.invalidate('avp_cache_system_config');
+        });
+    }
     fb.style.display = 'block'; fb.style.background = 'rgba(0,166,81,0.1)'; fb.style.border = '1px solid rgba(0,166,81,0.3)'; fb.style.color = '#00A651'; fb.textContent = 'Categoria "' + nome + '" criada!';
     setTimeout(function() { fb.style.display = 'none'; closeModal('modalNovaCategoria'); document.getElementById('formNovaCategoria').reset(); renderCategoriasGrid(); }, 1200);
 }
@@ -4463,6 +4545,24 @@ function salvarBeneficio(event) {
     var fb = document.getElementById('novoBenefFeedback');
     fb.style.display = 'block'; fb.style.background = 'rgba(0,166,81,0.1)'; fb.style.border = '1px solid rgba(0,166,81,0.3)'; fb.style.color = '#00A651'; fb.textContent = 'Benefício "' + b.titulo + '" criado!';
     setTimeout(function() { fb.style.display = 'none'; closeModal('modalNovoBeneficio'); document.getElementById('formNovoBeneficio').reset(); renderBeneficiosTable(); }, 1200);
+    if (supabaseClient) {
+        supabaseClient.from('partners').select('id').eq('trade_name', b.parceiro).limit(1).then(function(partnerRes) {
+            var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+            supabaseClient.from('partner_benefits').insert({
+                partner_id: partnerId,
+                title: b.titulo,
+                description: b.descricao,
+                benefit_type: b.tipo,
+                discount_percent: (b.tipo === 'discount_percent') ? b.valor : null,
+                discount_fixed: (b.tipo === 'discount_fixed') ? b.valor : null,
+                points_generated: b.pontos,
+                is_active: b.status === 'Ativo'
+            }).then(function(result) {
+                if (result.error) console.warn('[DB] Error inserting benefit:', result.error.message);
+                else avpCache.invalidate('avp_cache_partner_benefits');
+            });
+        });
+    }
 }
 function editarBeneficio(id) {
     var b = beneficiosData.find(function(x) { return x.id === id; });
@@ -4481,6 +4581,8 @@ function salvarEdicaoBeneficio(event) {
     event.preventDefault();
     var b = beneficiosData.find(function(x) { return x.id === window._editBenefId; });
     if (!b) return;
+    var oldTitulo = b.titulo;
+    var oldParceiro = b.parceiro;
     b.parceiro = document.getElementById('editBenefParceiro').value;
     b.titulo = document.getElementById('editBenefTitulo').value;
     b.descricao = document.getElementById('editBenefDescricao').value;
@@ -4491,6 +4593,52 @@ function salvarEdicaoBeneficio(event) {
     var fb = document.getElementById('editBenefFeedback');
     fb.style.display = 'block'; fb.style.background = 'rgba(0,166,81,0.1)'; fb.style.border = '1px solid rgba(0,166,81,0.3)'; fb.style.color = '#00A651'; fb.textContent = 'Benefício atualizado!';
     setTimeout(function() { fb.style.display = 'none'; closeModal('modalEditarBeneficio'); renderBeneficiosTable(); }, 1000);
+    if (supabaseClient) {
+        var updateData = {
+            title: b.titulo,
+            description: b.descricao,
+            benefit_type: b.tipo,
+            discount_percent: (b.tipo === 'discount_percent') ? b.valor : null,
+            discount_fixed: (b.tipo === 'discount_fixed') ? b.valor : null,
+            points_generated: b.pontos,
+            is_active: b.status === 'Ativo'
+        };
+        if (b.db_id) {
+            // Atualizar por ID do banco (mais confiável)
+            if (b.parceiro !== oldParceiro) {
+                supabaseClient.from('partners').select('id').eq('trade_name', b.parceiro).limit(1).then(function(newPartnerRes) {
+                    if (newPartnerRes.data && newPartnerRes.data.length > 0) updateData.partner_id = newPartnerRes.data[0].id;
+                    supabaseClient.from('partner_benefits').update(updateData).eq('id', b.db_id).then(function(result) {
+                        if (result.error) console.warn('[DB] Error updating benefit:', result.error.message);
+                        else avpCache.invalidate('avp_cache_partner_benefits');
+                    });
+                });
+            } else {
+                supabaseClient.from('partner_benefits').update(updateData).eq('id', b.db_id).then(function(result) {
+                    if (result.error) console.warn('[DB] Error updating benefit:', result.error.message);
+                    else avpCache.invalidate('avp_cache_partner_benefits');
+                });
+            }
+        } else {
+            supabaseClient.from('partners').select('id').eq('trade_name', oldParceiro).limit(1).then(function(partnerRes) {
+                var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+                if (b.parceiro !== oldParceiro) {
+                    supabaseClient.from('partners').select('id').eq('trade_name', b.parceiro).limit(1).then(function(newPartnerRes) {
+                        updateData.partner_id = (newPartnerRes.data && newPartnerRes.data.length > 0) ? newPartnerRes.data[0].id : partnerId;
+                        supabaseClient.from('partner_benefits').update(updateData).eq('title', oldTitulo).eq('partner_id', partnerId).then(function(result) {
+                            if (result.error) console.warn('[DB] Error updating benefit:', result.error.message);
+                            else avpCache.invalidate('avp_cache_partner_benefits');
+                        });
+                    });
+                } else {
+                    supabaseClient.from('partner_benefits').update(updateData).eq('title', oldTitulo).eq('partner_id', partnerId).then(function(result) {
+                        if (result.error) console.warn('[DB] Error updating benefit:', result.error.message);
+                        else avpCache.invalidate('avp_cache_partner_benefits');
+                    });
+                }
+            });
+        }
+    }
 }
 function excluirBeneficio(id) {
     var b = beneficiosData.find(function(x) { return x.id === id; });
@@ -4498,6 +4646,22 @@ function excluirBeneficio(id) {
     if (!confirm('Excluir benefício "' + b.titulo + '" de ' + b.parceiro + '?')) return;
     beneficiosData = beneficiosData.filter(function(x) { return x.id !== id; });
     renderBeneficiosTable();
+    if (supabaseClient) {
+        if (b.db_id) {
+            supabaseClient.from('partner_benefits').delete().eq('id', b.db_id).then(function(result) {
+                if (result.error) console.warn('[DB] Error deleting benefit:', result.error.message);
+                else avpCache.invalidate('avp_cache_partner_benefits');
+            });
+        } else {
+            supabaseClient.from('partners').select('id').eq('trade_name', b.parceiro).limit(1).then(function(partnerRes) {
+                var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+                supabaseClient.from('partner_benefits').delete().eq('title', b.titulo).eq('partner_id', partnerId).then(function(result) {
+                    if (result.error) console.warn('[DB] Error deleting benefit:', result.error.message);
+                    else avpCache.invalidate('avp_cache_partner_benefits');
+                });
+            });
+        }
+    }
 }
 document.addEventListener('DOMContentLoaded', function() { renderBeneficiosTable(); });
 
@@ -4690,6 +4854,15 @@ function encerrarCampanha() {
     c.status = 'encerrada';
     closeModal('modalDetalhesCampanha');
     renderCampanhas();
+    if (supabaseClient) {
+        var updateQuery = c.db_id
+            ? supabaseClient.from('campaigns').update({ is_active: false }).eq('id', c.db_id)
+            : supabaseClient.from('campaigns').update({ is_active: false }).eq('title', c.titulo);
+        updateQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error ending campaign:', result.error.message);
+            else avpCache.invalidate('avp_cache_campaigns');
+        });
+    }
 }
 
 function ativarCampanha() {
@@ -4699,6 +4872,15 @@ function ativarCampanha() {
     c.status = 'ativa';
     closeModal('modalDetalhesCampanha');
     renderCampanhas();
+    if (supabaseClient) {
+        var updateQuery = c.db_id
+            ? supabaseClient.from('campaigns').update({ is_active: true }).eq('id', c.db_id)
+            : supabaseClient.from('campaigns').update({ is_active: true }).eq('title', c.titulo);
+        updateQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error activating campaign:', result.error.message);
+            else avpCache.invalidate('avp_cache_campaigns');
+        });
+    }
 }
 
 function salvarCampanha(event) {
@@ -4758,6 +4940,27 @@ function salvarCampanha(event) {
 
 function finalizarSalvarCampanha(novaCampanha, btn, fb, titulo, status) {
     campanhasData.unshift(novaCampanha);
+
+    if (supabaseClient) {
+        var targetCats = null;
+        if (novaCampanha.parceiro && novaCampanha.parceiro !== 'Todos os parceiros') {
+            targetCats = novaCampanha.parceiro.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+        }
+        supabaseClient.from('campaigns').insert({
+            title: novaCampanha.titulo,
+            description: novaCampanha.descricao,
+            type: novaCampanha.tipo,
+            points_multiplier: novaCampanha.multiplicador,
+            start_date: novaCampanha.inicio,
+            end_date: novaCampanha.fim,
+            is_active: status === 'ativa',
+            image_url: novaCampanha.bannerUrl || null,
+            target_categories: targetCats
+        }).then(function(result) {
+            if (result.error) console.warn('[DB] Error inserting campaign:', result.error.message);
+            else avpCache.invalidate('avp_cache_campaigns');
+        });
+    }
 
     btn.disabled = false;
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Campanha';
@@ -4865,6 +5068,7 @@ function salvarEdicaoCampanha(event) {
     var c = campanhasData.find(function(x) { return x.id === id; });
     if (!c) return;
 
+    var oldTitulo = c.titulo;
     c.titulo = document.getElementById('editCampTitulo').value;
     c.tipo = document.getElementById('editCampTipo').value;
     c.descricao = document.getElementById('editCampDescricao').value;
@@ -4906,6 +5110,30 @@ function salvarEdicaoCampanha(event) {
         closeModal('modalEditarCampanha');
         renderCampanhas();
     }, 1200);
+    if (supabaseClient) {
+        var targetCats = null;
+        if (c.parceiro && c.parceiro !== 'Todos os parceiros') {
+            targetCats = c.parceiro.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+        }
+        var campUpdateData = {
+            title: c.titulo,
+            description: c.descricao,
+            type: c.tipo,
+            points_multiplier: c.multiplicador,
+            start_date: c.inicio,
+            end_date: c.fim,
+            is_active: c.status === 'ativa',
+            image_url: c.bannerUrl || null,
+            target_categories: targetCats
+        };
+        var campUpdateQuery = c.db_id
+            ? supabaseClient.from('campaigns').update(campUpdateData).eq('id', c.db_id)
+            : supabaseClient.from('campaigns').update(campUpdateData).eq('title', oldTitulo);
+        campUpdateQuery.then(function(result) {
+            if (result.error) console.warn('[DB] Error updating campaign:', result.error.message);
+            else avpCache.invalidate('avp_cache_campaigns');
+        });
+    }
 }
 
 function getSelectedParceiros(prefix) {
@@ -5028,6 +5256,190 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             return await supabaseClient.from(table).delete().eq('id', id);
         }
 
+        // ===== CARREGAR DADOS DO SUPABASE (substitui mock) =====
+
+        // Carregar Parceiros do banco
+        async function loadParceirosFromDB() {
+            if (!supabaseClient) return;
+            try {
+                var result = await supabaseQuery('partners', { select: '*', order: 'trade_name', ascending: true });
+                if (result.error || !result.data || result.data.length === 0) {
+                    console.log('[DB] Usando dados mock para parceiros');
+                    return;
+                }
+                parceirosData = result.data.map(function(p, idx) {
+                    return {
+                        id: idx + 1,
+                        db_id: p.id,
+                        nome: p.trade_name || p.company_name,
+                        razao: p.company_name || '',
+                        cnpj: p.cnpj || '',
+                        categoria: p.category || '',
+                        cidade: p.city || '',
+                        telefone: p.phone || '',
+                        whatsapp: p.whatsapp || '',
+                        endereco: p.address || '',
+                        status: p.status || 'pending',
+                        logo_url: p.logo_url || null,
+                        cover_url: p.cover_url || null
+                    };
+                });
+                console.log('[DB] Parceiros carregados:', parceirosData.length);
+                renderParceirosTable();
+            } catch(e) {
+                console.warn('[DB] Erro ao carregar parceiros:', e.message);
+            }
+        }
+
+        // Carregar Benefícios do banco
+        async function loadBeneficiosFromDB() {
+            if (!supabaseClient) return;
+            try {
+                var result = await supabaseQuery('partner_benefits', { select: '*, partners(trade_name)' });
+                if (result.error || !result.data || result.data.length === 0) {
+                    console.log('[DB] Usando dados mock para benefícios');
+                    return;
+                }
+                beneficiosData = result.data.map(function(b, idx) {
+                    return {
+                        id: idx + 1,
+                        db_id: b.id,
+                        parceiro: (b.partners && b.partners.trade_name) || 'Parceiro',
+                        titulo: b.title || '',
+                        descricao: b.description || '',
+                        tipo: b.benefit_type || 'discount_percent',
+                        valor: b.discount_percent || b.discount_fixed || 0,
+                        pontos: b.points_generated || 0,
+                        status: b.is_active ? 'Ativo' : 'Inativo'
+                    };
+                });
+                console.log('[DB] Benefícios carregados:', beneficiosData.length);
+                renderBeneficiosTable();
+            } catch(e) {
+                console.warn('[DB] Erro ao carregar benefícios:', e.message);
+            }
+        }
+
+        // Carregar Cupons do banco
+        async function loadCuponsFromDB() {
+            if (!supabaseClient) return;
+            try {
+                var result = await supabaseQuery('coupons', { select: '*, partners(trade_name)', order: 'created_at' });
+                if (result.error || !result.data || result.data.length === 0) {
+                    console.log('[DB] Usando dados mock para cupons');
+                    return;
+                }
+                cuponsData = result.data.map(function(c, idx) {
+                    var statusMap = { active: 'Válido', used: 'Usado', expired: 'Expirado', cancelled: 'Cancelado' };
+                    var emitido = c.issued_at ? new Date(c.issued_at).toLocaleDateString('pt-BR') : '';
+                    var validade = c.expires_at ? new Date(c.expires_at).toLocaleDateString('pt-BR') : '';
+                    return {
+                        id: idx + 1,
+                        db_id: c.id,
+                        code: c.code || '',
+                        nome: c.name || '',
+                        parceiro: (c.partners && c.partners.trade_name) || 'Parceiro',
+                        beneficio: (c.name || '') + ' (' + (c.benefit_type || 'desconto') + ')',
+                        tipo: c.benefit_type || 'desconto',
+                        tipoDesconto: c.discount_type || 'percentual',
+                        valor: c.discount_value || 0,
+                        emitido: emitido,
+                        validade: validade,
+                        status: statusMap[c.status] || c.status || 'Válido',
+                        associado: '',
+                        email: '',
+                        obs: c.notes || ''
+                    };
+                });
+                console.log('[DB] Cupons carregados:', cuponsData.length);
+                renderCuponsTable();
+            } catch(e) {
+                console.warn('[DB] Erro ao carregar cupons:', e.message);
+            }
+        }
+
+        // Carregar Campanhas do banco
+        async function loadCampanhasFromDB() {
+            if (!supabaseClient) return;
+            try {
+                var result = await supabaseQuery('campaigns', { select: '*', order: 'created_at' });
+                if (result.error || !result.data || result.data.length === 0) {
+                    console.log('[DB] Usando dados mock para campanhas');
+                    return;
+                }
+                var cores = ['orange','blue','green','red','gray'];
+                var icons = ['sun','car','trophy','gift','percent','users'];
+                campanhasData = result.data.map(function(c, idx) {
+                    var status = 'agendada';
+                    if (!c.is_active && new Date(c.end_date) < new Date()) status = 'encerrada';
+                    else if (c.is_active) status = 'ativa';
+                    var tipoLabel = c.type || 'custom';
+                    return {
+                        id: idx + 1,
+                        db_id: c.id,
+                        titulo: c.title || '',
+                        tipo: tipoLabel,
+                        descricao: c.description || '',
+                        inicio: c.start_date ? c.start_date.split('T')[0] : '',
+                        fim: c.end_date ? c.end_date.split('T')[0] : '',
+                        parceiro: (c.target_categories && c.target_categories.length > 0) ? c.target_categories.join(', ') : 'Todos os parceiros',
+                        multiplicador: c.points_multiplier || 1,
+                        cor: cores[idx % cores.length],
+                        status: status,
+                        publico: 'todos',
+                        icon: icons[idx % icons.length],
+                        bannerUrl: c.image_url || null
+                    };
+                });
+                console.log('[DB] Campanhas carregadas:', campanhasData.length);
+                renderCampanhas();
+            } catch(e) {
+                console.warn('[DB] Erro ao carregar campanhas:', e.message);
+            }
+        }
+
+        // Carregar Categorias do banco (baseado nos parceiros existentes)
+        async function loadCategoriasFromDB() {
+            if (!supabaseClient) return;
+            try {
+                var result = await supabaseQuery('partners', { select: 'trade_name, category' });
+                if (result.error || !result.data || result.data.length === 0) {
+                    console.log('[DB] Usando dados mock para categorias');
+                    return;
+                }
+                // Agrupar parceiros por categoria
+                var catMap = {};
+                result.data.forEach(function(p) {
+                    var cat = p.category || 'outros';
+                    if (!catMap[cat]) catMap[cat] = [];
+                    catMap[cat].push(p.trade_name || p.company_name);
+                });
+                // Atualizar categoriasData existente com parceiros reais do banco
+                categoriasData.forEach(function(c) {
+                    if (catMap[c.slug]) {
+                        c.parceiros = catMap[c.slug];
+                    }
+                });
+                // Adicionar categorias que existem no banco mas não na lista
+                Object.keys(catMap).forEach(function(slug) {
+                    var exists = categoriasData.find(function(c) { return c.slug === slug; });
+                    if (!exists) {
+                        categoriasData.push({
+                            slug: slug,
+                            nome: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '),
+                            descricao: '',
+                            icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>',
+                            parceiros: catMap[slug]
+                        });
+                    }
+                });
+                console.log('[DB] Categorias atualizadas com dados do banco');
+                renderCategoriasGrid();
+            } catch(e) {
+                console.warn('[DB] Erro ao carregar categorias:', e.message);
+            }
+        }
+
         // Admin Dashboard: Fetch stats from Supabase
         async function fetchDashboardStats() {
             if (!supabaseClient) return;
@@ -5038,17 +5450,38 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
                     supabaseClient.from('benefit_usages').select('id', { count: 'exact' }),
                     supabaseClient.from('point_transactions').select('amount').eq('type', 'earned')
                 ]);
-                // Log para debug (remover em produção)
                 console.log('[Supabase] Dashboard stats loaded:', { partners, users, benefits, points });
             } catch(e) {
                 console.warn('[Supabase] Erro ao buscar stats:', e.message);
             }
         }
 
+        // ===== INICIALIZAÇÃO: carregar tudo do Supabase =====
+        async function initLoadFromDB() {
+            if (!supabaseClient) {
+                console.warn('[DB] Supabase não disponível, usando dados mock');
+                return;
+            }
+            console.log('[DB] Iniciando carregamento do banco de dados...');
+            try {
+                await Promise.all([
+                    loadParceirosFromDB(),
+                    loadBeneficiosFromDB(),
+                    loadCuponsFromDB(),
+                    loadCampanhasFromDB(),
+                    loadCategoriasFromDB(),
+                    fetchDashboardStats()
+                ]);
+                console.log('[DB] Carregamento completo!');
+            } catch(e) {
+                console.warn('[DB] Erro parcial no carregamento:', e.message);
+            }
+        }
+
         // Inicializa conexão ao carregar
         if (supabaseClient) {
             console.log('[Supabase] Conectado ao projeto: dxvqawclzyjgwifbvbbr');
-            fetchDashboardStats();
+            initLoadFromDB();
         }
     </script>
 </body>
