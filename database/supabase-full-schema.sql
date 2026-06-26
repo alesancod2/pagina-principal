@@ -137,6 +137,7 @@ CREATE TABLE IF NOT EXISTS partners (
     website VARCHAR(500),
     logo_url TEXT,
     cover_url TEXT,
+    carousel_url TEXT,
     rating DECIMAL(2,1) DEFAULT 0,
     total_ratings INTEGER DEFAULT 0,
     status partner_status DEFAULT 'pending',
@@ -356,6 +357,9 @@ CREATE TABLE IF NOT EXISTS qrcode_sessions (
 
 DO $$
 BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'partners' AND column_name = 'carousel_url') THEN
+        ALTER TABLE partners ADD COLUMN carousel_url TEXT;
+    END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'name') THEN
         ALTER TABLE coupons ADD COLUMN name VARCHAR(255);
     END IF;

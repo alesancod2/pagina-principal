@@ -1206,6 +1206,21 @@
                             <input type="file" id="parcBannerFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewParcImg(this,'Banner')">
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Banner Carousel (propaganda marketplace)</label>
+                            <div id="parcCarouselPreview" style="display:none;margin-bottom:8px;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--dark-border);position:relative;">
+                                <img id="parcCarouselImg" style="width:100%;height:100%;object-fit:cover;" alt="">
+                                <button type="button" onclick="removeParcImg('Carousel')" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:#fff;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">&times;</button>
+                            </div>
+                            <label for="parcCarouselFile" style="display:flex;align-items:center;gap:6px;padding:10px;border:2px dashed var(--dark-border);border-radius:8px;cursor:pointer;color:var(--text-secondary);font-size:12px;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--dark-border)'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M12 7V3"/><path d="M8 7V5"/><path d="M16 7V5"/></svg>
+                                <span id="parcCarouselLabel">Upload banner carousel (1200x400 recomendado)</span>
+                            </label>
+                            <input type="file" id="parcCarouselFile" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="previewParcImg(this,'Carousel')">
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Imagem exibida no carousel de propagandas do Marketplace</span>
+                        </div>
+                    </div>
                     <div id="parcFeedback" style="margin-top:12px;font-size:13px;display:none;"></div>
                     <div style="margin-top:24px;display:flex;gap:12px;"><button type="submit" class="btn btn-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar</button><button type="button" class="btn btn-outline" onclick="closeModal('modalNovoParceiro')">Cancelar</button></div>
                 </form>
@@ -4259,7 +4274,7 @@ function navegarParaParceiro(nome) {
 }
 
 // ===== PARCEIROS - CRUD COMPLETO =====
-var parcLogoData = null, parcBannerData = null;
+var parcLogoData = null, parcBannerData = null, parcCarouselData = null;
 
 function previewParcImg(input, type) {
     var file = input.files[0]; if (!file) return;
@@ -4267,19 +4282,21 @@ function previewParcImg(input, type) {
     var reader = new FileReader();
     reader.onload = function(e) {
         if (type==='Logo') { parcLogoData=e.target.result; document.getElementById('parcLogoImg').src=e.target.result; document.getElementById('parcLogoPreview').style.display='block'; document.getElementById('parcLogoLabel').textContent=file.name; }
+        else if (type==='Carousel') { parcCarouselData=e.target.result; document.getElementById('parcCarouselImg').src=e.target.result; document.getElementById('parcCarouselPreview').style.display='block'; document.getElementById('parcCarouselLabel').textContent=file.name; }
         else { parcBannerData=e.target.result; document.getElementById('parcBannerImg').src=e.target.result; document.getElementById('parcBannerPreview').style.display='block'; document.getElementById('parcBannerLabel').textContent=file.name; }
     };
     reader.readAsDataURL(file);
 }
 function removeParcImg(type) {
     if (type==='Logo') { parcLogoData='removed'; document.getElementById('parcLogoFile').value=''; document.getElementById('parcLogoPreview').style.display='none'; document.getElementById('parcLogoLabel').textContent='Upload logo (PNG/JPG)'; }
+    else if (type==='Carousel') { parcCarouselData='removed'; document.getElementById('parcCarouselFile').value=''; document.getElementById('parcCarouselPreview').style.display='none'; document.getElementById('parcCarouselLabel').textContent='Upload banner carousel (1200x400 recomendado)'; }
     else { parcBannerData='removed'; document.getElementById('parcBannerFile').value=''; document.getElementById('parcBannerPreview').style.display='none'; document.getElementById('parcBannerLabel').textContent='Upload banner (PNG/JPG)'; }
 }
 function resetParcImgs() {
-    parcLogoData=null; parcBannerData=null;
-    document.getElementById('parcLogoFile').value=''; document.getElementById('parcBannerFile').value='';
-    document.getElementById('parcLogoPreview').style.display='none'; document.getElementById('parcBannerPreview').style.display='none';
-    document.getElementById('parcLogoLabel').textContent='Upload logo (PNG/JPG)'; document.getElementById('parcBannerLabel').textContent='Upload banner (PNG/JPG)';
+    parcLogoData=null; parcBannerData=null; parcCarouselData=null;
+    document.getElementById('parcLogoFile').value=''; document.getElementById('parcBannerFile').value=''; document.getElementById('parcCarouselFile').value='';
+    document.getElementById('parcLogoPreview').style.display='none'; document.getElementById('parcBannerPreview').style.display='none'; document.getElementById('parcCarouselPreview').style.display='none';
+    document.getElementById('parcLogoLabel').textContent='Upload logo (PNG/JPG)'; document.getElementById('parcBannerLabel').textContent='Upload banner (PNG/JPG)'; document.getElementById('parcCarouselLabel').textContent='Upload banner carousel (1200x400 recomendado)';
 }
 
 var parceirosData = [
@@ -4347,6 +4364,7 @@ function editarParceiro(id) {
     resetParcImgs();
     if(p.logo_url){parcLogoData=null;document.getElementById('parcLogoImg').src=p.logo_url;document.getElementById('parcLogoPreview').style.display='block';document.getElementById('parcLogoLabel').textContent='Alterar logo';}
     if(p.cover_url){parcBannerData=null;document.getElementById('parcBannerImg').src=p.cover_url;document.getElementById('parcBannerPreview').style.display='block';document.getElementById('parcBannerLabel').textContent='Alterar banner';}
+    if(p.carousel_url){parcCarouselData=null;document.getElementById('parcCarouselImg').src=p.carousel_url;document.getElementById('parcCarouselPreview').style.display='block';document.getElementById('parcCarouselLabel').textContent='Alterar banner carousel';}
     openModal('modalNovoParceiro');
 }
 
@@ -4360,9 +4378,10 @@ function salvarParceiro(event) {
     // Upload images to Supabase Storage
     var logoFile = document.getElementById('parcLogoFile').files[0];
     var bannerFile = document.getElementById('parcBannerFile').files[0];
+    var carouselFile = document.getElementById('parcCarouselFile').files[0];
 
     async function processUpload() {
-        var logoUrl = null, coverUrl = null;
+        var logoUrl = null, coverUrl = null, carouselUrl = null;
 
         if (supabaseClient) {
             // Upload logo
@@ -4375,7 +4394,7 @@ function salvarParceiro(event) {
                     if (urlData) logoUrl = urlData.publicUrl;
                 }
             } else if (parcLogoData && parcLogoData !== 'removed') {
-                logoUrl = parcLogoData; // keep base64 for local display
+                logoUrl = parcLogoData;
             }
 
             // Upload banner
@@ -4391,6 +4410,19 @@ function salvarParceiro(event) {
                 coverUrl = parcBannerData;
             }
 
+            // Upload carousel banner
+            if (carouselFile) {
+                var ext3 = carouselFile.name.split('.').pop().toLowerCase();
+                var fileName3 = 'carousel-' + data.cnpj.replace(/\D/g,'') + '-' + Date.now() + '.' + ext3;
+                var { data: uploadData3, error: error3 } = await supabaseClient.storage.from('partner-images').upload(fileName3, carouselFile, { cacheControl:'3600', upsert:true });
+                if (!error3) {
+                    var { data: urlData3 } = supabaseClient.storage.from('partner-images').getPublicUrl(fileName3);
+                    if (urlData3) carouselUrl = urlData3.publicUrl;
+                }
+            } else if (parcCarouselData && parcCarouselData !== 'removed') {
+                carouselUrl = parcCarouselData;
+            }
+
             // Update database
             if (window._editParceiroId) {
                 var p = parceirosData.find(function(x){return x.id===window._editParceiroId;});
@@ -4401,6 +4433,8 @@ function salvarParceiro(event) {
                     else if (parcLogoData === 'removed') updateData.logo_url = null;
                     if (coverUrl && coverUrl.startsWith('http')) updateData.cover_url = coverUrl;
                     else if (parcBannerData === 'removed') updateData.cover_url = null;
+                    if (carouselUrl && carouselUrl.startsWith('http')) updateData.carousel_url = carouselUrl;
+                    else if (parcCarouselData === 'removed') updateData.carousel_url = null;
                     var parcUpdateQuery = p.db_id
                         ? supabaseClient.from('partners').update(updateData).eq('id', p.db_id)
                         : supabaseClient.from('partners').update(updateData).eq('trade_name', p.nome);
@@ -4409,6 +4443,7 @@ function salvarParceiro(event) {
                     // Update local
                     data.logo_url = logoUrl || (parcLogoData==='removed'?null:p.logo_url);
                     data.cover_url = coverUrl || (parcBannerData==='removed'?null:p.cover_url);
+                    data.carousel_url = carouselUrl || (parcCarouselData==='removed'?null:p.carousel_url);
                     Object.assign(p, data);
                 }
                 fb.textContent='Parceiro atualizado e salvo no banco!';
@@ -4417,11 +4452,13 @@ function salvarParceiro(event) {
                 var insertData = { trade_name: data.nome, company_name: data.razao || data.nome, cnpj: data.cnpj, category: data.categoria, phone: data.telefone, whatsapp: data.whatsapp, address: data.endereco, city: data.cidade, state:'ES', status: data.status };
                 if (logoUrl && logoUrl.startsWith('http')) insertData.logo_url = logoUrl;
                 if (coverUrl && coverUrl.startsWith('http')) insertData.cover_url = coverUrl;
+                if (carouselUrl && carouselUrl.startsWith('http')) insertData.carousel_url = carouselUrl;
                 await supabaseClient.from('partners').insert(insertData);
                 avpCache.invalidate('avp_cache_partners');
                 data.id = parceirosData.length+1;
                 data.logo_url = logoUrl || null;
                 data.cover_url = coverUrl || null;
+                data.carousel_url = carouselUrl || null;
                 parceirosData.push(data);
                 fb.textContent='Parceiro "'+data.nome+'" criado e salvo no banco!';
             }
@@ -5552,7 +5589,8 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
                         endereco: p.address || '',
                         status: p.status || 'pending',
                         logo_url: p.logo_url || null,
-                        cover_url: p.cover_url || null
+                        cover_url: p.cover_url || null,
+                        carousel_url: p.carousel_url || null
                     };
                 });
                 console.log('[DB] Parceiros carregados:', parceirosData.length);

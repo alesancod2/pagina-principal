@@ -941,9 +941,11 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         bannerIndex = 0;
         if (bannerInterval) { clearInterval(bannerInterval); bannerInterval = null; }
 
-        // Priorizar parceiros que possuem cover_url (banner real do banco)
-        var bannerPartners = partners.filter(function(p) { return p.cover_url; });
-        // Fallback: se nenhum parceiro tem banner, usar todos com gradiente
+        // Priorizar parceiros que possuem carousel_url (banner carousel do banco)
+        var bannerPartners = partners.filter(function(p) { return p.carousel_url; });
+        // Fallback: usar parceiros com cover_url
+        if (bannerPartners.length === 0) bannerPartners = partners.filter(function(p) { return p.cover_url; });
+        // Fallback final: usar todos com gradiente
         if (bannerPartners.length === 0) bannerPartners = partners.slice(0, 6);
         var gradients = [
             'linear-gradient(135deg,#2F3EBF 0%,#6b7fff 100%)',
@@ -955,8 +957,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         ];
 
         track.innerHTML = bannerPartners.map(function(p, idx) {
-            var bg = p.cover_url
-                ? '<img src="' + p.cover_url + '" alt="' + p.name + '">'
+            var bg = (p.carousel_url || p.cover_url)
+                ? '<img src="' + (p.carousel_url || p.cover_url) + '" alt="' + p.name + '">'
                 : '<div style="width:100%;height:100%;background:' + gradients[idx % gradients.length] + ';"></div>';
             return '<div class="banner-slide" onclick="showPartnerDetail(' + p.id + ')">' +
                 bg +
@@ -1217,7 +1219,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                 if (cached) {
                     data = cached;
                 } else {
-                    var result = await supabaseClient.from('partners').select('trade_name, logo_url, cover_url').eq('status', 'active');
+                    var result = await supabaseClient.from('partners').select('trade_name, logo_url, cover_url, carousel_url').eq('status', 'active');
                     if (result.error || !result.data) return;
                     data = result.data;
                     avpCache.set(cacheKey, data, 5 * 60 * 1000); // 5 min cache
@@ -1229,6 +1231,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                         if (match) {
                             if (dbPartner.logo_url) match.logo_url = dbPartner.logo_url;
                             if (dbPartner.cover_url) match.cover_url = dbPartner.cover_url;
+                            if (dbPartner.carousel_url) match.carousel_url = dbPartner.carousel_url;
                         }
                     });
                     // Re-render cards with images
