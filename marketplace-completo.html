@@ -808,20 +808,28 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         }
 
         // Registrar no banco se disponível
-        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+        if (window.supabaseClient) {
             var userId = null;
             try { var u = JSON.parse(localStorage.getItem('avp_user') || '{}'); userId = u.id || null; } catch(e) {}
             if (userId) {
-                supabaseClient.from('usage_requests').insert({
-                    user_id: userId,
-                    partner_id: partnerId,
-                    benefit_id: null,
-                    status: 'pending',
-                    qr_token: usageCode,
-                    points_awarded: points
-                }).then(function(res) {
-                    if (res.error) console.warn('[DB] Erro ao registrar uso:', res.error.message);
-                    else console.log('[DB] Uso registrado:', usageCode);
+                // Buscar partner UUID real pelo nome
+                var partnerForDb = (window.partners || []).find(function(p) { return p.id === partnerId; });
+                var partnerNameForLookup = partnerForDb ? partnerForDb.name : partnerName;
+                window.supabaseClient.from('partners').select('id').eq('trade_name', partnerNameForLookup).limit(1).then(function(partnerRes) {
+                    var realPartnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+                    if (realPartnerId) {
+                        window.supabaseClient.from('usage_requests').insert({
+                            user_id: userId,
+                            partner_id: realPartnerId,
+                            benefit_id: null,
+                            status: 'pending',
+                            qr_token: usageCode,
+                            points_awarded: points
+                        }).then(function(res) {
+                            if (res.error) console.warn('[DB] Erro ao registrar uso:', res.error.message);
+                            else console.log('[DB] Uso registrado:', usageCode);
+                        });
+                    }
                 });
             }
         }
@@ -957,10 +965,12 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     (function(){
         'use strict';
 
-        // Supabase initialization
+        // Supabase initialization - EXPOSTO GLOBALMENTE para uso em outros scripts
         var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
         var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        // Expor globalmente para scripts externos (QR Code scanner etc)
+        window.supabaseClient = supabaseClient;
         if (supabaseClient) console.log('[Supabase] Conectado - Marketplace page');
 
         // ===== CACHE SYSTEM =====
