@@ -937,8 +937,14 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         var dotsContainer = document.getElementById('bannerDots');
         if (!track) return;
 
-        // Usar parceiros que tenham cover_url ou gerar slide com gradiente
-        var bannerPartners = partners.filter(function(p) { return p.cover_url || true; });
+        // Reset estado
+        bannerIndex = 0;
+        if (bannerInterval) { clearInterval(bannerInterval); bannerInterval = null; }
+
+        // Priorizar parceiros que possuem cover_url (banner real do banco)
+        var bannerPartners = partners.filter(function(p) { return p.cover_url; });
+        // Fallback: se nenhum parceiro tem banner, usar todos com gradiente
+        if (bannerPartners.length === 0) bannerPartners = partners.slice(0, 6);
         var gradients = [
             'linear-gradient(135deg,#2F3EBF 0%,#6b7fff 100%)',
             'linear-gradient(135deg,#00A651 0%,#00d68f 100%)',
@@ -994,6 +1000,7 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 
     window.pauseBannerScroll = function() { bannerPaused = true; };
     window.resumeBannerScroll = function() { bannerPaused = false; };
+    window.initBannerCarousel = initBannerCarousel;
 
     // Render inicial
     renderPartners('all');
@@ -1226,6 +1233,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     });
                     // Re-render cards with images
                     if (window.renderPartners) window.renderPartners('all');
+                    // Re-inicializar banner com imagens reais do banco
+                    if (window.initBannerCarousel) window.initBannerCarousel();
                 }
             } catch(e) {
                 console.warn('[Supabase] Erro ao carregar imagens dos parceiros:', e.message);
