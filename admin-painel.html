@@ -1233,6 +1233,18 @@
             <div class="table-container">
                 <div class="table-header">
                     <input type="text" class="table-search" id="benefSearchInput" placeholder="Buscar por título ou parceiro..." onkeyup="renderBeneficiosTable()">
+                    <select id="benefFilterTipo" onchange="renderBeneficiosTable()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;min-width:140px;">
+                        <option value="">Todos os tipos</option>
+                        <option value="discount_percent">Desconto %</option>
+                        <option value="discount_fixed">Desconto R$</option>
+                        <option value="freebie">Brinde/Gratuito</option>
+                    </select>
+                    <select id="benefFilterStatus" onchange="renderBeneficiosTable()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;min-width:120px;">
+                        <option value="">Todos os status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                        <option value="Pendente">Pendente</option>
+                    </select>
                     <button class="btn btn-green" onclick="openModal('modalNovoBeneficio')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Benefício</button>
                 </div>
                 <div style="overflow-x:auto">
@@ -4525,10 +4537,15 @@ function getBenefValorDisplay(b) {
 }
 function renderBeneficiosTable() {
     var search = (document.getElementById('benefSearchInput').value || '').toLowerCase();
+    var filterTipo = document.getElementById('benefFilterTipo') ? document.getElementById('benefFilterTipo').value : '';
+    var filterStatus = document.getElementById('benefFilterStatus') ? document.getElementById('benefFilterStatus').value : '';
     var tbody = document.getElementById('benefTableBody');
     if (!tbody) return;
     var filtered = beneficiosData.filter(function(b) {
-        return !search || b.titulo.toLowerCase().indexOf(search) > -1 || b.parceiro.toLowerCase().indexOf(search) > -1;
+        var matchSearch = !search || b.titulo.toLowerCase().indexOf(search) > -1 || b.parceiro.toLowerCase().indexOf(search) > -1;
+        var matchTipo = !filterTipo || b.tipo === filterTipo;
+        var matchStatus = !filterStatus || b.status === filterStatus;
+        return matchSearch && matchTipo && matchStatus;
     });
     if (filtered.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum benefício encontrado</td></tr>';
