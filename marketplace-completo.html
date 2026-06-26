@@ -404,11 +404,11 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                 <div class="marketplace-header">
                     <h2 class="section-title">Parceiros disponíveis</h2>
                     <div class="sort-options">
-                        <select class="sort-select">
-                            <option>Mais próximos</option>
-                            <option>Maior desconto</option>
-                            <option>Mais pontos</option>
-                            <option>Melhor avaliação</option>
+                        <select class="sort-select" id="partnerSortSelect" onchange="applySortFilter()">
+                            <option value="proximos">Mais próximos</option>
+                            <option value="desconto">Maior desconto</option>
+                            <option value="pontos">Mais pontos</option>
+                            <option value="avaliacao">Melhor avaliação</option>
                         </select>
                     </div>
                 </div>
@@ -606,9 +606,27 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     };
 
     // Renderizar cards
+    var _userLat = null, _userLng = null;
+
     function renderPartners(filter) {
         var grid = document.getElementById('partnersGrid');
-        var filtered = filter === 'all' ? partners : partners.filter(function(p) { return p.category === filter; });
+        var filtered = filter === 'all' ? partners.slice() : partners.filter(function(p) { return p.category === filter; });
+        
+        // Aplicar ordenação
+        var sortVal = document.getElementById('partnerSortSelect') ? document.getElementById('partnerSortSelect').value : 'proximos';
+        if (sortVal === 'desconto') {
+            filtered.sort(function(a, b) { return b.discount - a.discount; });
+        } else if (sortVal === 'pontos') {
+            filtered.sort(function(a, b) { return b.points - a.points; });
+        } else if (sortVal === 'avaliacao') {
+            filtered.sort(function(a, b) { return b.rating - a.rating; });
+        } else if (sortVal === 'proximos' && _userLat && _userLng) {
+            filtered.sort(function(a, b) {
+                var distA = parseFloat(a.distance) || 99;
+                var distB = parseFloat(b.distance) || 99;
+                return distA - distB;
+            });
+        }
         
         grid.innerHTML = filtered.map(function(p) {
             var logoHtml = p.logo_url
@@ -825,7 +843,18 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                         '<strong>+' + points + ' pontos</strong> serão creditados após a confirmação.' +
                     '</p>' +
                 '</div>' +
-                '<button class="modal-btn-use" style="background:#6b7280;cursor:default;" disabled>Aguardando confirmação do parceiro</button>';
+                '<button class="modal-btn-use" style="background:#6b7280;cursor:default;" disabled>Aguardando confirmação do parceiro</button>' +
+                '<div style="margin-top:16px;padding:16px;background:rgba(47,62,191,0.05);border:1px solid rgba(47,62,191,0.2);border-radius:10px;text-align:center;">' +
+                    '<p style="font-size:13px;color:#5A6475;margin-bottom:10px;">Como foi sua experiência?</p>' +
+                    '<div id="ratingStars" style="display:flex;justify-content:center;gap:4px;margin-bottom:8px;">' +
+                        '<span class="rate-star" onclick="submitRating(' + partnerId + ',1)" style="cursor:pointer;font-size:24px;color:#d1d5db;">&#9733;</span>' +
+                        '<span class="rate-star" onclick="submitRating(' + partnerId + ',2)" style="cursor:pointer;font-size:24px;color:#d1d5db;">&#9733;</span>' +
+                        '<span class="rate-star" onclick="submitRating(' + partnerId + ',3)" style="cursor:pointer;font-size:24px;color:#d1d5db;">&#9733;</span>' +
+                        '<span class="rate-star" onclick="submitRating(' + partnerId + ',4)" style="cursor:pointer;font-size:24px;color:#d1d5db;">&#9733;</span>' +
+                        '<span class="rate-star" onclick="submitRating(' + partnerId + ',5)" style="cursor:pointer;font-size:24px;color:#d1d5db;">&#9733;</span>' +
+                    '</div>' +
+                    '<span id="ratingFeedback" style="font-size:12px;color:var(--text-secondary);"></span>' +
+                '</div>';
         }
 
         // Registrar no banco se disponível
@@ -873,6 +902,51 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         }
     };
 
+    // Sistema de avaliação pós-uso
+    window.submitRating = function(partnerId, rating) {
+        // Visual: preencher estrelas
+        var stars = document.querySelectorAll('#ratingStars .rate-star');
+        stars.forEach(function(s, i) { s.style.color = i < rating ? '#f59e0b' : '#d1d5db'; });
+        var feedback = document.getElementById('ratingFeedback');
+        var labels = ['', 'Ruim', 'Regular', 'Bom', 'Muito bom', 'Excelente'];
+        if (feedback) feedback.textContent = labels[rating] + ' - Obrigado pela avaliação!';
+
+        // Atualizar localmente
+        var partner = partners.find(function(p) { return p.id === partnerId; });
+        if (partner) {
+            partner.rating = ((partner.rating * 10 + rating) / 11).toFixed(1);
+        }
+
+        // Salvar no banco
+        if (window.supabaseClient) {
+            var userId = null;
+            try { var u = JSON.parse(localStorage.getItem('avp_user') || '{}'); userId = u.id || null; } catch(e) {}
+            if (userId) {
+                // Buscar partner UUID
+                var partnerForDb = partners.find(function(p) { return p.id === partnerId; });
+                var pName = partnerForDb ? partnerForDb.name : '';
+                window.supabaseClient.from('partners').select('id').eq('trade_name', pName).limit(1).then(function(res) {
+                    var realId = (res.data && res.data.length > 0) ? res.data[0].id : null;
+                    if (realId) {
+                        window.supabaseClient.from('partner_ratings').upsert({
+                            user_id: userId,
+                            partner_id: realId,
+                            rating: rating
+                        }, { onConflict: 'user_id,partner_id' }).then(function(r) {
+                            if (r.error) console.warn('[DB] Erro ao salvar avaliação:', r.error.message);
+                            else console.log('[DB] Avaliação salva:', rating, 'estrelas');
+                        });
+                    }
+                });
+            }
+        }
+
+        // Desabilitar clique após avaliar
+        setTimeout(function() {
+            stars.forEach(function(s) { s.style.pointerEvents = 'none'; });
+        }, 100);
+    };
+
     // Fechar modal
     function closePartnerModal() {
         var modal = document.getElementById('partnerModal');
@@ -917,6 +991,70 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         var container = document.getElementById('categoriesContainer');
         if (container) container.scrollBy({ left: amount, behavior: 'smooth' });
     };
+
+    // Filtro de ordenação
+    window.applySortFilter = function() {
+        var sortVal = document.getElementById('partnerSortSelect').value;
+        if (sortVal === 'proximos') {
+            requestUserLocation();
+        } else {
+            var activeChip = document.querySelector('.category-chip.active');
+            var cat = activeChip ? activeChip.getAttribute('data-category') : 'all';
+            renderPartners(cat);
+        }
+    };
+
+    // Geolocalização
+    function requestUserLocation() {
+        if (_userLat && _userLng) {
+            var activeChip = document.querySelector('.category-chip.active');
+            renderPartners(activeChip ? activeChip.getAttribute('data-category') : 'all');
+            return;
+        }
+        if (!navigator.geolocation) {
+            alert('Geolocalização não suportada neste navegador.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                _userLat = position.coords.latitude;
+                _userLng = position.coords.longitude;
+                // Recalcular distâncias dos parceiros
+                recalcDistances(_userLat, _userLng);
+                var activeChip = document.querySelector('.category-chip.active');
+                renderPartners(activeChip ? activeChip.getAttribute('data-category') : 'all');
+            },
+            function(err) {
+                alert('Para ordenar por proximidade, ative a localização do seu dispositivo.\n\nPermissão negada ou indisponível.');
+                console.warn('[Geo] Erro:', err.message);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    function recalcDistances(lat, lng) {
+        // Coordenadas base de Linhares-ES (se parceiro não tem lat/lng real)
+        var defaultCoords = {
+            1: {lat:-19.3918,lng:-40.0720}, 2: {lat:-19.3945,lng:-40.0650}, 3: {lat:-19.3900,lng:-40.0680},
+            4: {lat:-19.3960,lng:-40.0700}, 5: {lat:-19.4050,lng:-40.0800}, 6: {lat:-19.3935,lng:-40.0710},
+            7: {lat:-19.3890,lng:-40.0690}, 8: {lat:-19.4100,lng:-40.0900}, 9: {lat:-19.3910,lng:-40.0660},
+            10:{lat:-19.3880,lng:-40.0650}, 11:{lat:-19.3980,lng:-40.0750}, 12:{lat:-19.4020,lng:-40.0780}
+        };
+        partners.forEach(function(p) {
+            var coords = defaultCoords[p.id] || {lat:-19.39,lng:-40.07};
+            var dist = haversine(lat, lng, coords.lat, coords.lng);
+            p.distance = dist.toFixed(1) + ' km';
+            p._distNum = dist;
+        });
+    }
+
+    function haversine(lat1, lng1, lat2, lng2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * Math.PI / 180;
+        var dLng = (lng2 - lng1) * Math.PI / 180;
+        var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
 
     // Theme Toggle
     var toggle = document.getElementById('themeToggle');

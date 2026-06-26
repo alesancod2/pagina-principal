@@ -943,6 +943,17 @@ CREATE POLICY "allow_insert_usage_requests" ON usage_requests FOR INSERT WITH CH
 DROP POLICY IF EXISTS "allow_update_usage_requests" ON usage_requests;
 CREATE POLICY "allow_update_usage_requests" ON usage_requests FOR UPDATE USING (true);
 
+-- Partner ratings: associado pode avaliar
+ALTER TABLE partner_ratings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "allow_public_read_ratings" ON partner_ratings;
+CREATE POLICY "allow_public_read_ratings" ON partner_ratings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_insert_ratings" ON partner_ratings;
+CREATE POLICY "allow_insert_ratings" ON partner_ratings FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "allow_update_ratings" ON partner_ratings;
+CREATE POLICY "allow_update_ratings" ON partner_ratings FOR UPDATE USING (true);
+
 -- RLS policy para INSERT/UPDATE em coupons (admin pode tudo)
 DROP POLICY IF EXISTS "allow_admin_insert_coupons" ON coupons;
 CREATE POLICY "allow_admin_insert_coupons" ON coupons FOR INSERT WITH CHECK (true);
