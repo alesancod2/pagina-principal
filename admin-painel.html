@@ -979,15 +979,23 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
                     <span id="notifBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--dark-bg);"></span>
                 </div>
-                <div id="notifPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:380px;max-height:480px;background:var(--dark-card);border:1px solid var(--dark-border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:2000;overflow:hidden;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--dark-border);">
-                        <h3 style="font-size:15px;font-weight:600;margin:0;">Notificações</h3>
-                        <button onclick="markAllNotifRead()" style="background:none;border:none;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit;">Marcar todas como lidas</button>
+                <div id="notifPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:400px;max-height:520px;background:var(--dark-card);border:1px solid var(--dark-border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:2000;overflow:hidden;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--dark-border);">
+                        <div style="display:flex;gap:0;">
+                            <button id="notifTabNew" onclick="switchNotifTab('new')" style="background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--text-primary);cursor:pointer;padding:6px 14px;border-radius:6px;transition:all 0.15s;background:rgba(47,62,191,0.15);">Novas <span id="notifTabCount" style="background:var(--primary-blue);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:4px;">0</span></button>
+                            <button id="notifTabHistory" onclick="switchNotifTab('history')" style="background:none;border:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;padding:6px 14px;border-radius:6px;transition:all 0.15s;">Histórico</button>
+                        </div>
+                        <button id="notifMarkAllBtn" onclick="markAllNotifRead()" style="background:none;border:none;color:var(--green);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;">Marcar todas lidas</button>
                     </div>
-                    <div id="notifList" style="max-height:380px;overflow-y:auto;padding:8px 0;"></div>
+                    <div id="notifList" style="max-height:400px;overflow-y:auto;padding:8px 0;"></div>
+                    <div id="notifHistoryList" style="display:none;max-height:400px;overflow-y:auto;padding:8px 0;"></div>
                     <div id="notifEmpty" style="display:none;padding:40px 20px;text-align:center;color:var(--text-secondary);">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;opacity:0.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                        <p style="font-size:13px;margin:0;">Nenhuma notificação</p>
+                        <p style="font-size:13px;margin:0;">Nenhuma notificação nova</p>
+                    </div>
+                    <div id="notifHistoryEmpty" style="display:none;padding:40px 20px;text-align:center;color:var(--text-secondary);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;opacity:0.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <p style="font-size:13px;margin:0;">Nenhum histórico ainda</p>
                     </div>
                 </div>
             </div>
@@ -5218,27 +5226,48 @@ function toggleCampParceiroFields(prefix) {
 
 // ===== SISTEMA DE NOTIFICAÇÕES =====
 var notificationsData = [];
+var notifHistoryData = [];
 var notifUnreadCount = 0;
+var notifCurrentTab = 'new';
+var _lastNotifIds = [];
 
 function toggleNotifPanel() {
     var panel = document.getElementById('notifPanel');
     var isOpen = panel.style.display !== 'none';
     panel.style.display = isOpen ? 'none' : 'block';
-    if (!isOpen) generateNotifications();
-    // Close on click outside
-    if (!isOpen) {
-        setTimeout(function() {
-            document.addEventListener('click', closeNotifOnClickOutside);
-        }, 10);
-    }
+    if (!isOpen) { generateNotifications(); switchNotifTab(notifCurrentTab); }
+    if (!isOpen) { setTimeout(function() { document.addEventListener('click', closeNotifOnClickOutside); }, 10); }
 }
 
 function closeNotifOnClickOutside(e) {
     var panel = document.getElementById('notifPanel');
     var btn = document.getElementById('notifBellBtn');
-    if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
-        panel.style.display = 'none';
-        document.removeEventListener('click', closeNotifOnClickOutside);
+    if (panel && !panel.contains(e.target) && !btn.contains(e.target)) { panel.style.display = 'none'; document.removeEventListener('click', closeNotifOnClickOutside); }
+}
+
+function switchNotifTab(tab) {
+    notifCurrentTab = tab;
+    var tabNew = document.getElementById('notifTabNew');
+    var tabHist = document.getElementById('notifTabHistory');
+    var listNew = document.getElementById('notifList');
+    var listHist = document.getElementById('notifHistoryList');
+    var emptyNew = document.getElementById('notifEmpty');
+    var emptyHist = document.getElementById('notifHistoryEmpty');
+    var markBtn = document.getElementById('notifMarkAllBtn');
+    if (tab === 'new') {
+        tabNew.style.background = 'rgba(47,62,191,0.15)'; tabNew.style.color = 'var(--text-primary)'; tabNew.style.fontWeight = '600';
+        tabHist.style.background = 'none'; tabHist.style.color = 'var(--text-secondary)'; tabHist.style.fontWeight = '500';
+        listNew.style.display = 'block'; listHist.style.display = 'none';
+        if (emptyHist) emptyHist.style.display = 'none';
+        if (markBtn) markBtn.style.display = 'block';
+        renderNotifList();
+    } else {
+        tabHist.style.background = 'rgba(47,62,191,0.15)'; tabHist.style.color = 'var(--text-primary)'; tabHist.style.fontWeight = '600';
+        tabNew.style.background = 'none'; tabNew.style.color = 'var(--text-secondary)'; tabNew.style.fontWeight = '500';
+        listNew.style.display = 'none'; listHist.style.display = 'block';
+        if (emptyNew) emptyNew.style.display = 'none';
+        if (markBtn) markBtn.style.display = 'none';
+        renderNotifHistory();
     }
 }
 
@@ -5268,129 +5297,89 @@ function getNotifColor(type) {
 
 function generateNotifications() {
     notificationsData = [];
-    var now = new Date();
+    notifHistoryData = JSON.parse(localStorage.getItem('avp_notif_history') || '[]');
+    var historyIds = notifHistoryData.map(function(h) { return h.id; });
 
     // 1. Novo parceiro pendente
-    var pendentes = parceirosData.filter(function(p) { return p.status === 'pending'; });
-    pendentes.forEach(function(p) {
-        notificationsData.push({
-            id: 'parc_' + p.id,
-            type: 'novo_parceiro',
-            title: 'Novo parceiro pendente',
-            message: p.nome + ' aguarda aprovação',
-            time: 'Aguardando',
-            read: false
-        });
+    parceirosData.filter(function(p) { return p.status === 'pending'; }).forEach(function(p) {
+        var nid = 'parc_' + p.id;
+        if (historyIds.indexOf(nid) === -1) notificationsData.push({ id: nid, type: 'novo_parceiro', title: 'Novo parceiro pendente', message: p.nome + ' aguarda aprovação', time: 'Aguardando', read: false });
     });
-
-    // 2. Cupons expirados recentemente
-    var expirados = cuponsData.filter(function(c) { return c.status === 'Expirado'; });
-    expirados.slice(0, 3).forEach(function(c) {
-        notificationsData.push({
-            id: 'cup_' + c.id,
-            type: 'cupom_expirado',
-            title: 'Cupom expirado',
-            message: (c.nome || c.code) + ' - ' + c.parceiro,
-            time: c.validade || 'Recente',
-            read: false
-        });
+    // 2. Cupons expirados
+    cuponsData.filter(function(c) { return c.status === 'Expirado'; }).slice(0, 3).forEach(function(c) {
+        var nid = 'cup_' + c.id;
+        if (historyIds.indexOf(nid) === -1) notificationsData.push({ id: nid, type: 'cupom_expirado', title: 'Cupom expirado', message: (c.nome || c.code) + ' - ' + c.parceiro, time: c.validade || 'Recente', read: false });
     });
-
     // 4. Campanhas encerradas
-    var encerradas = campanhasData.filter(function(c) { return c.status === 'encerrada'; });
-    encerradas.slice(0, 2).forEach(function(c) {
-        notificationsData.push({
-            id: 'camp_' + c.id,
-            type: 'campanha_encerrada',
-            title: 'Campanha encerrada',
-            message: '"' + c.titulo + '" finalizou em ' + (c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : ''),
-            time: c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : '',
-            read: false
-        });
+    campanhasData.filter(function(c) { return c.status === 'encerrada'; }).slice(0, 2).forEach(function(c) {
+        var nid = 'camp_' + c.id;
+        if (historyIds.indexOf(nid) === -1) notificationsData.push({ id: nid, type: 'campanha_encerrada', title: 'Campanha encerrada', message: '"' + c.titulo + '" finalizou em ' + (c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : ''), time: c.fim ? new Date(c.fim).toLocaleDateString('pt-BR') : '', read: false });
     });
-
-    // 5. Novos associados (simulado - baseado em dados do banco se disponível)
-    notificationsData.push({
-        id: 'assoc_new_1',
-        type: 'novo_associado',
-        title: 'Novo associado',
-        message: 'João Carlos Silva se cadastrou na plataforma',
-        time: 'Hoje',
-        read: false
-    });
-
+    // 5. Novo associado
+    if (historyIds.indexOf('assoc_new_1') === -1) notificationsData.push({ id: 'assoc_new_1', type: 'novo_associado', title: 'Novo associado', message: 'João Carlos Silva se cadastrou na plataforma', time: 'Hoje', read: false });
     // 7. Benefício popular
-    var topBenef = beneficiosData.filter(function(b) { return b.status === 'Ativo'; }).slice(0, 1);
-    topBenef.forEach(function(b) {
-        notificationsData.push({
-            id: 'benef_pop_' + b.id,
-            type: 'beneficio_popular',
-            title: 'Benefício em alta',
-            message: '"' + b.titulo + '" de ' + b.parceiro + ' com alta demanda',
-            time: 'Semana atual',
-            read: true
-        });
+    beneficiosData.filter(function(b) { return b.status === 'Ativo'; }).slice(0, 1).forEach(function(b) {
+        var nid = 'benef_pop_' + b.id;
+        if (historyIds.indexOf(nid) === -1) notificationsData.push({ id: nid, type: 'beneficio_popular', title: 'Benefício em alta', message: '"' + b.titulo + '" de ' + b.parceiro + ' com alta demanda', time: 'Semana atual', read: false });
     });
-
-    // 8. Erro de conexão (apenas se supabaseClient falhou)
+    // 8. Erro de conexão
     if (!window.supabaseClient && typeof supabaseClient === 'undefined') {
-        notificationsData.push({
-            id: 'err_conn_1',
-            type: 'erro_conexao',
-            title: 'Erro de conexão',
-            message: 'Não foi possível conectar ao banco de dados Supabase',
-            time: 'Agora',
-            read: false
-        });
+        if (historyIds.indexOf('err_conn_1') === -1) notificationsData.push({ id: 'err_conn_1', type: 'erro_conexao', title: 'Erro de conexão', message: 'Não foi possível conectar ao Supabase', time: 'Agora', read: false });
     }
-
-    // Check localStorage for read state
+    // Check read state
     var readIds = JSON.parse(localStorage.getItem('avp_notif_read') || '[]');
-    notificationsData.forEach(function(n) {
-        if (readIds.indexOf(n.id) > -1) n.read = true;
-    });
-
+    notificationsData.forEach(function(n) { if (readIds.indexOf(n.id) > -1) n.read = true; });
     notifUnreadCount = notificationsData.filter(function(n) { return !n.read; }).length;
     updateNotifBadge();
-    renderNotifList();
+    updateNotifTabCount();
+    // Detectar novas e mostrar toast
+    var currentIds = notificationsData.map(function(n) { return n.id; });
+    if (_lastNotifIds.length > 0) {
+        notificationsData.filter(function(n) { return _lastNotifIds.indexOf(n.id) === -1 && !n.read; }).forEach(function(n) { showNotifToast(n); });
+    }
+    _lastNotifIds = currentIds;
+    if (notifCurrentTab === 'new') renderNotifList(); else renderNotifHistory();
 }
 
 function updateNotifBadge() {
     var badge = document.getElementById('notifBadge');
-    if (badge) {
-        badge.style.display = notifUnreadCount > 0 ? 'block' : 'none';
-    }
+    if (badge) badge.style.display = notifUnreadCount > 0 ? 'block' : 'none';
+}
+
+function updateNotifTabCount() {
+    var countEl = document.getElementById('notifTabCount');
+    if (countEl) countEl.textContent = notifUnreadCount;
+}
+
+function renderNotifItem(n, showDelete) {
+    var color = getNotifColor(n.type);
+    var opacity = n.read ? '0.6' : '1';
+    var bg = n.read ? 'transparent' : 'rgba(47,62,191,0.04)';
+    var dot = n.read ? '' : '<span style="width:6px;height:6px;background:' + color + ';border-radius:50%;flex-shrink:0;"></span>';
+    var delBtn = showDelete ? '<button onclick="event.stopPropagation();removeFromHistory(\'' + n.id + '\')" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;flex-shrink:0;opacity:0.5;" onmouseover="this.style.opacity=\'1\'" onmouseout="this.style.opacity=\'0.5\'" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '';
+    return '<div onclick="markNotifRead(\'' + n.id + '\')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;cursor:pointer;opacity:' + opacity + ';background:' + bg + ';transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'' + bg + '\'">' +
+        '<div style="width:36px;height:36px;border-radius:10px;background:' + color + '15;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + color + ';">' + getNotifIcon(n.type) + '</div>' +
+        '<div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;font-weight:600;color:var(--text-primary);">' + n.title + '</span>' + dot + '</div>' +
+        '<p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.message + '</p>' +
+        '<span style="font-size:11px;color:var(--text-secondary);opacity:0.7;">' + n.time + '</span></div>' + delBtn + '</div>';
 }
 
 function renderNotifList() {
     var list = document.getElementById('notifList');
     var empty = document.getElementById('notifEmpty');
     if (!list) return;
+    if (notificationsData.length === 0) { list.style.display = 'none'; if (empty) empty.style.display = 'block'; return; }
+    list.style.display = 'block'; if (empty) empty.style.display = 'none';
+    list.innerHTML = notificationsData.map(function(n) { return renderNotifItem(n, false); }).join('');
+}
 
-    if (notificationsData.length === 0) {
-        list.style.display = 'none';
-        if (empty) empty.style.display = 'block';
-        return;
-    }
-    list.style.display = 'block';
+function renderNotifHistory() {
+    var list = document.getElementById('notifHistoryList');
+    var empty = document.getElementById('notifHistoryEmpty');
+    if (!list) return;
+    if (notifHistoryData.length === 0) { list.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
     if (empty) empty.style.display = 'none';
-
-    list.innerHTML = notificationsData.map(function(n) {
-        var color = getNotifColor(n.type);
-        var opacity = n.read ? '0.6' : '1';
-        var bg = n.read ? 'transparent' : 'rgba(47,62,191,0.04)';
-        var dot = n.read ? '' : '<span style="width:6px;height:6px;background:' + color + ';border-radius:50%;flex-shrink:0;"></span>';
-        return '<div onclick="markNotifRead(\'' + n.id + '\')" style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;cursor:pointer;opacity:' + opacity + ';background:' + bg + ';transition:background 0.15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseout="this.style.background=\'' + bg + '\'">' +
-            '<div style="width:36px;height:36px;border-radius:10px;background:' + color + '15;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + color + ';">' + getNotifIcon(n.type) + '</div>' +
-            '<div style="flex:1;min-width:0;">' +
-                '<div style="display:flex;align-items:center;gap:6px;">' +
-                    '<span style="font-size:13px;font-weight:600;color:var(--text-primary);">' + n.title + '</span>' + dot +
-                '</div>' +
-                '<p style="font-size:12px;color:var(--text-secondary);margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + n.message + '</p>' +
-                '<span style="font-size:11px;color:var(--text-secondary);opacity:0.7;">' + n.time + '</span>' +
-            '</div>' +
-        '</div>';
-    }).join('');
+    list.innerHTML = notifHistoryData.map(function(n) { return renderNotifItem(n, true); }).join('');
 }
 
 function markNotifRead(id) {
@@ -5400,22 +5389,52 @@ function markNotifRead(id) {
     var n = notificationsData.find(function(x) { return x.id === id; });
     if (n) n.read = true;
     notifUnreadCount = notificationsData.filter(function(x) { return !x.read; }).length;
-    updateNotifBadge();
-    renderNotifList();
+    updateNotifBadge(); updateNotifTabCount(); renderNotifList();
 }
 
 function markAllNotifRead() {
-    var readIds = notificationsData.map(function(n) { return n.id; });
-    localStorage.setItem('avp_notif_read', JSON.stringify(readIds));
-    notificationsData.forEach(function(n) { n.read = true; });
-    notifUnreadCount = 0;
-    updateNotifBadge();
-    renderNotifList();
+    if (notificationsData.length === 0) return;
+    var now = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+    notificationsData.forEach(function(n) {
+        n.read = true; n.movedAt = now;
+        if (!notifHistoryData.find(function(h) { return h.id === n.id; })) notifHistoryData.unshift(n);
+    });
+    if (notifHistoryData.length > 50) notifHistoryData = notifHistoryData.slice(0, 50);
+    localStorage.setItem('avp_notif_history', JSON.stringify(notifHistoryData));
+    localStorage.setItem('avp_notif_read', JSON.stringify(notificationsData.map(function(n) { return n.id; })));
+    notificationsData = []; notifUnreadCount = 0;
+    updateNotifBadge(); updateNotifTabCount(); renderNotifList();
+}
+
+function removeFromHistory(id) {
+    notifHistoryData = notifHistoryData.filter(function(n) { return n.id !== id; });
+    localStorage.setItem('avp_notif_history', JSON.stringify(notifHistoryData));
+    renderNotifHistory();
+}
+
+// Pop-up toast
+function showNotifToast(notif) {
+    var container = document.getElementById('notifToastContainer');
+    if (!container) return;
+    var color = getNotifColor(notif.type);
+    var toast = document.createElement('div');
+    toast.style.cssText = 'pointer-events:auto;display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--dark-card);border:1px solid var(--dark-border);border-left:4px solid ' + color + ';border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.3);min-width:320px;max-width:400px;animation:slideInRight 0.3s ease;cursor:pointer;transition:opacity 0.3s,transform 0.3s;';
+    toast.innerHTML = '<div style="width:32px;height:32px;border-radius:8px;background:' + color + '15;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + color + ';">' + getNotifIcon(notif.type) + '</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--text-primary);">' + notif.title + '</div><div style="font-size:12px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + notif.message + '</div></div><button onclick="event.stopPropagation();this.parentElement.remove();" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    toast.onclick = function() { toggleNotifPanel(); toast.remove(); };
+    container.appendChild(toast);
+    setTimeout(function() { if (toast.parentElement) { toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)'; setTimeout(function() { if (toast.parentElement) toast.remove(); }, 300); } }, 5000);
 }
 
 // Gerar notificações ao carregar a página
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(generateNotifications, 1000);
+    var style = document.createElement('style');
+    style.textContent = '@keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';
+    document.head.appendChild(style);
+    setTimeout(function() {
+        generateNotifications();
+        _lastNotifIds = notificationsData.map(function(n) { return n.id; });
+        if (notifUnreadCount > 0) { var first = notificationsData.find(function(n) { return !n.read; }); if (first) showNotifToast(first); }
+    }, 1200);
 });
 
 // Init cupons table on load
@@ -5736,5 +5755,7 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             initLoadFromDB();
         }
     </script>
+<!-- Toast container para pop-ups de notificação -->
+<div id="notifToastContainer" style="position:fixed;top:80px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;"></div>
 </body>
 </html>
