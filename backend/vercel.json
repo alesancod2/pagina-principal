@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/api" }

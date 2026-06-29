@@ -20,6 +20,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*", "api/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/app.module.ts", "src/main.ts", "api/**/*"],
+  "exclude": ["node_modules", "dist", "src/modules", "src/common", "src/serverless.ts"]
 }

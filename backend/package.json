@@ -4,9 +4,7 @@
   "description": "Backend API - Clube de Benefícios Auto Vale Prevenções",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/main.js",
-    "start:dev": "ts-node src/main.ts"
+    "start": "node dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
