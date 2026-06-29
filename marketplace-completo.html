@@ -295,8 +295,9 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     if (!stored) { window.location.href = '/'; return; }
     try {
         var user = JSON.parse(stored);
+        if (!user || !user.email || !user.role || !user.loginAt) { localStorage.removeItem('avp_user'); window.location.href = '/'; return; }
         var loginTime = new Date(user.loginAt).getTime();
-        if (Date.now() - loginTime > 24*60*60*1000) { localStorage.removeItem('avp_user'); window.location.href = '/'; return; }
+        if (isNaN(loginTime) || Date.now() - loginTime > 24*60*60*1000) { localStorage.removeItem('avp_user'); window.location.href = '/'; return; }
     } catch(e) { localStorage.removeItem('avp_user'); window.location.href = '/'; }
 })();
 </script>
@@ -541,6 +542,14 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 
     <script>
 /* ===== CLUBE DE BENEFÍCIOS AUTO VALE - Marketplace ===== */
+
+    // ===== SEGURANÇA: Sanitização XSS =====
+    function sanitize(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
 (function() {
     'use strict';
 
