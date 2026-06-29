@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import serverlessExpress from '@vendia/serverless-express';
 import { Handler, Context, Callback } from 'aws-lambda';
 import express from 'express';
-import { AppModule } from './modules/app.module';
+import { AppModule } from './app.module';
 
 let server: Handler;
 

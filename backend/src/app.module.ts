@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Controller, Get } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { AEasyModule } from './modules/aeasy/aeasy.module';
@@ -10,6 +10,14 @@ import { CampaignsModule } from './modules/campaigns/campaigns.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { VouchersModule } from './modules/vouchers/vouchers.module';
 import { QrCodeModule } from './modules/qrcode/qrcode.module';
+
+@Controller('health')
+class HealthController {
+  @Get()
+  check() {
+    return { status: 'ok', timestamp: new Date().toISOString(), version: '1.0.0' };
+  }
+}
 
 @Module({
   imports: [
@@ -31,5 +39,6 @@ import { QrCodeModule } from './modules/qrcode/qrcode.module';
     VouchersModule,
     QrCodeModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
