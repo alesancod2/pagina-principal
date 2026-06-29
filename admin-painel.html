@@ -2667,18 +2667,6 @@
             }
         });
 
-        // Table Search
-        function searchTable(input, tableId) {
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById(tableId);
-            const rows = table.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
-            });
-        }
-
         // Global Search
         document.getElementById('globalSearch').addEventListener('keyup', function() {
             const filter = this.value.toLowerCase();
@@ -2950,26 +2938,6 @@ function checkPasswordMatch() {
     feedback.style.display = 'block'; feedback.style.color = '#00A651'; feedback.textContent = '✓ Senhas coincidem.';
 }
 
-// Save password
-function savePassword() {
-    var newPw = document.getElementById('newPassword').value;
-    var confirmPw = document.getElementById('confirmPassword').value;
-    if (newPw.length < 6 || newPw !== confirmPw) return;
-    var btn = document.getElementById('btnSavePassword');
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/></svg> Salvando...';
-    btn.disabled = true;
-    setTimeout(function() {
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg> Senha alterada com sucesso!';
-        btn.style.background = '#00A651';
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-        document.getElementById('passwordFeedback').style.display = 'none';
-        setTimeout(function() {
-            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Senha';
-            btn.style.background = ''; btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed';
-        }, 3000);
-    }, 1500);
-}
 
     
 // Notification config save/load/cancel
