@@ -120,39 +120,75 @@
                     }
                 }
 
-                // 2. Verificar/criar usuário no Supabase
-                if (supabaseClient && (email || cpf)) {
+                // 2. Verificar se associado JÁ EXISTE no Supabase (por CPF, email ou placa)
+                if (supabaseClient) {
                     try {
-                        var query = email 
-                            ? supabaseClient.from('users').select('*').eq('email', email).single()
-                            : supabaseClient.from('users').select('*').eq('cpf', cpf).single();
-                        
-                        var { data: dbUser, error } = await query;
+                        setStatus('Verificando cadastro do associado...', '');
+                        var dbUser = null;
 
-                        if (dbUser && !error) {
-                            // Usuário já existe no banco
+                        // Buscar por CPF (identificador mais confiável)
+                        if (cpf) {
+                            var { data: byCpf } = await supabaseClient.from('users').select('*').eq('cpf', cpf).eq('is_active', true).single();
+                            if (byCpf) dbUser = byCpf;
+                        }
+                        // Se não achou por CPF, buscar por email
+                        if (!dbUser && email) {
+                            var { data: byEmail } = await supabaseClient.from('users').select('*').eq('email', email).eq('is_active', true).single();
+                            if (byEmail) dbUser = byEmail;
+                        }
+
+                        if (dbUser) {
+                            // ASSOCIADO JÁ EXISTE — apenas logar (não criar duplicata)
+                            console.log('[Auth] Associado encontrado no banco:', dbUser.name);
                             loginSuccess(dbUser);
                             return;
-                        } else {
-                            // Criar novo usuário com dados do AEasy
-                            var newUser = {
-                                name: nome || 'Associado',
-                                email: email || (cpf ? cpf.replace(/\D/g,'') + '@autovale.temp' : 'associado@autovale.temp'),
-                                cpf: cpf || '000.000.000-00',
-                                role: 'member',
-                                is_active: true,
-                                password_hash: 'aeasy_auth',
-                                email_verified_at: new Date().toISOString()
-                            };
+                        }
 
-                            var { data: created, error: createErr } = await supabaseClient.from('users').insert(newUser).select().single();
-                            if (created && !createErr) {
-                                loginSuccess(created);
-                                return;
-                            }
+                        // ASSOCIADO NÃO EXISTE — criar pela primeira vez
+                        setStatus('Primeiro acesso! Criando sua conta...', '');
+                        var userEmail = email || (cpf ? cpf.replace(/\D/g,'') + '@autovale.club' : 'associado_' + Date.now() + '@autovale.club');
+                        var userCpf = cpf || '000.000.000-00';
+
+                        // Verificar se email já existe (evitar unique constraint)
+                        var { data: emailCheck } = await supabaseClient.from('users').select('id').eq('email', userEmail).single();
+                        if (emailCheck) {
+                            // Email já em uso — logar com esse user
+                            var { data: existingUser } = await supabaseClient.from('users').select('*').eq('email', userEmail).single();
+                            if (existingUser) { loginSuccess(existingUser); return; }
+                        }
+
+                        // Verificar se CPF já existe
+                        var { data: cpfCheck } = await supabaseClient.from('users').select('id').eq('cpf', userCpf).single();
+                        if (cpfCheck) {
+                            var { data: existingByCpf } = await supabaseClient.from('users').select('*').eq('cpf', userCpf).single();
+                            if (existingByCpf) { loginSuccess(existingByCpf); return; }
+                        }
+
+                        // Tudo limpo — criar novo usuário
+                        var newUser = {
+                            name: nome || 'Associado Auto Vale',
+                            email: userEmail,
+                            cpf: userCpf,
+                            phone: params.get('telefone') || params.get('phone') || '',
+                            role: 'member',
+                            is_active: true,
+                            password_hash: 'aeasy_sso',
+                            email_verified_at: new Date().toISOString()
+                        };
+
+                        var { data: created, error: createErr } = await supabaseClient.from('users').insert(newUser).select().single();
+                        if (created && !createErr) {
+                            console.log('[Auth] Novo associado criado:', created.name);
+                            loginSuccess(created);
+                            return;
+                        } else if (createErr) {
+                            console.warn('[Auth] Erro ao criar:', createErr.message);
+                            // Pode ser conflito de unique — tentar buscar novamente
+                            var { data: retry } = await supabaseClient.from('users').select('*').eq('email', userEmail).single();
+                            if (retry) { loginSuccess(retry); return; }
                         }
                     } catch(e) {
-                        console.warn('[DB] Erro:', e.message);
+                        console.warn('[Auth] Erro no fluxo DB:', e.message);
                     }
                 }
 
