@@ -1676,6 +1676,20 @@
                         <option value="Expirado">Expirado</option>
                         <option value="Cancelado">Cancelado</option>
                     </select>
+                    <select id="cuponsFilterCategoria" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                        <option value="">Todas Categorias</option>
+                        <option value="postos">Postos</option>
+                        <option value="lava-jato">Lava-Jato</option>
+                        <option value="mecanica">Mecânica</option>
+                        <option value="estetica">Estética</option>
+                        <option value="pneus">Pneus</option>
+                        <option value="eletrica">Auto Elétrica</option>
+                        <option value="borracharia">Borracharia</option>
+                        <option value="guincho">Guincho</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="saude">Saúde</option>
+                        <option value="educacao">Educação</option>
+                    </select>
                     <div style="display:flex;gap:8px;margin-left:auto;">
                         <button class="btn btn-primary" onclick="openModal('modalGerarCupom')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> Gerar Cupom</button>
                         <button class="btn btn-green" onclick="openModal('modalGerarLote')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg> Gerar em Lote</button>
@@ -1687,6 +1701,7 @@
                         <tr>
                             <th>Código</th>
                             <th>Parceiro</th>
+                            <th>Categoria</th>
                             <th>Nome do Cupom</th>
                             <th>Tipo</th>
                             <th>Emitido em</th>
@@ -4031,14 +4046,14 @@ function atualizarTipoBeneficio(selectId, prefix) {
 }
 
 var cuponsData = [
-    { id:1, code:'AV-7X2K-9M4P', nome:'Desconto Combustível', parceiro:'Posto Shell Centro', beneficio:'Desconto Combustível (Desconto 5%)', tipo:'desconto', tipoDesconto:'percentual', valor:5, emitido:'10/01/2025', validade:'10/02/2025', status:'Válido', associado:'João Carlos Silva', email:'joao@email.com', obs:'' },
-    { id:2, code:'AV-3F8N-1L5Q', nome:'Lavagem Premium', parceiro:'Lava-Jato Express', beneficio:'Lavagem Premium (Desconto 15%)', tipo:'desconto', tipoDesconto:'percentual', valor:15, emitido:'08/01/2025', validade:'08/02/2025', status:'Válido', associado:'Maria Fernanda', email:'maria@email.com', obs:'' },
-    { id:3, code:'AV-9D4R-6H2W', nome:'Desconto Mecânica', parceiro:'Mecânica do João', beneficio:'Desconto Mecânica (Desconto 10%)', tipo:'desconto', tipoDesconto:'percentual', valor:10, emitido:'05/01/2025', validade:'05/02/2025', status:'Usado', associado:'Pedro Henrique', email:'pedro@email.com', obs:'Usado em 20/01/2025' },
-    { id:4, code:'AV-2B7T-8K3J', nome:'Pontos Dobrados', parceiro:'Pneu Forte', beneficio:'Pontos Dobrados (Pontos em Dobro)', tipo:'pontos_dobro', tipoDesconto:'percentual', valor:0, emitido:'01/01/2025', validade:'15/01/2025', status:'Expirado', associado:'Ana Beatriz', email:'ana@email.com', obs:'' },
-    { id:5, code:'AV-5G1M-4N8V', nome:'Desconto Polimento', parceiro:'Estética Premium', beneficio:'Desconto Polimento (Desconto 15%)', tipo:'desconto', tipoDesconto:'percentual', valor:15, emitido:'12/01/2025', validade:'12/03/2025', status:'Válido', associado:'Lucas Oliveira', email:'lucas@email.com', obs:'' },
-    { id:6, code:'AV-6C9P-2R7X', nome:'Revisão com Desconto', parceiro:'Auto Elétrica Raio', beneficio:'Revisão com Desconto (Desconto R$50)', tipo:'desconto', tipoDesconto:'valor_fixo', valor:50, emitido:'14/01/2025', validade:'14/04/2025', status:'Válido', associado:'Fernanda Costa', email:'fernanda@email.com', obs:'' },
-    { id:7, code:'AV-8H3M-5T9R', nome:'Desconto Borracharia', parceiro:'Borracharia 24h', beneficio:'Desconto Borracharia (Desconto 10%)', tipo:'desconto', tipoDesconto:'percentual', valor:10, emitido:'20/01/2025', validade:'20/02/2025', status:'Válido', associado:'Ricardo Alves', email:'ricardo@email.com', obs:'' },
-    { id:8, code:'AV-1K7P-4W2N', nome:'Desconto Guincho', parceiro:'Guincho Express', beneficio:'Desconto Guincho (Desconto 20%)', tipo:'desconto', tipoDesconto:'percentual', valor:20, emitido:'22/01/2025', validade:'22/03/2025', status:'Cancelado', associado:'Camila Santos', email:'camila@email.com', obs:'Cancelado a pedido do cliente' }
+    { id:1, code:'AV-7X2K-9M4P', nome:'Desconto Combustível', parceiro:'Posto Shell Centro', categoria:'postos', beneficio:'Desconto Combustível (Desconto 5%)', tipo:'desconto', tipoDesconto:'percentual', valor:5, emitido:'10/01/2025', validade:'10/02/2025', status:'Válido', associado:'João Carlos Silva', email:'joao@email.com', obs:'' },
+    { id:2, code:'AV-3F8N-1L5Q', nome:'Lavagem Premium', parceiro:'Lava-Jato Express', categoria:'lava-jato', beneficio:'Lavagem Premium (Desconto 15%)', tipo:'desconto', tipoDesconto:'percentual', valor:15, emitido:'08/01/2025', validade:'08/02/2025', status:'Válido', associado:'Maria Fernanda', email:'maria@email.com', obs:'' },
+    { id:3, code:'AV-9D4R-6H2W', nome:'Desconto Mecânica', parceiro:'Mecânica do João', categoria:'mecanica', beneficio:'Desconto Mecânica (Desconto 10%)', tipo:'desconto', tipoDesconto:'percentual', valor:10, emitido:'05/01/2025', validade:'05/02/2025', status:'Usado', associado:'Pedro Henrique', email:'pedro@email.com', obs:'Usado em 20/01/2025' },
+    { id:4, code:'AV-2B7T-8K3J', nome:'Pontos Dobrados', parceiro:'Pneu Forte', categoria:'pneus', beneficio:'Pontos Dobrados (Pontos em Dobro)', tipo:'pontos_dobro', tipoDesconto:'percentual', valor:0, emitido:'01/01/2025', validade:'15/01/2025', status:'Expirado', associado:'Ana Beatriz', email:'ana@email.com', obs:'' },
+    { id:5, code:'AV-5G1M-4N8V', nome:'Desconto Polimento', parceiro:'Estética Premium', categoria:'estetica', beneficio:'Desconto Polimento (Desconto 15%)', tipo:'desconto', tipoDesconto:'percentual', valor:15, emitido:'12/01/2025', validade:'12/03/2025', status:'Válido', associado:'Lucas Oliveira', email:'lucas@email.com', obs:'' },
+    { id:6, code:'AV-6C9P-2R7X', nome:'Revisão com Desconto', parceiro:'Auto Elétrica Raio', categoria:'eletrica', beneficio:'Revisão com Desconto (Desconto R$50)', tipo:'desconto', tipoDesconto:'valor_fixo', valor:50, emitido:'14/01/2025', validade:'14/04/2025', status:'Válido', associado:'Fernanda Costa', email:'fernanda@email.com', obs:'' },
+    { id:7, code:'AV-8H3M-5T9R', nome:'Desconto Borracharia', parceiro:'Borracharia 24h', categoria:'borracharia', beneficio:'Desconto Borracharia (Desconto 10%)', tipo:'desconto', tipoDesconto:'percentual', valor:10, emitido:'20/01/2025', validade:'20/02/2025', status:'Válido', associado:'Ricardo Alves', email:'ricardo@email.com', obs:'' },
+    { id:8, code:'AV-1K7P-4W2N', nome:'Desconto Guincho', parceiro:'Guincho Express', categoria:'guincho', beneficio:'Desconto Guincho (Desconto 20%)', tipo:'desconto', tipoDesconto:'percentual', valor:20, emitido:'22/01/2025', validade:'22/03/2025', status:'Cancelado', associado:'Camila Santos', email:'camila@email.com', obs:'Cancelado a pedido do cliente' }
 ];
 var cuponsPage = 1;
 var cuponsPerPage = 6;
@@ -4065,12 +4080,14 @@ function getFilteredCupons() {
     var statusFilter = document.getElementById('cuponsFilterStatus').value;
     var parceiroFilter = document.getElementById('cuponsFilterParceiro') ? document.getElementById('cuponsFilterParceiro').value : '';
     var tipoFilter = document.getElementById('cuponsFilterTipo') ? document.getElementById('cuponsFilterTipo').value : '';
+    var categoriaFilter = document.getElementById('cuponsFilterCategoria') ? document.getElementById('cuponsFilterCategoria').value : '';
     return cuponsData.filter(function(c) {
         var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1 || (c.nome && c.nome.toLowerCase().indexOf(search) > -1);
         var matchStatus = statusFilter === 'all' || c.status === statusFilter;
         var matchParceiro = !parceiroFilter || c.parceiro === parceiroFilter;
         var matchTipo = !tipoFilter || c.tipo === tipoFilter;
-        return matchSearch && matchStatus && matchParceiro && matchTipo;
+        var matchCategoria = !categoriaFilter || c.categoria === categoriaFilter;
+        return matchSearch && matchStatus && matchParceiro && matchTipo && matchCategoria;
     });
 }
 
@@ -4084,14 +4101,16 @@ function renderCuponsTable() {
     if (!tbody) return;
 
     if (page.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
     } else {
         tbody.innerHTML = page.map(function(c) {
             var tipoLabel = c.tipo === 'desconto' ? '<span style="color:var(--green)">Desconto</span>' : '<span style="color:var(--primary-blue)">Pontos em Dobro</span>';
             var valorDisplay = c.tipo === 'pontos_dobro' ? '' : (c.tipoDesconto === 'valor_fixo' ? ' R$' + c.valor.toFixed(2) : ' ' + c.valor + '%');
+            var catLabel = c.categoria ? '<span style="font-size:11px;background:rgba(47,62,191,0.1);color:var(--primary-blue);padding:2px 8px;border-radius:10px;">' + c.categoria + '</span>' : '<span style="color:var(--text-secondary);font-size:11px;">—</span>';
             return '<tr>' +
                 '<td><code style="background:var(--dark-bg);padding:4px 8px;border-radius:4px;font-size:12px">' + c.code + '</code></td>' +
                 '<td>' + c.parceiro + '</td>' +
+                '<td>' + catLabel + '</td>' +
                 '<td style="font-weight:600">' + (c.nome || c.beneficio) + '</td>' +
                 '<td>' + tipoLabel + valorDisplay + '</td>' +
                 '<td>' + c.emitido + '</td>' +
