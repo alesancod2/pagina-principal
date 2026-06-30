@@ -1748,27 +1748,30 @@
                                 <option value="categoria">Por Categoria</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group" id="cupomParceiroField">
                             <label>Parceiro *</label>
-                            <select id="cupomParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <select id="cupomParceiro" onchange="onCupomParceiroChange('cupom')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
-                                <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
-                                <option value="Lava Jato Premium">Lava Jato Premium</option>
-                                <option value="Mecânica Central">Mecânica Central</option>
-                                <option value="Estética Car Pro">Estética Car Pro</option>
-                                <option value="Pneus & Cia">Pneus &amp; Cia</option>
-                                <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
-                                <option value="Borracharia 24h">Borracharia 24h</option>
-                                <option value="Guincho Express">Guincho Express</option>
-                                <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
-                                <option value="Farmácia Saúde+">Farmácia Saúde+</option>
-                                <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
-                                <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
+                                <option value="Auto Posto São Jorge" data-cat="postos">Auto Posto São Jorge</option>
+                                <option value="Lava Jato Premium" data-cat="lava-jato">Lava Jato Premium</option>
+                                <option value="Mecânica Central" data-cat="mecanica">Mecânica Central</option>
+                                <option value="Estética Car Pro" data-cat="estetica">Estética Car Pro</option>
+                                <option value="Pneus & Cia" data-cat="pneus">Pneus &amp; Cia</option>
+                                <option value="Auto Elétrica Rápida" data-cat="eletrica">Auto Elétrica Rápida</option>
+                                <option value="Borracharia 24h" data-cat="borracharia">Borracharia 24h</option>
+                                <option value="Guincho Express" data-cat="guincho">Guincho Express</option>
+                                <option value="Restaurante Sabor Mineiro" data-cat="alimentacao">Restaurante Sabor Mineiro</option>
+                                <option value="Farmácia Saúde+" data-cat="saude">Farmácia Saúde+</option>
+                                <option value="Auto Escola Dirigir Bem" data-cat="educacao">Auto Escola Dirigir Bem</option>
+                                <option value="Posto Shell Av. Brasil" data-cat="postos">Posto Shell Av. Brasil</option>
                             </select>
                         </div>
-                        <div class="form-group" id="cupomCategoriaField" style="display:none;">
-                            <label>Categorias *</label>
-                            <select id="cupomCategoria" multiple style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;min-height:80px;">
+                        <div class="form-group" id="cupomCategoriaField">
+                            <label>Categoria</label>
+                            <select id="cupomCategoria" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione a categoria</option>
                                 <option value="postos">Postos</option>
                                 <option value="lava-jato">Lava-Jato</option>
                                 <option value="mecanica">Mecânica</option>
@@ -1781,7 +1784,6 @@
                                 <option value="saude">Saúde</option>
                                 <option value="educacao">Educação</option>
                             </select>
-                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Segure Ctrl para selecionar múltiplas</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1860,27 +1862,30 @@
                                 <option value="categoria">Por Categoria</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group" id="loteParceiroField">
                             <label>Parceiro *</label>
-                            <select id="loteParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <select id="loteParceiro" onchange="onCupomParceiroChange('lote')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
-                                <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
-                                <option value="Lava Jato Premium">Lava Jato Premium</option>
-                                <option value="Mecânica Central">Mecânica Central</option>
-                                <option value="Estética Car Pro">Estética Car Pro</option>
-                                <option value="Pneus & Cia">Pneus &amp; Cia</option>
-                                <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
-                                <option value="Borracharia 24h">Borracharia 24h</option>
-                                <option value="Guincho Express">Guincho Express</option>
-                                <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
-                                <option value="Farmácia Saúde+">Farmácia Saúde+</option>
-                                <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
-                                <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
+                                <option value="Auto Posto São Jorge" data-cat="postos">Auto Posto São Jorge</option>
+                                <option value="Lava Jato Premium" data-cat="lava-jato">Lava Jato Premium</option>
+                                <option value="Mecânica Central" data-cat="mecanica">Mecânica Central</option>
+                                <option value="Estética Car Pro" data-cat="estetica">Estética Car Pro</option>
+                                <option value="Pneus & Cia" data-cat="pneus">Pneus &amp; Cia</option>
+                                <option value="Auto Elétrica Rápida" data-cat="eletrica">Auto Elétrica Rápida</option>
+                                <option value="Borracharia 24h" data-cat="borracharia">Borracharia 24h</option>
+                                <option value="Guincho Express" data-cat="guincho">Guincho Express</option>
+                                <option value="Restaurante Sabor Mineiro" data-cat="alimentacao">Restaurante Sabor Mineiro</option>
+                                <option value="Farmácia Saúde+" data-cat="saude">Farmácia Saúde+</option>
+                                <option value="Auto Escola Dirigir Bem" data-cat="educacao">Auto Escola Dirigir Bem</option>
+                                <option value="Posto Shell Av. Brasil" data-cat="postos">Posto Shell Av. Brasil</option>
                             </select>
                         </div>
-                        <div class="form-group" id="loteCategoriaField" style="display:none;">
-                            <label>Categorias *</label>
-                            <select id="loteCategoria" multiple style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;min-height:80px;">
+                        <div class="form-group" id="loteCategoriaField">
+                            <label>Categoria</label>
+                            <select id="loteCategoria" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="">Selecione a categoria</option>
                                 <option value="postos">Postos</option>
                                 <option value="lava-jato">Lava-Jato</option>
                                 <option value="mecanica">Mecânica</option>
@@ -1893,7 +1898,6 @@
                                 <option value="saude">Saúde</option>
                                 <option value="educacao">Educação</option>
                             </select>
-                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Segure Ctrl para selecionar múltiplas</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -4228,26 +4232,44 @@ function excluirCupom(id) {
 // Toggle Alcance (Parceiro/Categoria) para Cupons
 function toggleCupomAlcance(prefix) {
     var alcance = document.getElementById(prefix + 'Alcance').value;
-    var parcField = document.getElementById(prefix + 'ParceiroField');
-    var catField = document.getElementById(prefix + 'CategoriaField');
+    var parcSelect = document.getElementById(prefix + 'Parceiro');
+    var catSelect = document.getElementById(prefix + 'Categoria');
+
     if (alcance === 'categoria') {
-        if (parcField) parcField.style.display = 'none';
-        if (catField) catField.style.display = 'block';
+        // Categoria ativa: travar parceiro, liberar categoria
+        if (parcSelect) { parcSelect.disabled = true; parcSelect.value = ''; parcSelect.style.opacity = '0.5'; }
+        if (catSelect) { catSelect.disabled = false; catSelect.style.opacity = '1'; }
     } else {
-        if (parcField) parcField.style.display = 'block';
-        if (catField) catField.style.display = 'none';
+        // Parceiro ativo: liberar parceiro, travar categoria (preenchida auto)
+        if (parcSelect) { parcSelect.disabled = false; parcSelect.style.opacity = '1'; }
+        if (catSelect) { catSelect.disabled = true; catSelect.style.opacity = '0.5'; }
+        // Auto-preencher categoria com base no parceiro selecionado
+        onCupomParceiroChange(prefix);
+    }
+}
+
+// Ao mudar parceiro: preencher categoria automaticamente
+function onCupomParceiroChange(prefix) {
+    var parcSelect = document.getElementById(prefix + 'Parceiro');
+    var catSelect = document.getElementById(prefix + 'Categoria');
+    if (!parcSelect || !catSelect) return;
+    var selected = parcSelect.options[parcSelect.selectedIndex];
+    var cat = selected ? selected.getAttribute('data-cat') : '';
+    if (cat) {
+        catSelect.value = cat;
+    } else {
+        catSelect.value = '';
     }
 }
 
 function getCupomAlcanceValue(prefix) {
     var alcance = document.getElementById(prefix + 'Alcance').value;
+    var catSelect = document.getElementById(prefix + 'Categoria');
+    var catValue = catSelect ? catSelect.value : '';
     if (alcance === 'parceiro') {
-        return { type: 'parceiro', value: document.getElementById(prefix + 'Parceiro').value };
+        return { type: 'parceiro', value: document.getElementById(prefix + 'Parceiro').value, categories: catValue ? [catValue] : [] };
     } else {
-        var sel = document.getElementById(prefix + 'Categoria');
-        var cats = [];
-        for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].selected) cats.push(sel.options[i].value); }
-        return { type: 'categoria', value: cats.join(', '), categories: cats };
+        return { type: 'categoria', value: catValue, categories: catValue ? [catValue] : [] };
     }
 }
 
