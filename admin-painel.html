@@ -1727,18 +1727,46 @@
                             <input type="text" id="cupomNome" required placeholder="Ex: Desconto Dia das Mães" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
                         <div class="form-group">
+                            <label>Alcance *</label>
+                            <select id="cupomAlcance" onchange="toggleCupomAlcance('cupom')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="parceiro">Parceiro Específico</option>
+                                <option value="categoria">Por Categoria</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="cupomParceiroField">
                             <label>Parceiro *</label>
-                            <select id="cupomParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <select id="cupomParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
-                                <option value="Posto Shell Centro">Posto Shell Centro</option>
-                                <option value="Lava-Jato Express">Lava-Jato Express</option>
-                                <option value="Mecânica do João">Mecânica do João</option>
-                                <option value="Pneu Forte">Pneu Forte</option>
-                                <option value="Estética Premium">Estética Premium</option>
-                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
+                                <option value="Lava Jato Premium">Lava Jato Premium</option>
+                                <option value="Mecânica Central">Mecânica Central</option>
+                                <option value="Estética Car Pro">Estética Car Pro</option>
+                                <option value="Pneus & Cia">Pneus &amp; Cia</option>
+                                <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
                                 <option value="Borracharia 24h">Borracharia 24h</option>
                                 <option value="Guincho Express">Guincho Express</option>
+                                <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
+                                <option value="Farmácia Saúde+">Farmácia Saúde+</option>
+                                <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
+                                <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="cupomCategoriaField" style="display:none;">
+                            <label>Categorias *</label>
+                            <select id="cupomCategoria" multiple style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;min-height:80px;">
+                                <option value="postos">Postos</option>
+                                <option value="lava-jato">Lava-Jato</option>
+                                <option value="mecanica">Mecânica</option>
+                                <option value="estetica">Estética</option>
+                                <option value="pneus">Pneus</option>
+                                <option value="eletrica">Auto Elétrica</option>
+                                <option value="borracharia">Borracharia</option>
+                                <option value="guincho">Guincho</option>
+                                <option value="alimentacao">Alimentação</option>
+                                <option value="saude">Saúde</option>
+                                <option value="educacao">Educação</option>
+                            </select>
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Segure Ctrl para selecionar múltiplas</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1811,18 +1839,46 @@
                             <input type="text" id="loteNome" required placeholder="Ex: Promoção Inverno 2025" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
                         <div class="form-group">
+                            <label>Alcance *</label>
+                            <select id="loteAlcance" onchange="toggleCupomAlcance('lote')" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                                <option value="parceiro">Parceiro Específico</option>
+                                <option value="categoria">Por Categoria</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="loteParceiroField">
                             <label>Parceiro *</label>
-                            <select id="loteParceiro" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <select id="loteParceiro" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                                 <option value="">Selecione o parceiro</option>
-                                <option value="Posto Shell Centro">Posto Shell Centro</option>
-                                <option value="Lava-Jato Express">Lava-Jato Express</option>
-                                <option value="Mecânica do João">Mecânica do João</option>
-                                <option value="Pneu Forte">Pneu Forte</option>
-                                <option value="Estética Premium">Estética Premium</option>
-                                <option value="Auto Elétrica Raio">Auto Elétrica Raio</option>
+                                <option value="Auto Posto São Jorge">Auto Posto São Jorge</option>
+                                <option value="Lava Jato Premium">Lava Jato Premium</option>
+                                <option value="Mecânica Central">Mecânica Central</option>
+                                <option value="Estética Car Pro">Estética Car Pro</option>
+                                <option value="Pneus & Cia">Pneus &amp; Cia</option>
+                                <option value="Auto Elétrica Rápida">Auto Elétrica Rápida</option>
                                 <option value="Borracharia 24h">Borracharia 24h</option>
                                 <option value="Guincho Express">Guincho Express</option>
+                                <option value="Restaurante Sabor Mineiro">Restaurante Sabor Mineiro</option>
+                                <option value="Farmácia Saúde+">Farmácia Saúde+</option>
+                                <option value="Auto Escola Dirigir Bem">Auto Escola Dirigir Bem</option>
+                                <option value="Posto Shell Av. Brasil">Posto Shell Av. Brasil</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="loteCategoriaField" style="display:none;">
+                            <label>Categorias *</label>
+                            <select id="loteCategoria" multiple style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;min-height:80px;">
+                                <option value="postos">Postos</option>
+                                <option value="lava-jato">Lava-Jato</option>
+                                <option value="mecanica">Mecânica</option>
+                                <option value="estetica">Estética</option>
+                                <option value="pneus">Pneus</option>
+                                <option value="eletrica">Auto Elétrica</option>
+                                <option value="borracharia">Borracharia</option>
+                                <option value="guincho">Guincho</option>
+                                <option value="alimentacao">Alimentação</option>
+                                <option value="saude">Saúde</option>
+                                <option value="educacao">Educação</option>
+                            </select>
+                            <span style="font-size:11px;color:var(--text-secondary);margin-top:4px;display:block;">Segure Ctrl para selecionar múltiplas</span>
                         </div>
                     </div>
                     <div class="form-row">
@@ -4150,16 +4206,48 @@ function excluirCupom(id) {
     }
 }
 
+// Toggle Alcance (Parceiro/Categoria) para Cupons
+function toggleCupomAlcance(prefix) {
+    var alcance = document.getElementById(prefix + 'Alcance').value;
+    var parcField = document.getElementById(prefix + 'ParceiroField');
+    var catField = document.getElementById(prefix + 'CategoriaField');
+    if (alcance === 'categoria') {
+        if (parcField) parcField.style.display = 'none';
+        if (catField) catField.style.display = 'block';
+    } else {
+        if (parcField) parcField.style.display = 'block';
+        if (catField) catField.style.display = 'none';
+    }
+}
+
+function getCupomAlcanceValue(prefix) {
+    var alcance = document.getElementById(prefix + 'Alcance').value;
+    if (alcance === 'parceiro') {
+        return { type: 'parceiro', value: document.getElementById(prefix + 'Parceiro').value };
+    } else {
+        var sel = document.getElementById(prefix + 'Categoria');
+        var cats = [];
+        for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].selected) cats.push(sel.options[i].value); }
+        return { type: 'categoria', value: cats.join(', '), categories: cats };
+    }
+}
+
 function salvarCupom(event) {
     event.preventDefault();
     var nome = document.getElementById('cupomNome').value;
-    var parceiro = document.getElementById('cupomParceiro').value;
+    var alcanceData = getCupomAlcanceValue('cupom');
+    var parceiro = alcanceData.type === 'parceiro' ? alcanceData.value : alcanceData.value;
     var tipoBeneficio = document.getElementById('cupomTipoBeneficio').value;
     var tipoDesconto = document.getElementById('cupomTipoDesconto').value;
     var valor = parseFloat(document.getElementById('cupomValorDesconto').value) || 0;
     var validade = parseInt(document.getElementById('cupomValidade').value) || 30;
     var associado = document.getElementById('cupomAssociado').value || 'Sem associado';
     var obs = document.getElementById('cupomObs').value || '';
+
+    // Validação
+    if (!nome) { alert('Preencha o nome do cupom'); return; }
+    if (alcanceData.type === 'parceiro' && !alcanceData.value) { alert('Selecione um parceiro'); return; }
+    if (alcanceData.type === 'categoria' && (!alcanceData.categories || alcanceData.categories.length === 0)) { alert('Selecione pelo menos uma categoria'); return; }
     var fb = document.getElementById('gerarCupomFeedback');
 
     var tipoLabel = tipoBeneficio === 'desconto' ? 'Desconto' : 'Pontos em Dobro';
@@ -4190,22 +4278,30 @@ function salvarCupom(event) {
     cuponsData.unshift(novoCupom);
 
     if (supabaseClient) {
-        supabaseClient.from('partners').select('id').eq('trade_name', parceiro).limit(1).then(function(partnerRes) {
-            var partnerId = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
-            supabaseClient.from('coupons').insert({
-                code: novoCupom.code,
-                name: nome,
-                partner_id: partnerId,
-                benefit_type: tipoBeneficio,
-                discount_type: tipoDesconto,
-                discount_value: valor,
-                status: 'active',
-                expires_at: vencimento.toISOString()
-            }).then(function(result) {
+        var dbInsertData = {
+            code: novoCupom.code,
+            name: nome,
+            benefit_type: tipoBeneficio,
+            discount_type: tipoDesconto,
+            discount_value: valor,
+            status: 'active',
+            expires_at: vencimento.toISOString(),
+            target_categories: alcanceData.type === 'categoria' ? alcanceData.categories : null
+        };
+        if (alcanceData.type === 'parceiro' && parceiro) {
+            supabaseClient.from('partners').select('id').eq('trade_name', parceiro).limit(1).then(function(partnerRes) {
+                dbInsertData.partner_id = (partnerRes.data && partnerRes.data.length > 0) ? partnerRes.data[0].id : null;
+                supabaseClient.from('coupons').insert(dbInsertData).then(function(result) {
+                    if (result.error) console.warn('[DB] Error inserting coupon:', result.error.message);
+                    else avpCache.invalidate('avp_cache_coupons');
+                });
+            });
+        } else {
+            supabaseClient.from('coupons').insert(dbInsertData).then(function(result) {
                 if (result.error) console.warn('[DB] Error inserting coupon:', result.error.message);
                 else avpCache.invalidate('avp_cache_coupons');
             });
-        });
+        }
     }
 
     fb.style.display = 'block';
@@ -4226,13 +4322,18 @@ function salvarCupom(event) {
 function salvarCupomLote(event) {
     event.preventDefault();
     var nome = document.getElementById('loteNome').value;
-    var parceiro = document.getElementById('loteParceiro').value;
+    var alcanceData = getCupomAlcanceValue('lote');
+    var parceiro = alcanceData.type === 'parceiro' ? alcanceData.value : alcanceData.value;
     var tipoBeneficio = document.getElementById('loteTipoBeneficio').value;
     var tipoDesconto = document.getElementById('loteTipoDesconto').value;
     var valor = parseFloat(document.getElementById('loteValorDesconto').value) || 0;
     var quantidade = parseInt(document.getElementById('loteQuantidade').value) || 10;
     var validade = parseInt(document.getElementById('loteValidade').value) || 30;
     var fb = document.getElementById('gerarLoteFeedback');
+
+    if (!nome) { alert('Preencha o nome do cupom'); return; }
+    if (alcanceData.type === 'parceiro' && !alcanceData.value) { alert('Selecione um parceiro'); return; }
+    if (alcanceData.type === 'categoria' && (!alcanceData.categories || alcanceData.categories.length === 0)) { alert('Selecione pelo menos uma categoria'); return; }
 
     var tipoLabel = tipoBeneficio === 'desconto' ? 'Desconto' : 'Pontos em Dobro';
     var valorSufixo = tipoDesconto === 'valor_fixo' ? 'R$ ' + valor.toFixed(2) : valor + '%';
