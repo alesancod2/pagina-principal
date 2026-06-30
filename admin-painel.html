@@ -2319,6 +2319,32 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Histórico de Benefícios Usados por Dia -->
+            <div class="table-container" style="margin-top:24px;">
+                <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;flex-wrap:wrap;">
+                    <h3 style="font-size:16px;margin:0;white-space:nowrap;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Histórico de Benefícios por Dia</h3>
+                    <input type="date" id="histBenefDateFrom" onchange="renderHistoricoBenefDia()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:12px;outline:none;width:130px;">
+                    <input type="date" id="histBenefDateTo" onchange="renderHistoricoBenefDia()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:12px;outline:none;width:130px;">
+                    <input type="text" id="histBenefSearch" placeholder="Buscar parceiro..." onkeyup="renderHistoricoBenefDia()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:6px;padding:6px 10px;color:var(--text-primary);font-size:12px;outline:none;width:150px;">
+                </div>
+                <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Parceiro</th>
+                            <th>Benefício</th>
+                            <th>Associado</th>
+                            <th>Pontos</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="histBenefDiaBody"></tbody>
+                </table>
+                </div>
+                <div style="padding:12px 20px;font-size:12px;color:var(--text-secondary);border-top:1px solid var(--dark-border);" id="histBenefDiaInfo">Mostrando 0 registros</div>
+            </div>
         </div>
 
         <!-- 10. CONFIGURAÇÕES -->
@@ -3578,6 +3604,56 @@ if (document.readyState === 'loading') {
 // ===== RELATÓRIOS - EXPORT FUNCTIONALITY =====
 
 // Report feedback helper
+// ===== HISTÓRICO DE BENEFÍCIOS POR DIA =====
+var histBenefData = [
+    { data:'22/06/2026', parceiro:'Auto Posto São Jorge', beneficio:'Desconto no abastecimento', associado:'João Oliveira', pontos:50, status:'Confirmado' },
+    { data:'22/06/2026', parceiro:'Lava Jato Premium', beneficio:'Lavagem Premium Grátis', associado:'Maria Santos', pontos:50, status:'Confirmado' },
+    { data:'21/06/2026', parceiro:'Mecânica Central', beneficio:'Desconto em revisão', associado:'Pedro Almeida', pontos:50, status:'Confirmado' },
+    { data:'21/06/2026', parceiro:'Estética Car Pro', beneficio:'Desconto em polimento', associado:'Ana Costa', pontos:50, status:'Pendente' },
+    { data:'20/06/2026', parceiro:'Auto Posto São Jorge', beneficio:'Desconto no abastecimento', associado:'Roberto Nunes', pontos:50, status:'Confirmado' },
+    { data:'20/06/2026', parceiro:'Pneus & Cia', beneficio:'Desconto em pneus', associado:'Carlos Silva', pontos:50, status:'Confirmado' },
+    { data:'19/06/2026', parceiro:'Borracharia 24h', beneficio:'Desconto em borracharia', associado:'João Oliveira', pontos:50, status:'Confirmado' },
+    { data:'19/06/2026', parceiro:'Guincho Express', beneficio:'Desconto em guincho', associado:'Maria Santos', pontos:50, status:'Pendente' },
+    { data:'18/06/2026', parceiro:'Auto Elétrica Rápida', beneficio:'Desconto em serviços', associado:'Ana Costa', pontos:50, status:'Confirmado' },
+    { data:'18/06/2026', parceiro:'Restaurante Sabor Mineiro', beneficio:'Desconto no almoço', associado:'Pedro Almeida', pontos:50, status:'Confirmado' },
+    { data:'17/06/2026', parceiro:'Farmácia Saúde+', beneficio:'Desconto em medicamentos', associado:'Roberto Nunes', pontos:50, status:'Confirmado' },
+    { data:'17/06/2026', parceiro:'Auto Escola Dirigir Bem', beneficio:'Desconto no curso', associado:'Carlos Silva', pontos:50, status:'Rejeitado' },
+    { data:'16/06/2026', parceiro:'Posto Shell Av. Brasil', beneficio:'Desconto V-Power', associado:'João Oliveira', pontos:50, status:'Confirmado' },
+    { data:'16/06/2026', parceiro:'Lava Jato Premium', beneficio:'Lavagem Premium Grátis', associado:'Maria Santos', pontos:50, status:'Confirmado' },
+    { data:'15/06/2026', parceiro:'Mecânica Central', beneficio:'Desconto em revisão', associado:'Ana Costa', pontos:50, status:'Confirmado' }
+];
+
+function renderHistoricoBenefDia() {
+    var tbody = document.getElementById('histBenefDiaBody');
+    var info = document.getElementById('histBenefDiaInfo');
+    if (!tbody) return;
+
+    var search = (document.getElementById('histBenefSearch') ? document.getElementById('histBenefSearch').value : '').toLowerCase();
+    var dateFrom = document.getElementById('histBenefDateFrom') ? document.getElementById('histBenefDateFrom').value : '';
+    var dateTo = document.getElementById('histBenefDateTo') ? document.getElementById('histBenefDateTo').value : '';
+
+    var filtered = histBenefData.filter(function(r) {
+        var matchSearch = !search || r.parceiro.toLowerCase().indexOf(search) > -1 || r.associado.toLowerCase().indexOf(search) > -1 || r.beneficio.toLowerCase().indexOf(search) > -1;
+        var matchFrom = true, matchTo = true;
+        if (dateFrom) { var d = new Date(r.data.split('/').reverse().join('-')); matchFrom = d >= new Date(dateFrom); }
+        if (dateTo) { var d2 = new Date(r.data.split('/').reverse().join('-')); var to = new Date(dateTo); to.setHours(23,59,59); matchTo = d2 <= to; }
+        return matchSearch && matchFrom && matchTo;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-secondary);">Nenhum registro encontrado para o período.</td></tr>';
+    } else {
+        tbody.innerHTML = filtered.map(function(r) {
+            var statusBadge = r.status === 'Confirmado' ? '<span class="badge badge-green">Confirmado</span>' : r.status === 'Pendente' ? '<span class="badge badge-yellow">Pendente</span>' : '<span class="badge badge-red">Rejeitado</span>';
+            return '<tr><td>' + r.data + '</td><td><strong>' + r.parceiro + '</strong></td><td>' + r.beneficio + '</td><td>' + r.associado + '</td><td><span style="color:var(--green);font-weight:600;">+' + r.pontos + '</span></td><td>' + statusBadge + '</td></tr>';
+        }).join('');
+    }
+    if (info) info.textContent = 'Mostrando ' + filtered.length + ' de ' + histBenefData.length + ' registros';
+}
+
+// Inicializar ao carregar
+document.addEventListener('DOMContentLoaded', function() { renderHistoricoBenefDia(); });
+
 function showReportFeedback(message, type) {
     var fb = document.getElementById('reportFeedback');
     if (!fb) return;
