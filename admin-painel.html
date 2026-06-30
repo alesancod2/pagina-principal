@@ -1813,8 +1813,12 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Validade (dias) *</label>
-                            <input type="number" id="cupomValidade" required placeholder="30" min="1" max="365" value="30" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <label>Início *</label>
+                            <input type="date" id="cupomValidadeInicio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Validade até *</label>
+                            <input type="date" id="cupomValidade" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
                     </div>
                     <div class="form-row">
@@ -1933,8 +1937,12 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Validade (dias) *</label>
-                            <input type="number" id="loteValidade" required placeholder="30" min="1" max="365" value="30" style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                            <label>Início *</label>
+                            <input type="date" id="loteValidadeInicio" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
+                        </div>
+                        <div class="form-group">
+                            <label>Validade até *</label>
+                            <input type="date" id="loteValidade" required style="width:100%;background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;outline:none;">
                         </div>
                     </div>
                     <div class="form-group">
@@ -4281,7 +4289,8 @@ function salvarCupom(event) {
     var tipoBeneficio = document.getElementById('cupomTipoBeneficio').value;
     var tipoDesconto = document.getElementById('cupomTipoDesconto').value;
     var valor = parseFloat(document.getElementById('cupomValorDesconto').value) || 0;
-    var validade = parseInt(document.getElementById('cupomValidade').value) || 30;
+    var validadeInicio = document.getElementById('cupomValidadeInicio').value;
+    var validadeFim = document.getElementById('cupomValidade').value;
     var associado = document.getElementById('cupomAssociado').value || 'Sem associado';
     var obs = document.getElementById('cupomObs').value || '';
 
@@ -4295,9 +4304,8 @@ function salvarCupom(event) {
     var valorSufixo = tipoDesconto === 'valor_fixo' ? 'R$ ' + valor.toFixed(2) : valor + '%';
     var beneficioNome = tipoBeneficio === 'pontos_dobro' ? nome + ' (Pontos em Dobro)' : nome + ' (' + tipoLabel + ' ' + valorSufixo + ')';
 
-    var hoje = new Date();
-    var vencimento = new Date(hoje.getTime() + validade * 24 * 60 * 60 * 1000);
-    var emitidoStr = hoje.toLocaleDateString('pt-BR');
+    var vencimento = new Date(validadeFim + 'T23:59:59');
+    var emitidoStr = validadeInicio ? new Date(validadeInicio).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
     var validadeStr = vencimento.toLocaleDateString('pt-BR');
 
     var novoCupom = {
@@ -4369,7 +4377,8 @@ function salvarCupomLote(event) {
     var tipoDesconto = document.getElementById('loteTipoDesconto').value;
     var valor = parseFloat(document.getElementById('loteValorDesconto').value) || 0;
     var quantidade = parseInt(document.getElementById('loteQuantidade').value) || 10;
-    var validade = parseInt(document.getElementById('loteValidade').value) || 30;
+    var validadeInicio = document.getElementById('loteValidadeInicio').value;
+    var validadeFim = document.getElementById('loteValidade').value;
     var fb = document.getElementById('gerarLoteFeedback');
 
     if (!nome) { alert('Preencha o nome do cupom'); return; }
@@ -4384,9 +4393,8 @@ function salvarCupomLote(event) {
     btn.disabled = true;
     btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Gerando...';
 
-    var hoje = new Date();
-    var vencimento = new Date(hoje.getTime() + validade * 24 * 60 * 60 * 1000);
-    var emitidoStr = hoje.toLocaleDateString('pt-BR');
+    var vencimento = new Date(validadeFim + 'T23:59:59');
+    var emitidoStr = validadeInicio ? new Date(validadeInicio).toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
     var validadeStr = vencimento.toLocaleDateString('pt-BR');
 
     setTimeout(function() {
