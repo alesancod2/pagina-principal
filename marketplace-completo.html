@@ -139,6 +139,9 @@ img{max-width:100%;display:block}
 .card-points{font-size:0.8rem;font-weight:700;color:var(--secondary)}
 .btn-use{padding:8px 20px;border-radius:var(--radius-xs);background:var(--gradient-brand);color:#fff;font-size:0.8rem;font-weight:600;transition:var(--transition)}
 .btn-use:hover{opacity:.9;transform:scale(1.02)}
+.coupon-filter{padding:8px 16px;border-radius:20px;font-size:0.8rem;font-weight:500;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;transition:all 0.2s;font-family:inherit}
+.coupon-filter:hover{border-color:var(--primary);color:var(--primary)}
+.coupon-filter.active{background:var(--gradient-brand);color:#fff;border-color:transparent}
 
 /* ===== DARK MODE ===== */
 html.dark-mode{
@@ -464,30 +467,14 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
         <!-- TAB: Cupons -->
         <div class="tab-content" id="tab-cupons" style="display:none;">
             <section style="padding:48px 24px;max-width:1400px;margin:0 auto;">
-                <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:24px;">Meus Cupons</h2>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;" id="couponsGrid">
-                    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;">
-                        <div style="position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:12px;background:rgba(0,166,81,.1);color:var(--secondary);font-size:0.7rem;font-weight:700;">ATIVO</div>
-                        <h4 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">15% OFF Lava Jato Premium</h4>
-                        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Lavagem completa com desconto exclusivo</p>
-                        <div style="font-size:0.75rem;color:var(--text-secondary);">Valido ate: 30/07/2025</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Codigo: AVP-LJ2025</div>
-                    </div>
-                    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;">
-                        <div style="position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:12px;background:rgba(0,166,81,.1);color:var(--secondary);font-size:0.7rem;font-weight:700;">ATIVO</div>
-                        <h4 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">10% OFF Mecanica Central</h4>
-                        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Revisao completa com desconto</p>
-                        <div style="font-size:0.75rem;color:var(--text-secondary);">Valido ate: 15/08/2025</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Codigo: AVP-MC2025</div>
-                    </div>
-                    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;opacity:0.6;">
-                        <div style="position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:12px;background:rgba(138,147,165,.1);color:var(--text-muted);font-size:0.7rem;font-weight:700;">UTILIZADO</div>
-                        <h4 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">20% OFF Estetica Car Pro</h4>
-                        <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Polimento tecnico</p>
-                        <div style="font-size:0.75rem;color:var(--text-secondary);">Utilizado em: 10/06/2025</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Codigo: AVP-EC2025</div>
-                    </div>
+                <h2 style="font-size:1.5rem;font-weight:800;color:var(--text-primary);margin-bottom:16px;">Meus Cupons</h2>
+                <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+                    <button class="coupon-filter active" data-filter="all" onclick="filterMeusCupons('all',this)">Todos</button>
+                    <button class="coupon-filter" data-filter="ativo" onclick="filterMeusCupons('ativo',this)">Ativos</button>
+                    <button class="coupon-filter" data-filter="utilizado" onclick="filterMeusCupons('utilizado',this)">Utilizados</button>
+                    <button class="coupon-filter" data-filter="expirado" onclick="filterMeusCupons('expirado',this)">Expirados</button>
                 </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;" id="couponsGrid"></div>
             </section>
         </div><!-- end tab-cupons -->
 
@@ -757,8 +744,25 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     '</div>' +
                 '</div>' +
             '</div>' +
+            // Cupons disponíveis para este parceiro
+            var availableCoupons = (window.meusCuponsData || []).filter(function(c) { return c.status === 'ativo' && (c.parceiro === partner.name || c.categoria === partner.category); });
+            var couponSection = '';
+            if (availableCoupons.length > 0) {
+                couponSection = '<div style="padding:0 32px 16px;"><div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>Cupons disponíveis</div>' +
+                    availableCoupons.map(function(c) {
+                        var isSelected = window._selectedCoupon && window._selectedCoupon.id === c.id;
+                        var selectedStyle = isSelected ? 'border-color:var(--secondary);background:rgba(0,166,81,0.05);' : '';
+                        var checkMark = isSelected ? '<span style="color:var(--secondary);font-weight:700;">✓ Selecionado</span>' : '<span style="color:var(--primary);font-size:0.7rem;">Selecionar</span>';
+                        return '<div onclick="selectCouponForUse(' + c.id + ',' + partner.id + ')" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:all 0.15s;' + selectedStyle + '" onmouseover="this.style.borderColor=\'var(--secondary)\'" onmouseout="this.style.borderColor=\'' + (isSelected ? 'var(--secondary)' : 'var(--border)') + '\'">' +
+                            '<div><div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">' + c.titulo + '</div><div style="font-size:0.7rem;color:var(--text-muted);">Código: ' + c.codigo + ' • Válido até: ' + c.validade + '</div></div>' +
+                            checkMark + '</div>';
+                    }).join('') +
+                '</div>';
+            }
+
+            content.innerHTML += couponSection +
             '<div class="modal-footer-section">' +
-                '<button class="modal-btn-use" onclick="solicitarUtilizacao(' + partner.id + ', \'' + partner.name.replace(/'/g, "\\'") + '\', ' + partner.points + ')">Utilizar Benefício</button>' +
+                '<button class="modal-btn-use" onclick="solicitarUtilizacao(' + partner.id + ', \'' + partner.name.replace(/'/g, "\\'") + '\', ' + partner.points + ')">Utilizar Benefício' + (window._selectedCoupon ? ' + Cupom' : '') + '</button>' +
                 '<button class="modal-btn-whatsapp" onclick="window.open(\'https://wa.me/55\' + \'' + partner.whatsapp.replace(/[^0-9]/g, '') + '\', \'_blank\')">' + infoIcons.message + ' WhatsApp</button>' +
             '</div>';
 
@@ -1169,6 +1173,94 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     window.pauseBannerScroll = function() { bannerPaused = true; };
     window.resumeBannerScroll = function() { bannerPaused = false; };
     window.initBannerCarousel = initBannerCarousel;
+
+    // ===== MEUS CUPONS (com filtros e redirecionamento) =====
+    var meusCuponsData = [
+        { id:1, titulo:'15% OFF Lava Jato Premium', descricao:'Lavagem completa com desconto exclusivo', parceiro:'Lava Jato Premium', categoria:'lava-jato', valor:15, tipo:'percentual', validade:'30/07/2025', codigo:'AVP-LJ2025', status:'ativo' },
+        { id:2, titulo:'10% OFF Mecânica Central', descricao:'Revisão completa com desconto', parceiro:'Mecânica Central', categoria:'mecanica', valor:10, tipo:'percentual', validade:'15/08/2025', codigo:'AVP-MC2025', status:'ativo' },
+        { id:3, titulo:'20% OFF Estética Car Pro', descricao:'Polimento técnico', parceiro:'Estética Car Pro', categoria:'estetica', valor:20, tipo:'percentual', validade:'10/06/2025', codigo:'AVP-EC2025', status:'utilizado' },
+        { id:4, titulo:'R$50 OFF Auto Elétrica', descricao:'Desconto fixo em serviço elétrico', parceiro:'Auto Elétrica Rápida', categoria:'eletrica', valor:50, tipo:'valor_fixo', validade:'01/05/2025', codigo:'AVP-AE2025', status:'expirado' },
+        { id:5, titulo:'5% OFF Auto Posto São Jorge', descricao:'Desconto em combustível', parceiro:'Auto Posto São Jorge', categoria:'postos', valor:5, tipo:'percentual', validade:'30/09/2025', codigo:'AVP-AP2025', status:'ativo' }
+    ];
+    window.meusCuponsData = meusCuponsData;
+
+    function renderMeusCupons(filter) {
+        var grid = document.getElementById('couponsGrid');
+        if (!grid) return;
+        var filtered = filter === 'all' ? meusCuponsData : meusCuponsData.filter(function(c) { return c.status === filter; });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhum cupom encontrado.</div>';
+            return;
+        }
+
+        grid.innerHTML = filtered.map(function(c) {
+            var isActive = c.status === 'ativo';
+            var opacity = isActive ? '1' : '0.6';
+            var badgeBg = isActive ? 'rgba(0,166,81,.1)' : c.status === 'utilizado' ? 'rgba(138,147,165,.1)' : 'rgba(239,68,68,.1)';
+            var badgeColor = isActive ? 'var(--secondary)' : c.status === 'utilizado' ? 'var(--text-muted)' : '#ef4444';
+            var badgeText = c.status.toUpperCase();
+            var cursor = isActive ? 'cursor:pointer;' : '';
+            var onclick = isActive ? 'onclick="usarCupomNoParceiro(' + c.id + ')"' : '';
+            var dateLabel = c.status === 'utilizado' ? 'Utilizado em: ' + c.validade : c.status === 'expirado' ? 'Expirou em: ' + c.validade : 'Válido até: ' + c.validade;
+
+            return '<div ' + onclick + ' style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;opacity:' + opacity + ';' + cursor + 'transition:all 0.2s;" ' + (isActive ? 'onmouseover="this.style.borderColor=\'var(--secondary)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.borderColor=\'\';this.style.transform=\'\'"' : '') + '>' +
+                '<div style="position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:12px;background:' + badgeBg + ';color:' + badgeColor + ';font-size:0.7rem;font-weight:700;">' + badgeText + '</div>' +
+                '<h4 style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:4px;">' + c.titulo + '</h4>' +
+                '<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">' + c.descricao + '</p>' +
+                '<div style="font-size:0.75rem;color:var(--text-secondary);">' + dateLabel + '</div>' +
+                '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Código: ' + c.codigo + '</div>' +
+                (isActive ? '<div style="margin-top:10px;font-size:0.7rem;color:var(--secondary);font-weight:600;">Clique para usar no parceiro →</div>' : '') +
+            '</div>';
+        }).join('');
+    }
+
+    window.filterMeusCupons = function(filter, btn) {
+        document.querySelectorAll('.coupon-filter').forEach(function(b) { b.classList.remove('active'); });
+        if (btn) btn.classList.add('active');
+        renderMeusCupons(filter);
+    };
+
+    window.usarCupomNoParceiro = function(cupomId) {
+        var cupom = meusCuponsData.find(function(c) { return c.id === cupomId; });
+        if (!cupom || cupom.status !== 'ativo') return;
+        // Encontrar parceiro pelo nome
+        var partner = partners.find(function(p) { return p.name === cupom.parceiro; });
+        if (partner) {
+            // Navegar para tab marketplace e abrir modal do parceiro com cupom selecionado
+            document.querySelectorAll('.nav-link[data-tab]').forEach(function(l) { l.classList.remove('active'); });
+            document.querySelector('.nav-link[data-tab="marketplace"]').classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(function(tc) { tc.style.display = 'none'; });
+            document.getElementById('tab-marketplace').style.display = 'block';
+            window._selectedCoupon = cupom;
+            setTimeout(function() { showPartnerDetail(partner.id); }, 200);
+        } else {
+            // Parceiro não encontrado — filtrar pela categoria
+            document.querySelectorAll('.nav-link[data-tab]').forEach(function(l) { l.classList.remove('active'); });
+            document.querySelector('.nav-link[data-tab="marketplace"]').classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(function(tc) { tc.style.display = 'none'; });
+            document.getElementById('tab-marketplace').style.display = 'block';
+            var chip = document.querySelector('.category-chip[data-category="' + cupom.categoria + '"]');
+            if (chip) chip.click();
+        }
+    };
+
+    // Init cupons on tab click
+    document.addEventListener('DOMContentLoaded', function() { renderMeusCupons('all'); });
+
+    // Selecionar cupom para usar com o benefício do parceiro
+    window.selectCouponForUse = function(cupomId, partnerId) {
+        var cupom = meusCuponsData.find(function(c) { return c.id === cupomId; });
+        if (!cupom) return;
+        // Toggle: se já selecionado, desseleciona
+        if (window._selectedCoupon && window._selectedCoupon.id === cupomId) {
+            window._selectedCoupon = null;
+        } else {
+            window._selectedCoupon = cupom;
+        }
+        // Re-render modal
+        showPartnerDetail(partnerId);
+    };
 
     // Render inicial
     renderPartners('all');
