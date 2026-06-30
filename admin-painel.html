@@ -5807,8 +5807,14 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             if (!supabaseClient) return;
             try {
                 var result = await supabaseQuery('partners', { select: '*', order: 'trade_name', ascending: true });
-                if (result.error || !result.data || result.data.length === 0) {
-                    console.log('[DB] Usando dados mock para parceiros');
+                if (result.error) {
+                    console.warn('[DB] Erro ao carregar parceiros, usando mock:', result.error);
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    parceirosData = [];
+                    console.log('[DB] Parceiros: banco vazio');
+                    renderParceirosTable();
                     return;
                 }
                 parceirosData = result.data.map(function(p, idx) {
@@ -5841,8 +5847,14 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             if (!supabaseClient) return;
             try {
                 var result = await supabaseQuery('partner_benefits', { select: '*, partners(trade_name)' });
-                if (result.error || !result.data || result.data.length === 0) {
-                    console.log('[DB] Usando dados mock para benefícios');
+                if (result.error) {
+                    console.warn('[DB] Erro ao carregar benefícios:', result.error);
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    beneficiosData = [];
+                    console.log('[DB] Benefícios: banco vazio');
+                    renderBeneficiosTable();
                     return;
                 }
                 beneficiosData = result.data.map(function(b, idx) {
@@ -5870,8 +5882,14 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             if (!supabaseClient) return;
             try {
                 var result = await supabaseQuery('coupons', { select: '*, partners(trade_name)', order: 'created_at' });
-                if (result.error || !result.data || result.data.length === 0) {
-                    console.log('[DB] Usando dados mock para cupons');
+                if (result.error) {
+                    console.warn('[DB] Erro ao carregar cupons:', result.error);
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    cuponsData = [];
+                    console.log('[DB] Cupons: banco vazio');
+                    renderCuponsTable();
                     return;
                 }
                 cuponsData = result.data.map(function(c, idx) {
@@ -5908,8 +5926,14 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             if (!supabaseClient) return;
             try {
                 var result = await supabaseQuery('campaigns', { select: '*', order: 'created_at' });
-                if (result.error || !result.data || result.data.length === 0) {
-                    console.log('[DB] Usando dados mock para campanhas');
+                if (result.error) {
+                    console.warn('[DB] Erro ao carregar campanhas:', result.error);
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    campanhasData = [];
+                    console.log('[DB] Campanhas: banco vazio');
+                    renderCampanhas();
                     return;
                 }
                 var cores = ['orange','blue','green','red','gray'];
@@ -5948,8 +5972,12 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
             if (!supabaseClient) return;
             try {
                 var result = await supabaseQuery('partners', { select: 'trade_name, category' });
-                if (result.error || !result.data || result.data.length === 0) {
-                    console.log('[DB] Usando dados mock para categorias');
+                if (result.error) {
+                    console.warn('[DB] Erro ao carregar categorias:', result.error);
+                    return;
+                }
+                if (!result.data || result.data.length === 0) {
+                    console.log('[DB] Categorias: sem parceiros no banco');
                     return;
                 }
                 // Agrupar parceiros por categoria
@@ -6008,6 +6036,8 @@ document.addEventListener('DOMContentLoaded', function() { renderCuponsTable(); 
                 return;
             }
             console.log('[DB] Iniciando carregamento do banco de dados...');
+            // Limpar cache antigo para garantir dados frescos
+            avpCache.invalidate('avp_cache_');
             try {
                 await Promise.all([
                     loadParceirosFromDB(),
