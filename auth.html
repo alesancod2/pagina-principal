@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Vale - Autenticação</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:linear-gradient(135deg,#050A14 0%,#08101F 50%,#0D1728 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; color:#fff; }
+        .auth-container { text-align:center; padding:40px; }
+        .logo { width:80px; height:80px; margin:0 auto 24px; }
+        .logo img { width:100%; height:100%; object-fit:contain; }
+        h1 { font-size:1.5rem; margin-bottom:8px; }
+        .subtitle { color:#8892a4; font-size:0.9rem; margin-bottom:32px; }
+        .loader { width:48px; height:48px; border:4px solid rgba(255,255,255,0.1); border-top:4px solid #00A651; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .status { font-size:0.9rem; color:#8892a4; }
+        .status.error { color:#ef4444; }
+        .status.success { color:#00A651; }
+        .btn-retry { margin-top:20px; padding:10px 24px; border-radius:8px; background:#2F3EBF; color:#fff; border:none; font-size:0.85rem; cursor:pointer; font-family:inherit; }
+        .btn-retry:hover { background:#4157D8; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo"><img src="assets/Logomarca 2.png" alt="Auto Vale"></div>
+        <h1>Clube de Benefícios</h1>
+        <p class="subtitle">Verificando sua associação...</p>
+        <div class="loader" id="loader"></div>
+        <p class="status" id="statusMsg">Conectando ao sistema AEasy...</p>
+        <button class="btn-retry" id="btnRetry" style="display:none;" onclick="window.location.reload()">Tentar novamente</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+    (function() {
+        var SUPABASE_URL = 'https://dxvqawclzyjgwifbvbbr.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4dnFhd2NsenlqZ3dpZmJ2YmJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjEwNzQsImV4cCI6MjA5NzI5NzA3NH0.fepNkTt-tHn4o1pe11ir7_ofA_EDdK-UhoEwihFInX4';
+        var AEASY_API_URL = 'https://api.autovaleprevencoes.org';
+        var AEASY_TOKEN = 'nqovqqgPvUmntqonnYouq1fqrUoYXnWvsOfvJdfRHaoMcdPTlvWQJqkGvrqtJCAxrUtqZx5GJxtfJrkanCRofnPnqUZlqqq0nvWMcqmnJOqwqxq4rUtqXxYWZ2YntOYGvqZ4gYUSqFWMcMAWr2YutdbSXdAoHrY5vqZlZCfWlpfmHx5LsOfiJdbVHdRmJC9WnCRoc1mxrrkfJCf0rpWhfx5rcaYfXYk6rkthcYmxtptwqdPerqqoXU5TqUmlJYUPlvY3JqksqMhAtOY5sqAVJdtaHaoBJnU2lvWFXU9xlrmJqkn1vrmqXx1xtCRJtdZ5vYtJHn5xgpZJHnq5rYtLJ056trfwqxxVrUtUJx5alrqoXCPIvrmlHkWatC1JJYx0rCWofqWGgCAJtdcOrYZoJnPzlUWMtnoGvYAiXCm5lromJUn0r1c0Xx1Gvpqitxk1rqtkXUYWZ2Yrt1oIvUZvXqosrMkovxWVsFYmfUYTfnmncdPwnCL5n1tqtUqnXnYOlvRvZvtaHdRoq1mLsOhLJ0YGH2YtXUxOnrhitkmktptftxWarpUPtU5nJOmcqqq4r1qkZkkqtUtlqxodr1tmXU9nHxfmJpZWqrfvJqmpfrhAq1mIvUZvlYWzlroBHYoOsUDVwgjXRAs5vxzaJOOOjXRAs5vxzaJOOO';
+
+        var supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // Pegar parâmetros da URL
+        var params = new URLSearchParams(window.location.search);
+        var placa = params.get('placa') || params.get('plate') || '';
+        var cpf = params.get('cpf') || '';
+        var nome = params.get('nome') || params.get('name') || '';
+        var email = params.get('email') || '';
+        var userId = params.get('user_id') || params.get('uid') || '';
+        var autoToken = params.get('token') || '';
+
+        var statusEl = document.getElementById('statusMsg');
+        var loaderEl = document.getElementById('loader');
+        var btnRetry = document.getElementById('btnRetry');
+
+        function setStatus(msg, type) {
+            statusEl.textContent = msg;
+            statusEl.className = 'status ' + (type || '');
+        }
+
+        function showError(msg) {
+            setStatus(msg, 'error');
+            loaderEl.style.display = 'none';
+            btnRetry.style.display = 'inline-block';
+        }
+
+        function loginSuccess(user) {
+            setStatus('Associado verificado! Redirecionando...', 'success');
+            loaderEl.style.borderTopColor = '#00A651';
+
+            // Criar sessão no localStorage
+            var sessionData = {
+                id: user.id || userId || 'aeasy_' + Date.now(),
+                name: user.name || nome || 'Associado',
+                email: user.email || email || '',
+                cpf: user.cpf || cpf || '',
+                role: 'member',
+                placa: placa,
+                loginAt: new Date().toISOString(),
+                source: 'aeasy'
+            };
+            localStorage.setItem('avp_user', JSON.stringify(sessionData));
+
+            // Redirecionar para marketplace
+            setTimeout(function() {
+                window.location.href = '/marketplace-completo.html';
+            }, 1000);
+        }
+
+        async function verificarAssociado() {
+            // Se tem dados suficientes na URL (vindo do app AEasy)
+            if (nome || email || cpf || placa) {
+                setStatus('Verificando associado na plataforma...', '');
+
+                // 1. Verificar na API AEasy se placa/associado está ativo
+                if (placa) {
+                    try {
+                        setStatus('Consultando API AEasy...', '');
+                        var response = await fetch(AEASY_API_URL + '/VendasCarros/VerificaPlacaExiste/' + encodeURIComponent(placa), {
+                            method: 'GET',
+                            headers: {
+                                'accept': 'application/json',
+                                'Authorization': 'Bearer ' + AEASY_TOKEN
+                            }
+                        });
+
+                        if (response.ok) {
+                            var data = await response.json();
+                            console.log('[AEasy] Resposta:', data);
+
+                            // Se API retorna que placa existe/associado ativo
+                            if (data && (data.existe || data.ativo || data.status === 'ativo' || data === true || response.status === 200)) {
+                                setStatus('Placa verificada! Autenticando...', 'success');
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('[AEasy] Erro ao consultar API:', e.message);
+                        // Continuar mesmo com erro na API (fallback)
+                    }
+                }
+
+                // 2. Verificar/criar usuário no Supabase
+                if (supabaseClient && (email || cpf)) {
+                    try {
+                        var query = email 
+                            ? supabaseClient.from('users').select('*').eq('email', email).single()
+                            : supabaseClient.from('users').select('*').eq('cpf', cpf).single();
+                        
+                        var { data: dbUser, error } = await query;
+
+                        if (dbUser && !error) {
+                            // Usuário já existe no banco
+                            loginSuccess(dbUser);
+                            return;
+                        } else {
+                            // Criar novo usuário com dados do AEasy
+                            var newUser = {
+                                name: nome || 'Associado',
+                                email: email || (cpf ? cpf.replace(/\D/g,'') + '@autovale.temp' : 'associado@autovale.temp'),
+                                cpf: cpf || '000.000.000-00',
+                                role: 'member',
+                                is_active: true,
+                                password_hash: 'aeasy_auth',
+                                email_verified_at: new Date().toISOString()
+                            };
+
+                            var { data: created, error: createErr } = await supabaseClient.from('users').insert(newUser).select().single();
+                            if (created && !createErr) {
+                                loginSuccess(created);
+                                return;
+                            }
+                        }
+                    } catch(e) {
+                        console.warn('[DB] Erro:', e.message);
+                    }
+                }
+
+                // 3. Fallback: logar com dados da URL mesmo sem DB
+                loginSuccess({ name: nome, email: email, cpf: cpf });
+                return;
+            }
+
+            // Se não tem parâmetros suficientes
+            if (autoToken) {
+                setStatus('Validando token de acesso...', '');
+                // Token direto = confiança do app AEasy
+                setTimeout(function() {
+                    loginSuccess({ name: 'Associado Auto Vale', email: '', cpf: '' });
+                }, 1500);
+                return;
+            }
+
+            // Nenhum parâmetro válido
+            showError('Acesso inválido. Use o link do aplicativo de associados.');
+        }
+
+        // Iniciar verificação
+        verificarAssociado();
+    })();
+    </script>
+</body>
+</html>

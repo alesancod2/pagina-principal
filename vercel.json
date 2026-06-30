@@ -4,7 +4,8 @@
     { "source": "/admin", "destination": "/admin-painel.html" },
     { "source": "/marketplace", "destination": "/marketplace-completo.html" },
     { "source": "/qr-confirmacao", "destination": "/qr-confirmacao.html" },
-    { "source": "/qr-erro", "destination": "/qr-erro.html" }
+    { "source": "/qr-erro", "destination": "/qr-erro.html" },
+    { "source": "/auth", "destination": "/auth.html" }
   ],
   "headers": [
     {
