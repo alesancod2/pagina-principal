@@ -748,7 +748,8 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                         '</div>' +
                     '</div>' +
                 '</div>' +
-            '</div>' +
+            '</div>';
+
             // Cupons disponíveis para este parceiro
             var availableCoupons = (window.meusCuponsData || []).filter(function(c) { return c.status === 'ativo' && (c.parceiro === partner.name || c.categoria === partner.category); });
             var couponSection = '';
