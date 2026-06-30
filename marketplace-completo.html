@@ -478,7 +478,6 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                     <button class="coupon-filter active" data-filter="all" onclick="filterMeusCupons('all',this)">Todos</button>
                     <button class="coupon-filter" data-filter="ativo" onclick="filterMeusCupons('ativo',this)">Ativos</button>
                     <button class="coupon-filter" data-filter="utilizado" onclick="filterMeusCupons('utilizado',this)">Utilizados</button>
-                    <button class="coupon-filter" data-filter="expirado" onclick="filterMeusCupons('expirado',this)">Expirados</button>
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;" id="couponsGrid"></div>
             </section>
@@ -1208,7 +1207,22 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     function renderMeusCupons(filter) {
         var grid = document.getElementById('couponsGrid');
         if (!grid) return;
-        var filtered = filter === 'all' ? meusCuponsData : meusCuponsData.filter(function(c) { return c.status === filter; });
+        // Membros veem apenas cupons ativos e utilizados (não veem aguardando/expirado)
+        var visibleCupons = meusCuponsData.filter(function(c) {
+            // Recalcular status por data
+            var hoje = new Date(); hoje.setHours(0,0,0,0);
+            if (c.status !== 'utilizado') {
+                var parts = c.validade.split('/');
+                if (parts.length === 3) {
+                    var dataFim = new Date(parts[2], parts[1]-1, parts[0]);
+                    if (dataFim < hoje) { c.status = 'expirado'; }
+                }
+                // Verificar se ainda é futuro (aguardando - não mostrar)
+                // Cupons com data de emissão futura ficam ocultos para membros
+            }
+            return c.status === 'ativo' || c.status === 'utilizado';
+        });
+        var filtered = filter === 'all' ? visibleCupons : visibleCupons.filter(function(c) { return c.status === filter; });
 
         if (filtered.length === 0) {
             grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">Nenhum cupom encontrado.</div>';

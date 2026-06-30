@@ -1672,6 +1672,7 @@
                     <select id="cuponsFilterStatus" onchange="filterCuponsTable()" style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
                         <option value="all">Todos Status</option>
                         <option value="Válido">Válido</option>
+                        <option value="Aguardando">Aguardando</option>
                         <option value="Usado">Usado</option>
                         <option value="Expirado">Expirado</option>
                         <option value="Cancelado">Cancelado</option>
@@ -4078,8 +4079,35 @@ function generateCupomCode() {
 }
 
 function getStatusBadge(status) {
-    var cls = status === 'Válido' ? 'badge-green' : status === 'Usado' ? 'badge-yellow' : status === 'Expirado' ? 'badge-red' : 'badge-red';
-    return '<span class="badge ' + cls + '">' + status + '</span>';
+    if (status === 'Válido') return '<span class="badge badge-green">Válido</span>';
+    if (status === 'Aguardando') return '<span class="badge badge-blue" style="background:rgba(47,62,191,0.15);color:#4157D8;">Aguardando</span>';
+    if (status === 'Usado') return '<span class="badge badge-yellow">Usado</span>';
+    if (status === 'Expirado') return '<span class="badge badge-red">Expirado</span>';
+    if (status === 'Cancelado') return '<span class="badge badge-red">Cancelado</span>';
+    return '<span class="badge badge-red">' + status + '</span>';
+}
+
+// Determina status real do cupom baseado nas datas
+function calcCupomStatus(c) {
+    if (c.status === 'Usado' || c.status === 'Cancelado') return c.status;
+    var hoje = new Date(); hoje.setHours(0,0,0,0);
+    // Verificar data de validade (expirado)
+    if (c.validade) {
+        var parts = c.validade.split('/');
+        if (parts.length === 3) {
+            var dataFim = new Date(parts[2], parts[1]-1, parts[0]);
+            if (dataFim < hoje) return 'Expirado';
+        }
+    }
+    // Verificar data de início (aguardando)
+    if (c.emitido) {
+        var partsI = c.emitido.split('/');
+        if (partsI.length === 3) {
+            var dataInicio = new Date(partsI[2], partsI[1]-1, partsI[0]);
+            if (dataInicio > hoje) return 'Aguardando';
+        }
+    }
+    return 'Válido';
 }
 
 function filterCuponsTable() {
@@ -4094,6 +4122,7 @@ function getFilteredCupons() {
     var tipoFilter = document.getElementById('cuponsFilterTipo') ? document.getElementById('cuponsFilterTipo').value : '';
     var categoriaFilter = document.getElementById('cuponsFilterCategoria') ? document.getElementById('cuponsFilterCategoria').value : '';
     return cuponsData.filter(function(c) {
+        c.status = calcCupomStatus(c); // recalcular status baseado nas datas
         var matchSearch = !search || c.code.toLowerCase().indexOf(search) > -1 || c.parceiro.toLowerCase().indexOf(search) > -1 || c.beneficio.toLowerCase().indexOf(search) > -1 || c.associado.toLowerCase().indexOf(search) > -1 || (c.nome && c.nome.toLowerCase().indexOf(search) > -1);
         var matchStatus = statusFilter === 'all' || c.status === statusFilter;
         var matchParceiro = !parceiroFilter || c.parceiro === parceiroFilter;
@@ -4116,6 +4145,8 @@ function renderCuponsTable() {
         tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-secondary);">Nenhum cupom encontrado</td></tr>';
     } else {
         tbody.innerHTML = page.map(function(c) {
+            // Auto-calcular status baseado em datas
+            c.status = calcCupomStatus(c);
             var tipoLabel = c.tipo === 'desconto' ? '<span style="color:var(--green)">Desconto</span>' : '<span style="color:var(--primary-blue)">Pontos em Dobro</span>';
             var valorDisplay = c.tipo === 'pontos_dobro' ? '' : (c.tipoDesconto === 'valor_fixo' ? ' R$' + c.valor.toFixed(2) : ' ' + c.valor + '%');
             var catLabel = c.categoria ? '<span style="font-size:11px;background:rgba(47,62,191,0.1);color:var(--primary-blue);padding:2px 8px;border-radius:10px;">' + c.categoria + '</span>' : '<span style="color:var(--text-secondary);font-size:11px;">—</span>';
