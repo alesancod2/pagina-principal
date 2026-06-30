@@ -1942,8 +1942,11 @@
 
             <!-- Top Usuários - Ranking -->
             <div class="table-container" style="margin-bottom:24px">
-                <div class="table-header">
+                <div class="table-header" style="flex-wrap:wrap;">
                     <h3 style="font-size:16px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>Top Usuários - Ranking</h3>
+                    <input type="text" id="rankUserSearch" placeholder="Buscar associado..." onkeyup="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;width:180px;">
+                    <input type="date" id="rankUserDateFrom" onchange="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                    <input type="date" id="rankUserDateTo" onchange="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
                 </div>
                 <table>
                     <thead>
@@ -1964,8 +1967,11 @@
 
             <!-- Ranking de Benefícios Utilizados -->
             <div class="table-container" style="margin-bottom:24px">
-                <div class="table-header">
+                <div class="table-header" style="flex-wrap:wrap;">
                     <h3 style="font-size:16px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Ranking de Benefícios Utilizados</h3>
+                    <input type="text" id="rankBenefSearch" placeholder="Buscar parceiro..." onkeyup="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;width:180px;">
+                    <input type="date" id="rankBenefDateFrom" onchange="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
+                    <input type="date" id="rankBenefDateTo" onchange="filtrarPontuacao()" style="background:var(--dark-bg);border:1px solid var(--dark-border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none;">
                 </div>
                 <table>
                     <thead>
@@ -3427,20 +3433,43 @@ function filtrarPontuacao() {
     document.getElementById('pontMedia').textContent = media.toLocaleString('pt-BR');
 
     // Render Top Usuários Ranking (aggregate by user from filtered data)
+    var rankUserSearch = (document.getElementById('rankUserSearch') ? document.getElementById('rankUserSearch').value : '').toLowerCase();
+    var rankUserFrom = document.getElementById('rankUserDateFrom') ? document.getElementById('rankUserDateFrom').value : '';
+    var rankUserTo = document.getElementById('rankUserDateTo') ? document.getElementById('rankUserDateTo').value : '';
+
+    var userTransFiltered = filteredTrans;
+    var userCuponsFiltered = filteredCupons;
+    // Filtro de data adicional para ranking de usuários
+    if (rankUserFrom) {
+        var fromDate = new Date(rankUserFrom);
+        userTransFiltered = userTransFiltered.filter(function(t) { return new Date(t.data.split('/').reverse().join('-')) >= fromDate; });
+        userCuponsFiltered = userCuponsFiltered.filter(function(c) { return new Date(c.data.split('/').reverse().join('-')) >= fromDate; });
+    }
+    if (rankUserTo) {
+        var toDate = new Date(rankUserTo); toDate.setHours(23,59,59);
+        userTransFiltered = userTransFiltered.filter(function(t) { return new Date(t.data.split('/').reverse().join('-')) <= toDate; });
+        userCuponsFiltered = userCuponsFiltered.filter(function(c) { return new Date(c.data.split('/').reverse().join('-')) <= toDate; });
+    }
+
     var userMap = {};
-    filteredTrans.forEach(function(t) {
+    userTransFiltered.forEach(function(t) {
         if (!userMap[t.nome]) userMap[t.nome] = { ganhos: 0, utilizados: 0 };
         userMap[t.nome].ganhos += t.pontos;
     });
-    filteredCupons.forEach(function(c) {
+    userCuponsFiltered.forEach(function(c) {
         if (!userMap[c.nome]) userMap[c.nome] = { ganhos: 0, utilizados: 0 };
         userMap[c.nome].utilizados += c.pontos;
     });
     var userList = Object.keys(userMap).map(function(nome) {
         var saldo = userMap[nome].ganhos - userMap[nome].utilizados;
-        if (saldo < 0) saldo = 0; // Saldo nunca pode ser negativo
+        if (saldo < 0) saldo = 0;
         return { nome: nome, ganhos: userMap[nome].ganhos, utilizados: userMap[nome].utilizados, saldo: saldo };
     }).sort(function(a, b) { return b.saldo - a.saldo; });
+
+    // Filtro de busca por nome
+    if (rankUserSearch) {
+        userList = userList.filter(function(u) { return u.nome.toLowerCase().indexOf(rankUserSearch) > -1; });
+    }
 
     var rankHtml = '';
     for (var i = 0; i < userList.length; i++) {
@@ -3457,8 +3486,22 @@ function filtrarPontuacao() {
     document.getElementById('pontRankingBody').innerHTML = rankHtml;
 
     // Render Ranking Benefícios (aggregate by parceiro)
+    var rankBenefSearch = (document.getElementById('rankBenefSearch') ? document.getElementById('rankBenefSearch').value : '').toLowerCase();
+    var rankBenefFrom = document.getElementById('rankBenefDateFrom') ? document.getElementById('rankBenefDateFrom').value : '';
+    var rankBenefTo = document.getElementById('rankBenefDateTo') ? document.getElementById('rankBenefDateTo').value : '';
+
+    var benefTransFiltered = filteredTrans;
+    if (rankBenefFrom) {
+        var bFromDate = new Date(rankBenefFrom);
+        benefTransFiltered = benefTransFiltered.filter(function(t) { return new Date(t.data.split('/').reverse().join('-')) >= bFromDate; });
+    }
+    if (rankBenefTo) {
+        var bToDate = new Date(rankBenefTo); bToDate.setHours(23,59,59);
+        benefTransFiltered = benefTransFiltered.filter(function(t) { return new Date(t.data.split('/').reverse().join('-')) <= bToDate; });
+    }
+
     var parcMap = {};
-    filteredTrans.forEach(function(t) {
+    benefTransFiltered.forEach(function(t) {
         if (!parcMap[t.parceiro]) parcMap[t.parceiro] = { usos: 0, ultima: t.data };
         parcMap[t.parceiro].usos++;
         if (t.data > parcMap[t.parceiro].ultima) parcMap[t.parceiro].ultima = t.data;
@@ -3466,6 +3509,11 @@ function filtrarPontuacao() {
     var parcList = Object.keys(parcMap).map(function(p) {
         return { parceiro: p, usos: parcMap[p].usos, ultima: parcMap[p].ultima };
     }).sort(function(a, b) { return b.usos - a.usos; });
+
+    // Filtro de busca por parceiro
+    if (rankBenefSearch) {
+        parcList = parcList.filter(function(p) { return p.parceiro.toLowerCase().indexOf(rankBenefSearch) > -1; });
+    }
 
     var benefRankHtml = '';
     for (var j = 0; j < parcList.length; j++) {
