@@ -385,33 +385,10 @@
                     }
                 }
 
-                // 2. Consultar tabela users via REST API direta (bypassa SDK/RLS issues)
-                var restUrl = SUPABASE_URL + '/rest/v1/users?email=eq.' + encodeURIComponent(email) + '&is_active=eq.true&select=id,name,email,role,password_hash';
-                var response = await fetch(restUrl, {
-                    method: 'GET',
-                    headers: {
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    }
-                });
-
-                if (response.ok) {
-                    var users = await response.json();
-                    if (users && users.length > 0) {
-                        var dbUser = users[0];
-                        // Usuário encontrado no banco!
-                        // Nota: em produção, validar senha com bcrypt no backend
-                        // Por agora, aceitar login se email existe (modo dev/demo)
-                        loginSuccess(dbUser.id, dbUser.name, dbUser.email, dbUser.role || 'member');
-                        return;
-                    }
-                }
-
-                // 3. Nenhum método funcionou
+                // 2. Supabase Auth falhou — NÃO permitir login sem validação de senha
+                // O fallback REST foi REMOVIDO por segurança (permitia login sem senha)
                 fb.className = 'feedback error';
-                fb.textContent = 'Email não encontrado ou credenciais incorretas.';
+                fb.textContent = 'Email ou senha incorretos. Verifique suas credenciais.';
                 fb.style.display = 'block';
                 // Rate limiting: incrementar tentativas
                 _loginAttempts++;
