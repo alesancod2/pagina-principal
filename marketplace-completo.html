@@ -1196,14 +1196,60 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
     })();
 
     // ===== MEUS CUPONS (com filtros e redirecionamento) =====
-    var meusCuponsData = [
-        { id:1, titulo:'15% OFF Lava Jato Premium', descricao:'Lavagem completa com desconto exclusivo', parceiro:'Lava Jato Premium', categoria:'lava-jato', valor:15, tipo:'percentual', validade:'30/07/2025', codigo:'AVP-LJ2025', status:'ativo' },
-        { id:2, titulo:'10% OFF Mecânica Central', descricao:'Revisão completa com desconto', parceiro:'Mecânica Central', categoria:'mecanica', valor:10, tipo:'percentual', validade:'15/08/2025', codigo:'AVP-MC2025', status:'ativo' },
-        { id:3, titulo:'20% OFF Estética Car Pro', descricao:'Polimento técnico', parceiro:'Estética Car Pro', categoria:'estetica', valor:20, tipo:'percentual', validade:'10/06/2025', codigo:'AVP-EC2025', status:'utilizado' },
-        { id:4, titulo:'R$50 OFF Auto Elétrica', descricao:'Desconto fixo em serviço elétrico', parceiro:'Auto Elétrica Rápida', categoria:'eletrica', valor:50, tipo:'valor_fixo', validade:'01/05/2025', codigo:'AVP-AE2025', status:'expirado' },
-        { id:5, titulo:'5% OFF Auto Posto São Jorge', descricao:'Desconto em combustível', parceiro:'Auto Posto São Jorge', categoria:'postos', valor:5, tipo:'percentual', validade:'30/09/2025', codigo:'AVP-AP2025', status:'ativo' }
-    ];
+    var meusCuponsData = [];
     window.meusCuponsData = meusCuponsData;
+
+    // Carregar cupons do banco de dados para o usuário logado
+    async function loadMeusCuponsFromDB() {
+        if (!window.supabaseClient) return;
+        try {
+            // Buscar todos os cupons ativos (disponíveis para o membro)
+            var { data, error } = await window.supabaseClient
+                .from('coupons')
+                .select('*, partners(trade_name, category)')
+                .order('created_at', { ascending: false });
+
+            if (error || !data) {
+                console.warn('[DB] Erro ao carregar cupons:', error);
+                return;
+            }
+
+            meusCuponsData = data.map(function(c, idx) {
+                var statusMap = { active: 'ativo', used: 'utilizado', expired: 'expirado', cancelled: 'expirado' };
+                var parceiro = (c.partners && c.partners.trade_name) || 'Parceiro';
+                var categoria = (c.partners && c.partners.category) || (c.target_categories && c.target_categories[0]) || '';
+                var validade = c.expires_at ? new Date(c.expires_at).toLocaleDateString('pt-BR') : '';
+                var valorDisplay = '';
+                if (c.discount_type === 'percentual') valorDisplay = c.discount_value + '% OFF ';
+                else if (c.discount_type === 'valor_fixo') valorDisplay = 'R$' + (c.discount_value || 0) + ' OFF ';
+
+                return {
+                    id: idx + 1,
+                    db_id: c.id,
+                    titulo: valorDisplay + parceiro,
+                    descricao: c.name || '',
+                    parceiro: parceiro,
+                    categoria: categoria,
+                    valor: c.discount_value || 0,
+                    tipo: c.discount_type || 'percentual',
+                    validade: validade,
+                    codigo: c.code || '',
+                    status: statusMap[c.status] || 'ativo'
+                };
+            });
+
+            window.meusCuponsData = meusCuponsData;
+            console.log('[DB] Cupons carregados:', meusCuponsData.length);
+            renderMeusCupons('all');
+        } catch(e) {
+            console.warn('[DB] Erro cupons:', e.message);
+        }
+    }
+
+    // Carregar ao iniciar (após Supabase carregar)
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { loadMeusCuponsFromDB(); }, 800);
+    });
 
     function renderMeusCupons(filter) {
         var grid = document.getElementById('couponsGrid');
