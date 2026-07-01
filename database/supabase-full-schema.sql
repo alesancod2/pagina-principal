@@ -246,6 +246,7 @@ CREATE TABLE IF NOT EXISTS coupons (
     current_uses INTEGER DEFAULT 0,
     batch_id UUID,
     target_categories VARCHAR(255)[],
+    points_cost INTEGER DEFAULT 0,
     notes TEXT,
     issued_at TIMESTAMP DEFAULT NOW(),
     expires_at TIMESTAMP NOT NULL,
@@ -363,6 +364,9 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'target_categories') THEN
         ALTER TABLE coupons ADD COLUMN target_categories VARCHAR(255)[];
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'points_cost') THEN
+        ALTER TABLE coupons ADD COLUMN points_cost INTEGER DEFAULT 0;
     END IF;
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'coupons' AND column_name = 'name') THEN
         ALTER TABLE coupons ADD COLUMN name VARCHAR(255);

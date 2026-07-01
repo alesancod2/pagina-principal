@@ -467,6 +467,18 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
                         </div>
                     </div>
                 </div>
+                </div>
+
+                <!-- Resgatar Cupons com Pontos -->
+                <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:24px;">
+                    <h3 style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>
+                        Resgatar Cupons com Pontos
+                    </h3>
+                    <div id="redeemCouponsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+                        <div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Carregando cupons disponíveis...</div>
+                    </div>
+                </div>
             </section>
         </div><!-- end tab-meus-pontos -->
 
@@ -1248,8 +1260,105 @@ html.dark-mode .modal-btn-whatsapp{background:rgba(37,211,102,.08);border-color:
 
     // Carregar ao iniciar (após Supabase carregar)
     document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(function() { loadMeusCuponsFromDB(); }, 800);
+        setTimeout(function() { loadMeusCuponsFromDB(); loadRedeemCoupons(); }, 800);
     });
+
+    // ===== RESGATE DE CUPONS COM PONTOS =====
+    async function loadRedeemCoupons() {
+        var grid = document.getElementById('redeemCouponsGrid');
+        if (!grid || !window.supabaseClient) return;
+
+        try {
+            // Buscar cupons com points_cost > 0 e status active e sem user_id (disponíveis)
+            var { data, error } = await window.supabaseClient
+                .from('coupons')
+                .select('*, partners(trade_name)')
+                .eq('status', 'active')
+                .gt('points_cost', 0)
+                .is('user_id', null)
+                .order('points_cost', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Nenhum cupom disponível para resgate no momento.</div>';
+                return;
+            }
+
+            grid.innerHTML = data.map(function(c) {
+                var parceiro = (c.partners && c.partners.trade_name) || 'Parceiro';
+                var valorLabel = c.discount_type === 'percentual' ? c.discount_value + '% OFF' : 'R$' + (c.discount_value || 0) + ' OFF';
+                var validade = c.expires_at ? new Date(c.expires_at).toLocaleDateString('pt-BR') : '';
+                return '<div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-xs);padding:16px;position:relative;transition:all 0.2s;" onmouseover="this.style.borderColor=\'var(--secondary)\'" onmouseout="this.style.borderColor=\'\'">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">' +
+                        '<div><div style="font-size:0.9rem;font-weight:700;color:var(--text-primary);">' + valorLabel + ' ' + parceiro + '</div>' +
+                        '<div style="font-size:0.75rem;color:var(--text-muted);">' + (c.name || '') + '</div></div>' +
+                        '<div style="background:rgba(47,62,191,0.1);color:var(--primary);padding:4px 10px;border-radius:12px;font-size:0.7rem;font-weight:700;white-space:nowrap;">' + c.points_cost + ' pts</div>' +
+                    '</div>' +
+                    '<div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:10px;">Válido até: ' + validade + ' • Código: ' + c.code + '</div>' +
+                    '<button onclick="redeemCoupon(\'' + c.id + '\',' + c.points_cost + ',\'' + parceiro + '\')" style="width:100%;padding:8px;border-radius:6px;background:var(--gradient-brand);color:#fff;font-size:0.8rem;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:opacity 0.2s;" onmouseover="this.style.opacity=\'0.9\'" onmouseout="this.style.opacity=\'1\'">Resgatar por ' + c.points_cost + ' pontos</button>' +
+                '</div>';
+            }).join('');
+        } catch(e) {
+            console.warn('[Redeem] Erro:', e.message);
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Erro ao carregar cupons.</div>';
+        }
+    }
+
+    window.redeemCoupon = async function(couponId, pointsCost, parceiro) {
+        if (!window.supabaseClient) { alert('Conexão não disponível'); return; }
+
+        // Verificar saldo do usuário
+        var user = null;
+        try { user = JSON.parse(localStorage.getItem('avp_user') || '{}'); } catch(e) {}
+        if (!user || !user.id) { alert('Faça login para resgatar cupons'); return; }
+
+        if (!confirm('Resgatar cupom de ' + parceiro + ' por ' + pointsCost + ' pontos?')) return;
+
+        try {
+            // Verificar saldo via user_points
+            var { data: pointsData } = await window.supabaseClient
+                .from('user_points')
+                .select('balance')
+                .eq('user_id', user.id)
+                .single();
+
+            var balance = (pointsData && pointsData.balance) || 0;
+
+            if (balance < pointsCost) {
+                alert('Saldo insuficiente!\n\nNecessário: ' + pointsCost + ' pontos\nSeu saldo: ' + balance + ' pontos');
+                return;
+            }
+
+            // Vincular cupom ao usuário
+            var { error: updateErr } = await window.supabaseClient
+                .from('coupons')
+                .update({ user_id: user.id })
+                .eq('id', couponId);
+
+            if (updateErr) { alert('Erro ao resgatar: ' + updateErr.message); return; }
+
+            // Debitar pontos (inserir transação de resgate)
+            await window.supabaseClient.from('point_transactions').insert({
+                user_id: user.id,
+                type: 'redeemed',
+                amount: pointsCost,
+                balance_after: balance - pointsCost,
+                description: 'Resgate de cupom: ' + parceiro
+            });
+
+            // Feedback
+            alert('Cupom resgatado com sucesso!\n\n-' + pointsCost + ' pontos debitados\nNovo saldo: ' + (balance - pointsCost) + ' pontos\n\nVeja em "Meus Cupons"');
+
+            // Atualizar displays
+            var balanceEl = document.getElementById('pointsBalance');
+            if (balanceEl) balanceEl.textContent = (balance - pointsCost).toLocaleString('pt-BR');
+
+            // Recarregar listas
+            loadRedeemCoupons();
+            loadMeusCuponsFromDB();
+        } catch(e) {
+            alert('Erro ao processar resgate: ' + e.message);
+        }
+    };
 
     function renderMeusCupons(filter) {
         var grid = document.getElementById('couponsGrid');
